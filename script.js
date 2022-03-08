@@ -5,31 +5,31 @@ let mouseX, mouseY
 let dragBool = true
 //Variables for HTML elements
 let buyBtn = document.getElementById("buy");
-let img = document.getElementById("restaurant")
+let img = document.getElementById("restaurant");
+let background = document.getElementById("background");
 //Event Listeners
-
 buyBtn.addEventListener("click", drag);
-ctx.drawImage(img, 10, 10, 5, 5);
+
+ctx.fillStyle = "blue";
+ctx.fillRect(0, 0, cnv.width, cnv.height);
+
 function drag() {
-    ctx.fillStyle = "white";
-    ctx.fillRect(0, 0, ctx.width, ctx.heigth);
-    if (dragBool === true) {
-        requestAnimationFrame(drag)
-        document.addEventListener("mousemove", mousemoveHandler);
-    }
+    document.addEventListener("mousemove", mousemoveHandler);
+    dragBool = true;
 }
 
 function mousemoveHandler(event) {
-    let cnvRect = cnv.getBoundingClientRect()
-    mouseX = event.clientX - cnvRect.left;
-    mouseY = event.clientY;
-    console.log(mouseX)
-    ctx.drawImage(img, mouseX, mouseY, 20, 20);
-    document.addEventListener("mousedown", mousedownHandler);
+    if (dragBool === true) {
+        ctx.fillStyle = "blue";
+        ctx.fillRect(0, 0, cnv.width, cnv.height);
+        mouseX = event.x;
+        mouseY = event.y;
+        ctx.drawImage(img, mouseX, mouseY, 40, 40);
+        document.addEventListener("mousedown", mousedownHandler);
+    }
 }
 
 function mousedownHandler(event) {
-    alert("mousePressed")
+    console.log("mousePressed")
     dragBool = false;
 }
-
