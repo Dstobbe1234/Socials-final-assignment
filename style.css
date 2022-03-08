@@ -1,0 +1,14 @@
+div {
+    padding-top:20px;
+    padding-bottom: 100%;
+    width: 20%;
+    text-align:center;
+    float:right;
+    background-color: rgb(175, 175, 175);
+
+}
+
+canvas {
+    width: 79.5%;
+    border:2px solid orangered;
+}
