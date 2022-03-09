@@ -7,12 +7,16 @@ let dragBool = true
 let numberOfRestaurants = 0;
 let restaurantxlist = []
 let restaurantylist = []
+let money = 50;
 //Variables for HTML elements
 let buyBtn = document.getElementById("buy");
 let img = document.getElementById("restaurant");
 let background = document.getElementById("background");
+let amountEl = document.getElementById("amount");
+
 //Event Listeners
 buyBtn.addEventListener("click", drag, false);
+
 
 ctx.fillStyle = "blue";
 ctx.fillRect(0, 0, cnv.width, cnv.height);
@@ -23,7 +27,6 @@ function drag() {
 }
 
 function mousemoveHandler(event) {
-    let cnvRect = cnv.getBoundingClientRect()
     if (dragBool === true) {
         ctx.fillStyle = "blue";
         ctx.fillRect(0, 0, cnv.width, cnv.height);
@@ -38,8 +41,6 @@ function mousedownHandler() {
     console.log("mousePressed");
     restaurantxlist.push(mouseX);
     restaurantylist.push(mouseY);
-    alert(restaurantxlist);
-    alert(restaurantylist);
     numberOfRestaurants++;
     dragBool = false;
     document.removeEventListener("mousedown", mousedownHandler)
@@ -56,3 +57,9 @@ function display() {
     }
     requestAnimationFrame(display)
 }
+
+function changeMoney() {
+    money += 2 * numberOfRestaurants;
+    amountEl.innerHTML = money
+}
+ setInterval(changeMoney, 500)
