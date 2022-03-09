@@ -46,13 +46,13 @@ function mousedownHandler() {
 
 }
 
-requestAnimationFrame(displayRestaurants)
-function displayRestaurants() {
+requestAnimationFrame(display)
+function display() {
     if (numberOfRestaurants > 0) {
         for (let n = restaurantxlist.length; n >= 0; n--) {
             console.log(n)
-            ctx.drawImage(img, restaurantxlist[n], restaurantylist, 40, 40);
+            ctx.drawImage(img, restaurantxlist[n], restaurantylist[n], 40, 40);
         }
     }
-    requestAnimationFrame(displayRestaurants)
+    requestAnimationFrame(display)
 }
