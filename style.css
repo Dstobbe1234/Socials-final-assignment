@@ -1,18 +1,22 @@
 div {
     padding-top:20px;
-    padding-bottom: 100%;
+    padding-bottom: 500px;
     width: 20%;
     text-align:center;
     float:right;
     background-color: rgb(175, 175, 175);
+    border-radius: 20px;
 
-}
-
-canvas {
-    width: 79.5%;
 }
 
 img {
     width: 100px;
 }
 
+#coin {
+    width:17px;
+}
+
+.available {
+    border: 5px solid rgb(0, 255, 0);
+}
