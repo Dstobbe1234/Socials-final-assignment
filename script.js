@@ -24,9 +24,9 @@ let mapWidth = 10000
 buyBtn.addEventListener("click", drag);
 //document.addEventListener("mousedown", zoom)
 
-cnv.height = 760
-cnv.width = 960
-ctx.drawImage(background, 0, 0, mapWidth, mapHeight)
+cnv.height = 700
+cnv.width = 750
+ctx.drawImage(background, 0, 0, cnv.width, cnv.height)
 
 function drag() {
     if (money >= 50) {
@@ -74,22 +74,21 @@ function changeMoney() {
     money += 2 * numberOfRestaurants;
     amountEl.innerHTML = money
 }
-setInterval(changeMoney, 500)
+setInterval(changeMoney, 1000)
 
 //function zoom(event) {
-    //alert("click")
-// document.addEventListener("mousemove", clickDrag)
+//    console.log("click")
+//    dragBool = true
+//    while (dragBool === true) {
+//        document.addEventListener("mousemove", clickDrag)
+//        document.addEventListener("mouseup", () => {
+//          console.log("RTH")
+//            dragBool = false
+//        })
+//    }
+//    document.removeEventListener("mousemove", clickDrag)
 //}
 
 //function clickDrag(event) {
-//    alert("drag")
-//    let n = true
-//    let mouseX = []
-//    while(n === true) {
-//        mouseX.push(event.x)
-//        console.log(mouseX)
-//        document.addEventListener("mouseUp", () => {
-//            n = false;
-//        })
-//    }
+//    console.log("drag")
 //}
