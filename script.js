@@ -25,28 +25,32 @@ let mapHeight = 700;
 let mapWidth = 750;
 let backgroundX = 0;
 let backgroundY = 0;
-ctx.strokeStyle = "white"
 cnv.height = 700;
 cnv.width = 750;
 
 //Tile class for asset placement 
 class tile {
-    constructor(x, y) {
+    constructor(x, y, color) {
         this.x = x;
         this.y = y;
+        this.color = color;
     }
     draw() {
-        if (mapWidth >= 800)
-        ctx.strokeRect(this.x, this.y, mapWidth / 20, mapHeight / 18)
-    }
-    displaygreen() {
-        if (this.x <= mouseX <= this.x + (mapWidth / 20) && this.y <= mouseY <= this.y + (mapWidth / 18)) {
-            console.log(this.x)
-            ctx.strokeStyle = "rgb(0, 255, 0)"
+        if (mapWidth === 1150) {
+            ctx.strokeStyle = this.color
+            ctx.strokeRect(this.x, this.y, 57.5, 61.1)
+            if (this.x <= mouseX && mouseX <= this.x + 57.5 && this.y <= mouseY && mouseY <= this.y + 61.1) {//<= this.x + 57.5 //&& this.y <= mouseY <= this.y + 61.1) {
+                console.log(this.x)
+                this.color = "rgb(0, 255, 0)"
+            } else {
+                this.color = "rgb(0, 0, 0)"
+            }
         }
     }
 }
-let tile1 = new tile(0, 0);
+let tile1 = new tile(0, 0, "rgb(0, 0, 0)");
+let tile2 = new tile(57.5, 0, "rgb(0, 255, 0)");
+
 
 //Event Listeners
 buyBtn.addEventListener("click", drag);
@@ -57,7 +61,7 @@ document.addEventListener("keydown", keydownHandler);
 
 //Event Functions
 function drag() {
-    if (money >= 50) {
+    if (money >= 50 && mapWidth === 1150) {
         money -= 50;
         document.addEventListener("mousemove", mousemoveHandler);
         dragBool = true; 
@@ -88,7 +92,7 @@ requestAnimationFrame(display);
 function display() {
     ctx.drawImage(background, backgroundX, backgroundY, mapWidth, mapHeight);
     tile1.draw()
-    tile1.displaygreen()
+    tile2.draw()
     if (moveMap === true && mapWidth > 750) {
         backgroundX += mouseMoveX;
         backgroundY += mouseMoveY;
@@ -121,11 +125,15 @@ function mouseupHandler() {
 
 function keydownHandler(event) {
     if (event.code === "Equal") {
-        mapWidth += 10;
-        mapHeight += 10;
+        if (mapWidth !== 1150) {
+            mapWidth += 400;
+            mapHeight += 400;
+        }
     } else if (event.code === "Minus") {
-        mapWidth -= 10;
-        mapHeight -= 10;
+        if (mapWidth > 750) {
+            mapWidth -= 400;
+            mapHeight -= 400;
+        }
     }
 }
 
