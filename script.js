@@ -93,10 +93,36 @@ function display() {
     ctx.drawImage(background, backgroundX, backgroundY, mapWidth, mapHeight);
     tile1.draw()
     tile2.draw()
+    console.log(mouseMoveY)
     if (moveMap === true && mapWidth > 750) {
-        backgroundX += mouseMoveX;
-        backgroundY += mouseMoveY;
+    //    if (backgroundX + 1150 > 750 && mouseMoveX < 0) {
+            backgroundX += mouseMoveX;
+  //      } else if (backgroundX < 0 && mouseMoveX > 0) {
+   //         backgroundX += mouseMoveX;
+    //    }
+
+   //     if (backgroundY + 1100 > 700 && mouseMoveY < 0) {
+           // backgroundY += mouseMoveY;
+     //   } else if (backgroundY < 0 && mouseMoveY > 0) {
+            backgroundY += mouseMoveY;
+     //   }
     }
+
+    if (backgroundX > 0 && backgroundX + mapWidth > 750) {
+        console.log("EEEEEEE")
+        backgroundX = 0
+    } else if (backgroundX < 0 && backgroundX + mapWidth < 750) {
+        console.log("ee")
+        backgroundX = 750 - mapWidth;
+    }
+
+    if (backgroundY < 0 && backgroundY + mapHeight < 700) {
+        console.log("RRR")
+        backgroundY = 700 - mapHeight
+    } else if (backgroundY > 0 && backgroundY + mapHeight > 700) {
+        backgroundY = 0
+    }
+
     if (numberOfRestaurants > 0) {
         for (let n = restaurantxlist.length; n >= 0; n--) {
             ctx.drawImage(img, restaurantxlist[n], restaurantylist[n], 100, 100);
@@ -131,6 +157,8 @@ function keydownHandler(event) {
         }
     } else if (event.code === "Minus") {
         if (mapWidth > 750) {
+            backgroundX = 0;
+            backgroundY = 0;
             mapWidth -= 400;
             mapHeight -= 400;
         }
