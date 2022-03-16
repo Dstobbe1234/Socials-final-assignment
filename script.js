@@ -11,6 +11,7 @@ let restaurantylist = [];
 let money = 50;
 let pMouseX, pMouseY;
 let mouseMoveX, mouseMoveY;
+let restaurantX, restaurantY
 
 //Variables for HTML elements
 let cnv = document.getElementById("canvas");
@@ -39,8 +40,12 @@ class tile {
         if (mapWidth === 1150) {
             ctx.strokeStyle = this.color
             ctx.strokeRect(this.x, this.y, 57.5, 61.1)
-            if (this.x <= mouseX && mouseX <= this.x + 57.5 && this.y <= mouseY && mouseY <= this.y + 61.1) {//<= this.x + 57.5 //&& this.y <= mouseY <= this.y + 61.1) {
-                console.log(this.x)
+            if (this.x <= mouseX && mouseX <= this.x + 57.5 && this.y <= mouseY && mouseY <= this.y + 61.1 && dragBool === true) {
+                this.status = "taken"
+                restaurantX = this.x
+                restaurantY = this.y
+                document.addEventListener("mousedown", mousedownHandler)
+                ctx.drawImage(img, restaurantX, restaurantY, 57.5, 61.1);
                 this.color = "rgb(0, 255, 0)"
             } else {
                 this.color = "rgb(0, 0, 0)"
@@ -48,9 +53,6 @@ class tile {
         }
     }
 }
-let tile1 = new tile(0, 0, "rgb(0, 0, 0)");
-let tile2 = new tile(57.5, 0, "rgb(0, 255, 0)");
-
 
 //Event Listeners
 buyBtn.addEventListener("click", drag);
@@ -79,9 +81,10 @@ function mousemoveHandler(event) {
 
 function mousedownHandler() {
     moveMap = true
+    console.log("restaurant X = " + restaurantX)
     if (dragBool === true) {
-        restaurantxlist.push(mouseX - 50);
-        restaurantylist.push(mouseY - 50);
+        restaurantxlist.push(restaurantX);
+        restaurantylist.push(restaurantY);
         numberOfRestaurants++;
         dragBool = false;
     }
@@ -91,21 +94,13 @@ function mousedownHandler() {
 requestAnimationFrame(display);
 function display() {
     ctx.drawImage(background, backgroundX, backgroundY, mapWidth, mapHeight);
+    let tile1 = new tile(backgroundX, backgroundY, "rgb(0, 0, 0)");
+    let tile2 = new tile(backgroundX + 57.5, backgroundY, "rgb(0, 0, 0)");
     tile1.draw()
     tile2.draw()
-    console.log(mouseMoveY)
     if (moveMap === true && mapWidth > 750) {
-    //    if (backgroundX + 1150 > 750 && mouseMoveX < 0) {
             backgroundX += mouseMoveX;
-  //      } else if (backgroundX < 0 && mouseMoveX > 0) {
-   //         backgroundX += mouseMoveX;
-    //    }
-
-   //     if (backgroundY + 1100 > 700 && mouseMoveY < 0) {
-           // backgroundY += mouseMoveY;
-     //   } else if (backgroundY < 0 && mouseMoveY > 0) {
             backgroundY += mouseMoveY;
-     //   }
     }
 
     if (backgroundX > 0 && backgroundX + mapWidth > 750) {
@@ -125,16 +120,12 @@ function display() {
 
     if (numberOfRestaurants > 0) {
         for (let n = restaurantxlist.length; n >= 0; n--) {
-            ctx.drawImage(img, restaurantxlist[n], restaurantylist[n], 100, 100);
+            ctx.drawImage(img, restaurantxlist[n], restaurantylist[n], 57.5, 61.1);
         }
     } if (money >= 50) {
         buyBtn.classList.add("available");
     } else {
         buyBtn.classList.remove("available");
-    }
-    if (dragBool === true) {
-        ctx.drawImage(img, mouseX - 50, mouseY - 50, 100, 100);
-        document.addEventListener("mousedown", mousedownHandler);
     }
     requestAnimationFrame(display);
 }
