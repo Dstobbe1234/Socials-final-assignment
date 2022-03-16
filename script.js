@@ -12,6 +12,10 @@ let money = 50;
 let pMouseX, pMouseY;
 let mouseMoveX, mouseMoveY;
 let restaurantX, restaurantY
+let cnvX = 0;
+let cnvY = 0;
+let worldX = 0;
+let worldY = 0;
 
 //Variables for HTML elements
 let cnv = document.getElementById("canvas");
@@ -42,10 +46,10 @@ class tile {
             ctx.strokeRect(this.x, this.y, 57.5, 61.1)
             if (this.x <= mouseX && mouseX <= this.x + 57.5 && this.y <= mouseY && mouseY <= this.y + 61.1 && dragBool === true) {
                 this.status = "taken"
-                restaurantX = this.x
-                restaurantY = this.y
+                worldX = this.x
+                worldY = this.y
                 document.addEventListener("mousedown", mousedownHandler)
-                ctx.drawImage(img, restaurantX, restaurantY, 57.5, 61.1);
+                ctx.drawImage(img, worldX - cnvX, worldY - cnvY, 57.5, 61.1);
                 this.color = "rgb(0, 255, 0)"
             } else {
                 this.color = "rgb(0, 0, 0)"
@@ -83,8 +87,8 @@ function mousedownHandler() {
     moveMap = true
     console.log("restaurant X = " + restaurantX)
     if (dragBool === true) {
-        restaurantxlist.push(restaurantX);
-        restaurantylist.push(restaurantY);
+        restaurantxlist.push(worldX - cnvX);
+        restaurantylist.push(worldY - cnvY);
         numberOfRestaurants++;
         dragBool = false;
     }
@@ -101,6 +105,8 @@ function display() {
     if (moveMap === true && mapWidth > 750) {
             backgroundX += mouseMoveX;
             backgroundY += mouseMoveY;
+            cnvX += mouseMoveX
+            cnvY += mouseMoveY
     }
 
     if (backgroundX > 0 && backgroundX + mapWidth > 750) {
