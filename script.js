@@ -16,6 +16,8 @@ let cnvX = 0;
 let cnvY = 0;
 let worldX = 0;
 let worldY = 0;
+let worldCnvDifLeft
+let worldCnvDifRight
 
 //Variables for HTML elements
 let cnv = document.getElementById("canvas");
@@ -30,6 +32,7 @@ let mapHeight = 700;
 let mapWidth = 750;
 let backgroundX = 0;
 let backgroundY = 0;
+let tiles = []
 cnv.height = 700;
 cnv.width = 750;
 
@@ -45,11 +48,9 @@ class tile {
             ctx.strokeStyle = this.color
             ctx.strokeRect(this.x, this.y, 57.5, 61.1)
             if (this.x <= mouseX && mouseX <= this.x + 57.5 && this.y <= mouseY && mouseY <= this.y + 61.1 && dragBool === true) {
-                this.status = "taken"
-                worldX = this.x
-                worldY = this.y
                 document.addEventListener("mousedown", mousedownHandler)
-                ctx.drawImage(img, worldX - cnvX, worldY - cnvY, 57.5, 61.1);
+                ctx.drawImage(img, this.x, this.y, 57.5, 61.1)
+                drawRestaurant()
                 this.color = "rgb(0, 255, 0)"
             } else {
                 this.color = "rgb(0, 0, 0)"
@@ -85,10 +86,9 @@ function mousemoveHandler(event) {
 
 function mousedownHandler() {
     moveMap = true
-    console.log("restaurant X = " + restaurantX)
     if (dragBool === true) {
-        restaurantxlist.push(worldX - cnvX);
-        restaurantylist.push(worldY - cnvY);
+ //       restaurantxlist.push(worldX);
+  //      restaurantylist.push(worldY);
         numberOfRestaurants++;
         dragBool = false;
     }
@@ -97,38 +97,42 @@ function mousedownHandler() {
 
 requestAnimationFrame(display);
 function display() {
+    let x = 0
     ctx.drawImage(background, backgroundX, backgroundY, mapWidth, mapHeight);
-    let tile1 = new tile(backgroundX, backgroundY, "rgb(0, 0, 0)");
-    let tile2 = new tile(backgroundX + 57.5, backgroundY, "rgb(0, 0, 0)");
+    //for (let n = 0; n <= 24; n++) {
+      //  tiles.push(new tile(backgroundX + x, backgroundY, "rgb(0, 0, 0)"));
+      //  x += 57.5;
+    //}
+
+    //tiles[0].draw()
+    //tiles[1].draw()
+    let tile1 = new tile(backgroundX, backgroundY, "rgb(0, 0, 0)")
+    let tile2 = new tile(backgroundX + 57.5, backgroundY, "rgb(0, 0, 0)")
     tile1.draw()
     tile2.draw()
+
     if (moveMap === true && mapWidth > 750) {
             backgroundX += mouseMoveX;
             backgroundY += mouseMoveY;
-            cnvX += mouseMoveX
-            cnvY += mouseMoveY
     }
 
     if (backgroundX > 0 && backgroundX + mapWidth > 750) {
-        console.log("EEEEEEE")
         backgroundX = 0
     } else if (backgroundX < 0 && backgroundX + mapWidth < 750) {
-        console.log("ee")
         backgroundX = 750 - mapWidth;
     }
 
     if (backgroundY < 0 && backgroundY + mapHeight < 700) {
-        console.log("RRR")
         backgroundY = 700 - mapHeight
     } else if (backgroundY > 0 && backgroundY + mapHeight > 700) {
         backgroundY = 0
     }
 
-    if (numberOfRestaurants > 0) {
-        for (let n = restaurantxlist.length; n >= 0; n--) {
-            ctx.drawImage(img, restaurantxlist[n], restaurantylist[n], 57.5, 61.1);
-        }
-    } if (money >= 50) {
+  //  if (numberOfRestaurants > 0) {
+     //   for (let n = restaurantxlist.length; n >= 0; n--) {
+     //       ctx.drawImage(img, restaurantxlist[n], restaurantylist[n], 57.5, 61.1);
+    //    }
+    if (money >= 50) {
         buyBtn.classList.add("available");
     } else {
         buyBtn.classList.remove("available");
@@ -140,7 +144,7 @@ function changeMoney() {
     money += 2 * numberOfRestaurants;
     amountEl.innerHTML = money;
 }
-setInterval(changeMoney, 1000);
+setInterval(changeMoney, 100);
 
 function mouseupHandler() {
     moveMap = false;
@@ -160,5 +164,10 @@ function keydownHandler(event) {
             mapHeight -= 400;
         }
     }
+}
+
+function drawRestaurant() {
+    ctx.drawImage(img, this.x, this.y, 57.5, 61.1)
+    requestAnimationFrame(drawRestaurant)
 }
 
