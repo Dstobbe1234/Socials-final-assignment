@@ -31,45 +31,43 @@ let backgroundX = 0;
 let backgroundY = 0;
 let cnvX = backgroundX * -1;
 let cnvY = backgroundY * -1;
-let tiles = []
-let index
 
 cnv.height = 700;
 cnv.width = 750;
 
 //Tile class for asset placement 
 class tile {
-    constructor(x, y, color, status) {
+    constructor(x, y, color) {
         this.x = x;
         this.y = y;
         this.color = color;
-        this.status = status
+        this.status = "open";
+        this.index = undefined;
+
     }
+
     draw() {
         if (mapWidth === 1150) {
             ctx.strokeStyle = this.color
             ctx.strokeRect(this.x, this.y, 57.5, 61.1)
             if (this.x <= mouseX && mouseX <= this.x + 57.5 && this.y <= mouseY && mouseY <= this.y + 61.1 && dragBool === true) {
-                document.addEventListener("mousedown", mousedownHandler)
+                document.addEventListener("mousedown", () => {
+                    if (this.x <= mouseX && mouseX <= this.x + 57.5 && this.y <= mouseY && mouseY <= this.y + 61.1) {
+                        this.status = "occupied"
+                    }
+                })
                 ctx.drawImage(img, this.x - cnvX, this.y - cnvY, 57.5, 61.1)
-                
-                //drawRestaurant(this.x, this.y)
                 this.color = "rgb(0, 255, 0)"
             } else {
                 this.color = "rgb(0, 0, 0)"
             }
+            if (this.status === "occupied" && this.index === undefined) {
+                this.index = restaurantxlist.length 
+            }
+            if (this.index !== undefined) {
 
-            if(numberOfRestaurants > 0 ) {
-                console.log(backgroundX)
-               // ctx.drawImage(img, this.x, this.y, 57.5, 61.1)
-                if (index !== null) {
-                    index ++
-                } else {
-                    index = 0
-                }
-
-                restaurantxlist.splice(0, 1, this.x - cnvX)
-                restaurantylist.splice(0, 1, this.y - cnvY)
+                restaurantxlist.splice(this.index, 1, this.x - cnvX)
+                restaurantylist.splice(this.index, 1, this.y - cnvY)
             }
         }
     }
@@ -103,31 +101,27 @@ function mousemoveHandler(event) {
 function mousedownHandler() {
     moveMap = true
     if (dragBool === true) {
- //       restaurantxlist.push(worldX);
-  //      restaurantylist.push(worldY);
         numberOfRestaurants++;
         dragBool = false;
     }
 
 }
 
+
+let tile1 = new tile(0, 0, "rgb(0, 0, 0)")
+let tile2 = new tile(57.5, 0, "rgb(0, 0, 0)")
+
 requestAnimationFrame(display);
 function display() {
-    //console.log(backgroundX)
-    //console.log("background Y = " + backgroundY)
-    ctx.drawImage(background, backgroundX, backgroundY, mapWidth, mapHeight);
-    //for (let n = 0; n <= 24; n++) {
-      //  tiles.push(new tile(backgroundX + x, backgroundY, "rgb(0, 0, 0)"));
-      //  x += 57.5;
-    //}
 
-    //tiles[0].draw()
-    //tiles[1].draw()
-    let tile1 = new tile(backgroundX, backgroundY, "rgb(0, 0, 0)", "free")
-    let tile2 = new tile(backgroundX + 57.5, backgroundY, "rgb(0, 0, 0)", "free")
+    tile1.x = backgroundX
+    tile2.x = backgroundX + 57.5
+    tile1.y = backgroundY
+    tile2.y = backgroundY
+    ctx.drawImage(background, backgroundX, backgroundY, mapWidth, mapHeight);
+
     tile1.draw()
     tile2.draw()
-    console.log()
     if (moveMap === true && mapWidth > 750) {
             backgroundX += mouseMoveX;
             backgroundY += mouseMoveY;
@@ -146,7 +140,7 @@ function display() {
     }
 
     if (numberOfRestaurants > 0) {
-        for (let n = restaurantxlist.length; n >= 0; n--) {
+        for (let n = restaurantxlist.length -1 ; n >= 0; n--) {
             ctx.drawImage(img, restaurantxlist[n], restaurantylist[n], 57.5, 61.1);
         }
     }
@@ -186,7 +180,6 @@ function keydownHandler(event) {
 
 function drawRestaurant() {
     ctx.drawImage(img, this.x, this.y, 57.5, 61.1)
-    console.log(this.x)
     requestAnimationFrame(drawRestaurant)
 }
 
