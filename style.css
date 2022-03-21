@@ -9,7 +9,11 @@ div {
 
 }
 
+
 img {
+    width:40px
+}
+#restaurant {
     width: 100px;
 }
 
@@ -17,6 +21,9 @@ img {
     width:17px;
 }
 
+#lumberimg {
+    width:50px
+}
 .available {
     border: 5px solid rgb(0, 255, 0);
 }

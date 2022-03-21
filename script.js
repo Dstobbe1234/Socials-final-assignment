@@ -16,6 +16,18 @@ let worldX = 0;
 let worldY = 0;
 let worldCnvDifLeft
 let worldCnvDifRight
+let mapHeight = 700;
+let mapWidth = 750;
+let backgroundX = 0;
+let backgroundY = 0;
+let cnvX = backgroundX * -1;
+let cnvY = backgroundY * -1;
+let tiles = []
+let x = 0
+
+let resources = 0
+
+
 //Variables for HTML elements
 let cnv = document.getElementById("canvas");
 let ctx = cnv.getContext("2d");
@@ -25,12 +37,8 @@ let background = document.getElementById("background");
 let amountEl = document.getElementById("amount");
 let feedback = document.getElementById("feedback");
 let grid = document.getElementById("grid");
-let mapHeight = 700;
-let mapWidth = 750;
-let backgroundX = 0;
-let backgroundY = 0;
-let cnvX = backgroundX * -1;
-let cnvY = backgroundY * -1;
+let restaurantSum = document.getElementById("restaurantAmount")
+
 
 cnv.height = 700;
 cnv.width = 750;
@@ -50,7 +58,7 @@ class tile {
         if (mapWidth === 1150) {
             ctx.strokeStyle = this.color
             ctx.strokeRect(this.x, this.y, 57.5, 61.1)
-            if (this.x <= mouseX && mouseX <= this.x + 57.5 && this.y <= mouseY && mouseY <= this.y + 61.1 && dragBool === true) {
+            if (this.x <= mouseX && mouseX <= this.x + 57.5 && this.y <= mouseY && mouseY <= this.y + 61.1 && dragBool === true && this.status === "open") {
                 document.addEventListener("mousedown", () => {
                     if (this.x <= mouseX && mouseX <= this.x + 57.5 && this.y <= mouseY && mouseY <= this.y + 61.1) {
                         this.status = "occupied"
@@ -107,22 +115,36 @@ function mousedownHandler() {
 
 }
 
+for (let n = 0; n <= 18; n++) {
+    tiles.push(new tile(0 + x, 0, "rgb(0, 0, 0)"))
+    x += 58
+}
 
-let tile1 = new tile(0, 0, "rgb(0, 0, 0)")
-let tile2 = new tile(57.5, 0, "rgb(0, 0, 0)")
+console.log(tiles[0])
+console.log(tiles[1])
+console.log(tiles[2])
 
 requestAnimationFrame(display);
 function display() {
-
-    tile1.x = backgroundX
-    tile2.x = backgroundX + 57.5
-    tile1.y = backgroundY
-    tile2.y = backgroundY
+    restaurantSum.innerHTML = numberOfRestaurants;
     ctx.drawImage(background, backgroundX, backgroundY, mapWidth, mapHeight);
+    tiles[0].x = backgroundX 
+    tiles[0].y = backgroundY
+    tiles[1].x = backgroundX + 58
+    tiles[1].y = backgroundY
+    tiles[2].x = backgroundX + (2 * 58)
+    tiles[2].y = backgroundY
+    tiles[3].x = backgroundX + (3 * 58)
+    tiles[3].y = backgroundY
+    tiles[4].x = backgroundX + (4 * 58)
+    tiles[4].y = backgroundY
 
-    tile1.draw()
-    tile2.draw()
-    if (moveMap === true && mapWidth > 750) {
+    tiles[0].draw()
+    tiles[1].draw()
+    tiles[2].draw()
+    tiles[3].draw()
+    tiles[4].draw()
+    if (moveMap === true && mapWidth > 750 && mouseX >= 0 && mouseX <= 750 && mouseY >= 0 && mouseY <= 700) {
             backgroundX += mouseMoveX;
             backgroundY += mouseMoveY;
     }
