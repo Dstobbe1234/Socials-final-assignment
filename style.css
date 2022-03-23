@@ -28,3 +28,6 @@ img {
     border: 5px solid rgb(0, 255, 0);
 }
 
+.alert {
+    text-align: center;
+}

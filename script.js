@@ -24,6 +24,7 @@ let cnvX = backgroundX * -1;
 let cnvY = backgroundY * -1;
 let tiles = []
 let x = 0
+let randomInterval
 
 let resources = 0
 
@@ -45,10 +46,10 @@ cnv.width = 750;
 
 //Tile class for asset placement 
 class tile {
-    constructor(x, y, color) {
+    constructor(x, y) {
         this.x = x;
         this.y = y;
-        this.color = color;
+        this.color = "rgb(0, 0, 0)";
         this.status = "open";
         this.index = undefined;
 
@@ -56,13 +57,16 @@ class tile {
 
     draw() {
         if (mapWidth === 1150) {
+            randomInterval = Math.random() * 100
             ctx.strokeStyle = this.color
             ctx.strokeRect(this.x, this.y, 57.5, 61.1)
-            if (this.x <= mouseX && mouseX <= this.x + 57.5 && this.y <= mouseY && mouseY <= this.y + 61.1 && dragBool === true && this.status === "open") {
+            if (this.x <= mouseX && mouseX <= this.x + 58 && this.y <= mouseY && mouseY <= this.y + 61.1 && dragBool === true && this.status === "open") {
+                console.log("eL")
                 document.addEventListener("mousedown", () => {
-                    if (this.x <= mouseX && mouseX <= this.x + 57.5 && this.y <= mouseY && mouseY <= this.y + 61.1) {
+                    //if (this.x <= mouseX && mouseX <= this.x + 57.5 && this.y <= mouseY && mouseY <= this.y + 61.1) {
                         this.status = "occupied"
-                    }
+                        console.log("EEEEE")
+                    //}
                 })
                 ctx.drawImage(img, this.x - cnvX, this.y - cnvY, 57.5, 61.1)
                 this.color = "rgb(0, 255, 0)"
@@ -92,8 +96,8 @@ document.addEventListener("keydown", keydownHandler);
 function drag() {
     if (money >= 50 && mapWidth === 1150) {
         money -= 50;
-        document.addEventListener("mousemove", mousemoveHandler);
         dragBool = true; 
+        alert("EE")
     }
 }
 
@@ -116,7 +120,7 @@ function mousedownHandler() {
 }
 
 for (let n = 0; n <= 18; n++) {
-    tiles.push(new tile(0 + x, 0, "rgb(0, 0, 0)"))
+    tiles.push(new tile(x, 0))
     x += 58
 }
 
@@ -144,6 +148,11 @@ function display() {
     tiles[2].draw()
     tiles[3].draw()
     tiles[4].draw()
+
+    console.log("tile 1 = " + tiles[0].status)
+    console.log("tile 2 = " + tiles[1].status)
+    console.log("tile 3 = " + tiles[2].status)
+    console.log("tile 1 x = " + tiles[0].x)
     if (moveMap === true && mapWidth > 750 && mouseX >= 0 && mouseX <= 750 && mouseY >= 0 && mouseY <= 700) {
             backgroundX += mouseMoveX;
             backgroundY += mouseMoveY;
@@ -200,8 +209,9 @@ function keydownHandler(event) {
     }
 }
 
-function drawRestaurant() {
-    ctx.drawImage(img, this.x, this.y, 57.5, 61.1)
-    requestAnimationFrame(drawRestaurant)
+
+function tradeWood() {
+    
 }
 
+setInterval(tradeWood, randomInterval)
