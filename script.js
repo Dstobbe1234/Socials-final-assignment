@@ -24,7 +24,7 @@ let cnvX = backgroundX * -1;
 let cnvY = backgroundY * -1;
 let tiles = []
 let x = 0
-let randomInterval
+let randomInterval = 1000
 
 let resources = 0
 
@@ -38,7 +38,8 @@ let background = document.getElementById("background");
 let amountEl = document.getElementById("amount");
 let feedback = document.getElementById("feedback");
 let grid = document.getElementById("grid");
-let restaurantSum = document.getElementById("restaurantAmount")
+let restaurantSum = document.getElementById("restaurantAmount");
+let tradeMessage = document.getElementById("trade");
 
 
 cnv.height = 700;
@@ -56,16 +57,14 @@ class tile {
     }
 
     draw() {
+        randomInterval = Math.random() * 10000
         if (mapWidth === 1150) {
-            randomInterval = Math.random() * 100
             ctx.strokeStyle = this.color
             ctx.strokeRect(this.x, this.y, 57.5, 61.1)
             if (this.x <= mouseX && mouseX <= this.x + 58 && this.y <= mouseY && mouseY <= this.y + 61.1 && dragBool === true && this.status === "open") {
-                console.log("eL")
                 document.addEventListener("mousedown", () => {
                     //if (this.x <= mouseX && mouseX <= this.x + 57.5 && this.y <= mouseY && mouseY <= this.y + 61.1) {
                         this.status = "occupied"
-                        console.log("EEEEE")
                     //}
                 })
                 ctx.drawImage(img, this.x - cnvX, this.y - cnvY, 57.5, 61.1)
@@ -124,10 +123,6 @@ for (let n = 0; n <= 18; n++) {
     x += 58
 }
 
-console.log(tiles[0])
-console.log(tiles[1])
-console.log(tiles[2])
-
 requestAnimationFrame(display);
 function display() {
     restaurantSum.innerHTML = numberOfRestaurants;
@@ -149,10 +144,6 @@ function display() {
     tiles[3].draw()
     tiles[4].draw()
 
-    console.log("tile 1 = " + tiles[0].status)
-    console.log("tile 2 = " + tiles[1].status)
-    console.log("tile 3 = " + tiles[2].status)
-    console.log("tile 1 x = " + tiles[0].x)
     if (moveMap === true && mapWidth > 750 && mouseX >= 0 && mouseX <= 750 && mouseY >= 0 && mouseY <= 700) {
             backgroundX += mouseMoveX;
             backgroundY += mouseMoveY;
@@ -209,9 +200,10 @@ function keydownHandler(event) {
     }
 }
 
-
 function tradeWood() {
-    
+    console.log(randomInterval)
+    ctx.drawImage(tradeMessage, Math.random() * 50, Math.random() * 50, 100, 100)
+    setTimeout(tradeWood, randomInterval)
 }
+tradeWood()
 
-setInterval(tradeWood, randomInterval)
