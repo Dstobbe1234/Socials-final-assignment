@@ -24,9 +24,11 @@ let cnvX = backgroundX * -1;
 let cnvY = backgroundY * -1;
 let tiles = []
 let x = 0
-let randomInterval = 1000
-
-let resources = 0
+let randomInterval = (Math.random() * 1000).toFixed()
+let randomX, randomY;
+let randomIndex
+let repetition = 0;
+let reputation = 1;
 
 
 //Variables for HTML elements
@@ -38,9 +40,10 @@ let background = document.getElementById("background");
 let amountEl = document.getElementById("amount");
 let feedback = document.getElementById("feedback");
 let grid = document.getElementById("grid");
-let restaurantSum = document.getElementById("restaurantAmount");
-let tradeMessage = document.getElementById("trade");
+let restaurantSum = document.getElementById("restaurantAmount")
+let trade1 = document.getElementById("trade");
 
+let possibleTrades = [trade1]
 
 cnv.height = 700;
 cnv.width = 750;
@@ -52,27 +55,34 @@ class tile {
         this.y = y;
         this.color = "rgb(0, 0, 0)";
         this.status = "open";
-        this.index = undefined;
+        this.index;
 
     }
 
     draw() {
-        randomInterval = Math.random() * 10000
+        console.log(this.status)
         if (mapWidth === 1150) {
             ctx.strokeStyle = this.color
             ctx.strokeRect(this.x, this.y, 57.5, 61.1)
-            if (this.x <= mouseX && mouseX <= this.x + 58 && this.y <= mouseY && mouseY <= this.y + 61.1 && dragBool === true && this.status === "open") {
+            if (mouseX >= this.x && mouseX <= this.x + 58 && mouseY >= this.y && mouseY <= this.y + 61.1 && dragBool === true && this.status === "open") {
                 document.addEventListener("mousedown", () => {
-                    //if (this.x <= mouseX && mouseX <= this.x + 57.5 && this.y <= mouseY && mouseY <= this.y + 61.1) {
+                    if (mouseX >= this.x && mouseX <= this.x + 58 && mouseY >= this.y && mouseY <= this.y + 61.1) {
                         this.status = "occupied"
-                    //}
+                        console.log("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
+                    }
                 })
                 ctx.drawImage(img, this.x - cnvX, this.y - cnvY, 57.5, 61.1)
                 this.color = "rgb(0, 255, 0)"
             } else {
+                console.log("EEE")
+                document.removeEventListener("mousedown", () => {
+                    if (mouseX >= this.x && mouseX <= this.x + 58 && mouseY >= this.y && mouseY <= this.y + 61.1) {
+                        this.status = "occupied"
+                    }
+                })
                 this.color = "rgb(0, 0, 0)"
             }
-            if (this.status === "occupied" && this.index === undefined) {
+            if (this.status == "occupied" && this.index === undefined) {
                 this.index = restaurantxlist.length 
             }
             if (this.index !== undefined) {
@@ -111,7 +121,7 @@ function mousemoveHandler(event) {
 
 function mousedownHandler() {
     moveMap = true
-    if (dragBool === true) {
+    if (dragBool === true) { 
         numberOfRestaurants++;
         dragBool = false;
     }
@@ -125,6 +135,19 @@ for (let n = 0; n <= 18; n++) {
 
 requestAnimationFrame(display);
 function display() {
+    repetition ++
+    ctx.drawImage(trade1, 300, 300, 100, 200)
+    if (repetition == randomInterval) {
+        repetition = 0
+        console.log("EEEEEEEEEEEEEEEEEEEEEEEEE")
+        randomIndex = (Math.random() * 2).toFixed()
+        randomX = Math.random() * 700
+        randomY = Math.random() * 750
+        ctx.drawImage(trade1, randomX, randomY, 100, 200)
+        randomInterval = (Math.random() * 100).toFixed()
+    }
+    console.log("repetition = " + repetition)
+    console.log("randomInterval =" + randomInterval)
     restaurantSum.innerHTML = numberOfRestaurants;
     ctx.drawImage(background, backgroundX, backgroundY, mapWidth, mapHeight);
     tiles[0].x = backgroundX 
@@ -199,11 +222,4 @@ function keydownHandler(event) {
         }
     }
 }
-
-function tradeWood() {
-    console.log(randomInterval)
-    ctx.drawImage(tradeMessage, Math.random() * 50, Math.random() * 50, 100, 100)
-    setTimeout(tradeWood, randomInterval)
-}
-tradeWood()
 
