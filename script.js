@@ -123,33 +123,10 @@ function mousedownHandler() {
 
 }
 
-for (; y < cnv.height; y += 20, x = 0) {
-    for (; x < cnv.width; x += 20) {
-        let imageData = ctx.getImageData(x, y, 20, 20);
-        let containsOcean = 0;
-        let r, g, b;
-
-        for (var i = 0; i + 3 < imageData.data.length; i += 4) {
-            r = imageData.data[i];
-            g = imageData.data[i + 1];
-            b = imageData.data[i + 2];
-
-            if (r === 55 && g === 83 && b === 218) {
-                containsOcean++;
-            }
-        }
-        if (containsOcean === 0) {
-            tiles.push(new tile(x, y));
-        }
-    }
-}
-
 requestAnimationFrame(display);
 
 function display() {
     ctx.drawImage(background, backgroundX, backgroundY, mapWidth, mapHeight);
-
-    ctx.strokeRect(x - 1, y - 1, 22, 22);
 
     repetition++;
     if (repetition == randomInterval) {
@@ -233,3 +210,27 @@ function keydownHandler(event) {
         }
     }
 }
+
+setTimeout(function createTiles() {
+    for (; y < cnv.height; y += 20, x = 0) {
+        for (; x < cnv.width; x += 20) {
+            ctx.drawImage(background, backgroundX, backgroundY, mapWidth, mapHeight);
+            let imageData = ctx.getImageData(x, y, 20, 20);
+            let containsOcean = 0;
+            let r, g, b;
+
+            for (var i = 0; i + 3 < imageData.data.length; i += 4) {
+                r = imageData.data[i];
+                g = imageData.data[i + 1];
+                b = imageData.data[i + 2];
+
+                if (r === 55 && g === 83 && b === 218) {
+                    containsOcean++;
+                }
+            }
+            if (containsOcean === 0) {
+                tiles.push(new tile(x, y));
+            }
+        }
+    }
+}, 100)
