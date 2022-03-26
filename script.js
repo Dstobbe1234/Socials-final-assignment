@@ -23,12 +23,12 @@ let backgroundY = 0;
 let cnvX = backgroundX * -1;
 let cnvY = backgroundY * -1;
 let tiles = []
-let x = 0
 let randomInterval = (Math.random() * 1000).toFixed()
 let randomX, randomY;
 let randomIndex
 let repetition = 0;
 let reputation = 1;
+let y = x = 0;
 
 
 //Variables for HTML elements
@@ -60,35 +60,31 @@ class tile {
     }
 
     draw() {
-        console.log(this.status)
         if (mapWidth === 1150) {
-            ctx.strokeStyle = this.color
-            ctx.strokeRect(this.x, this.y, 57.5, 61.1)
+            ctx.strokeStyle = this.color;
+            ctx.strokeRect(this.x, this.y, 57.5, 61.1);
             if (mouseX >= this.x && mouseX <= this.x + 58 && mouseY >= this.y && mouseY <= this.y + 61.1 && dragBool === true && this.status === "open") {
                 document.addEventListener("mousedown", () => {
                     if (mouseX >= this.x && mouseX <= this.x + 58 && mouseY >= this.y && mouseY <= this.y + 61.1) {
-                        this.status = "occupied"
-                        console.log("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
+                        this.status = "occupied";
                     }
                 })
-                ctx.drawImage(img, this.x - cnvX, this.y - cnvY, 57.5, 61.1)
-                this.color = "rgb(0, 255, 0)"
+                ctx.drawImage(img, this.x - cnvX, this.y - cnvY, 57.5, 61.1);
+                this.color = "rgb(0, 255, 0)";
             } else {
-                console.log("EEE")
                 document.removeEventListener("mousedown", () => {
                     if (mouseX >= this.x && mouseX <= this.x + 58 && mouseY >= this.y && mouseY <= this.y + 61.1) {
-                        this.status = "occupied"
+                        this.status = "occupied";
                     }
                 })
-                this.color = "rgb(0, 0, 0)"
+                this.color = "rgb(0, 0, 0)";
             }
             if (this.status == "occupied" && this.index === undefined) {
-                this.index = restaurantxlist.length 
+                this.index = restaurantxlist.length;
             }
             if (this.index !== undefined) {
-
-                restaurantxlist.splice(this.index, 1, this.x - cnvX)
-                restaurantylist.splice(this.index, 1, this.y - cnvY)
+                restaurantxlist.splice(this.index, 1, this.x - cnvX);
+                restaurantylist.splice(this.index, 1, this.y - cnvY);
             }
         }
     }
@@ -105,8 +101,7 @@ document.addEventListener("keydown", keydownHandler);
 function drag() {
     if (money >= 50 && mapWidth === 1150) {
         money -= 50;
-        dragBool = true; 
-        alert("EE")
+        dragBool = true;
     }
 }
 
@@ -121,71 +116,87 @@ function mousemoveHandler(event) {
 
 function mousedownHandler() {
     moveMap = true
-    if (dragBool === true) { 
+    if (dragBool === true) {
         numberOfRestaurants++;
         dragBool = false;
     }
 
 }
 
-for (let n = 0; n <= 18; n++) {
-    tiles.push(new tile(x, 0))
-    x += 58
+for (; y < cnv.height; y += 20, x = 0) {
+    for (; x < cnv.width; x += 20) {
+        let imageData = ctx.getImageData(x, y, 20, 20);
+        let containsOcean = 0;
+        let r, g, b;
+
+        for (var i = 0; i + 3 < imageData.data.length; i += 4) {
+            r = imageData.data[i];
+            g = imageData.data[i + 1];
+            b = imageData.data[i + 2];
+
+            if (r === 55 && g === 83 && b === 218) {
+                containsOcean++;
+            }
+        }
+        if (containsOcean === 0) {
+            tiles.push(new tile(x, y));
+        }
+    }
 }
 
 requestAnimationFrame(display);
-function display() {
-    repetition ++
-    ctx.drawImage(trade1, 300, 300, 100, 200)
-    if (repetition == randomInterval) {
-        repetition = 0
-        console.log("EEEEEEEEEEEEEEEEEEEEEEEEE")
-        randomIndex = (Math.random() * 2).toFixed()
-        randomX = Math.random() * 700
-        randomY = Math.random() * 750
-        ctx.drawImage(trade1, randomX, randomY, 100, 200)
-        randomInterval = (Math.random() * 100).toFixed()
-    }
-    console.log("repetition = " + repetition)
-    console.log("randomInterval =" + randomInterval)
-    restaurantSum.innerHTML = numberOfRestaurants;
-    ctx.drawImage(background, backgroundX, backgroundY, mapWidth, mapHeight);
-    tiles[0].x = backgroundX 
-    tiles[0].y = backgroundY
-    tiles[1].x = backgroundX + 58
-    tiles[1].y = backgroundY
-    tiles[2].x = backgroundX + (2 * 58)
-    tiles[2].y = backgroundY
-    tiles[3].x = backgroundX + (3 * 58)
-    tiles[3].y = backgroundY
-    tiles[4].x = backgroundX + (4 * 58)
-    tiles[4].y = backgroundY
 
-    tiles[0].draw()
-    tiles[1].draw()
-    tiles[2].draw()
-    tiles[3].draw()
-    tiles[4].draw()
+function display() {
+    ctx.drawImage(background, backgroundX, backgroundY, mapWidth, mapHeight);
+
+    ctx.strokeRect(x - 1, y - 1, 22, 22);
+
+    repetition++;
+    if (repetition == randomInterval) {
+        repetition = 0;
+        randomIndex = (Math.random() * 2).toFixed();
+        randomX = Math.random() * 700;
+        randomY = Math.random() * 750;
+        ctx.drawImage(trade1, randomX, randomY, 100, 200);
+        randomInterval = (Math.random() * 100).toFixed();
+    }
+    restaurantSum.innerHTML = numberOfRestaurants;
+    // tiles[0].x = backgroundX;
+    // tiles[0].y = backgroundY;
+    // tiles[1].x = backgroundX + 58;
+    // tiles[1].y = backgroundY;
+    // tiles[2].x = backgroundX + (2 * 58);
+    // tiles[2].y = backgroundY;
+    // tiles[3].x = backgroundX + (3 * 58);
+    // tiles[3].y = backgroundY;
+    // tiles[4].x = backgroundX + (4 * 58);
+    // tiles[4].y = backgroundY;
+
+    // tiles[0].draw();
+    // tiles[1].draw();
+    // tiles[2].draw();
+    // tiles[3].draw();
+    // tiles[4].draw();
 
     if (moveMap === true && mapWidth > 750 && mouseX >= 0 && mouseX <= 750 && mouseY >= 0 && mouseY <= 700) {
-            backgroundX += mouseMoveX;
-            backgroundY += mouseMoveY;
+        backgroundX += mouseMoveX;
+        backgroundY += mouseMoveY;
     }
 
     if (backgroundX > 0 && backgroundX + mapWidth > 750) {
-        backgroundX = 0
+        backgroundX = 0;
     } else if (backgroundX < 0 && backgroundX + mapWidth < 750) {
         backgroundX = 750 - mapWidth;
     }
 
     if (backgroundY < 0 && backgroundY + mapHeight < 700) {
-        backgroundY = 700 - mapHeight
+        backgroundY = 700 - mapHeight;
     } else if (backgroundY > 0 && backgroundY + mapHeight > 700) {
-        backgroundY = 0
+        backgroundY = 0;
     }
 
     if (numberOfRestaurants > 0) {
-        for (let n = restaurantxlist.length -1 ; n >= 0; n--) {
+        for (let n = restaurantxlist.length - 1; n >= 0; n--) {
             ctx.drawImage(img, restaurantxlist[n], restaurantylist[n], 57.5, 61.1);
         }
     }
@@ -222,4 +233,3 @@ function keydownHandler(event) {
         }
     }
 }
-
