@@ -23,12 +23,15 @@ let backgroundY = 0;
 let cnvX = backgroundX * -1;
 let cnvY = backgroundY * -1;
 let tiles = []
-let randomInterval = (Math.random() * 1000).toFixed()
+let randomInterval = (Math.random() * 100).toFixed()
 let randomX, randomY;
 let randomIndex
 let repetition = 0;
 let reputation = 1;
 let y = x = 0;
+let zoomedIn = false;
+let trade = false;
+
 
 
 //Variables for HTML elements
@@ -38,7 +41,6 @@ let buyBtn = document.getElementById("buy");
 let img = document.getElementById("restaurant");
 let background = document.getElementById("background");
 let amountEl = document.getElementById("amount");
-let feedback = document.getElementById("feedback");
 let grid = document.getElementById("grid");
 let restaurantSum = document.getElementById("restaurantAmount")
 let trade1 = document.getElementById("trade");
@@ -51,10 +53,10 @@ cnv.width = 750;
 //Tile class for asset placement 
 class tile {
     constructor(x, y, w, h) {
-        this.x = x;
-        this.y = y;
-        this.w = w;
-        this.h = h;
+        this.x = x
+        this.y = y
+        this.w = w
+        this.h = h
         this.color = "rgb(0, 0, 0)";
         this.status = "open";
         this.index;
@@ -62,30 +64,28 @@ class tile {
     }
 
     draw() {
-        ctx.strokeStyle = this.color;
-        ctx.strokeRect(this.x, this.y, this.w, this.h);
-        if (mouseX > this.x && mouseX < this.x + this.w && mouseY > this.y && mouseY < this.y + this.h && dragBool === true && this.status === "open") {
-            document.addEventListener("mousedown", () => {
-                if (mouseX > this.x && mouseX < this.x + this.w && mouseY > this.y && mouseY < this.y + this.h) {
-                    this.status = "occupied";
-                }
-            })
-            ctx.drawImage(img, this.x - cnvX, this.y - cnvY, this.w, this.h);
-            this.color = "rgb(0, 255, 0)";
-        } else {
-            document.removeEventListener("mousedown", () => {
-                if (mouseX > this.x && mouseX < this.x + this.w && mouseY > this.y && mouseY < this.y + this.h) {
-                    this.status = "occupied";
-                }
-            })
-            this.color = "rgb(0, 0, 0)";
-        }
-        if (this.status == "occupied" && this.index === undefined) {
-            this.index = restaurantxlist.length;
-        }
-        if (this.index !== undefined) {
-            restaurantxlist.splice(this.index, 1, this.x - cnvX);
-            restaurantylist.splice(this.index, 1, this.y - cnvY);
+        if (zoomedIn) {
+            ctx.strokeStyle = this.color;
+            ctx.strokeRect(this.x + backgroundX, this.y + backgroundY, this.w, this.h);
+            if (mouseX > this.x && mouseX < this.x + this.w && mouseY > this.y && mouseY < this.y + this.h && dragBool === true && this.status === "open") {
+                document.addEventListener("mousedown", () => {
+                    if (mouseX > this.x && mouseX < this.x + this.w && mouseY > this.y && mouseY < this.y + this.h) {
+                        this.status = "occupied";
+                    }
+                })
+                ctx.drawImage(img, this.x - cnvX, this.y - cnvY, this.w, this.h);
+                this.color = "rgb(0, 255, 0)";
+            } else {
+                this.color = "rgb(0, 0, 0)";
+            }
+            if (this.status == "occupied" && this.index === undefined) {
+                this.index = restaurantxlist.length;
+            }
+            if (this.index !== undefined) {
+                restaurantxlist.splice(this.index, 1, this.x + backgroundX);
+                restaurantylist.splice(this.index, 1, this.y + backgroundY);
+                console.log(restaurantxlist)
+            }
         }
     }
 }
@@ -127,15 +127,21 @@ requestAnimationFrame(display);
 
 function display() {
     ctx.drawImage(background, backgroundX, backgroundY, mapWidth, mapHeight);
-
     repetition++;
     if (repetition == randomInterval) {
-        repetition = 0;
         randomIndex = (Math.random() * 2).toFixed();
-        randomX = Math.random() * 700;
-        randomY = Math.random() * 750;
-        ctx.drawImage(trade1, randomX, randomY, 100, 200);
-        randomInterval = (Math.random() * 100).toFixed();
+        randomX = tiles[Math.round(Math.random() * 263)].x;
+        randomY = tiles[Math.round(Math.random() * 263)].y;
+        trade = true
+    }
+
+    if (trade = true) {
+        for (let n= 0; n <= 100; n++) {
+            ctx.drawImage(trade1, randomX, randomY, 100, 200);
+            randomInterval = (Math.random() * 100).toFixed();
+        }
+        repetition = 0
+        trade = false
     }
     restaurantSum.innerHTML = numberOfRestaurants;
 
@@ -144,7 +150,7 @@ function display() {
         tiles[x].draw();
     }
 
-    if (moveMap === true && mapWidth > 750 && mouseX >= 0 && mouseX <= 750 && mouseY >= 0 && mouseY <= 700) {
+    if (moveMap === true && zoomedIn && mouseX >= 0 && mouseX <= 750 && mouseY >= 0 && mouseY <= 700) {
         backgroundX += mouseMoveX;
         backgroundY += mouseMoveY;
     }
@@ -186,41 +192,46 @@ function mouseupHandler() {
 
 function keydownHandler(event) {
     if (event.code === "Equal") {
-        if (mapWidth !== 1150) {
-            mapWidth += 400;
-            mapHeight += 400;
+        if (!zoomedIn) {
+            mapWidth *= 2;
+            mapHeight *= 2;
+            zoomedIn = true;
         }
     } else if (event.code === "Minus") {
-        if (mapWidth > 750) {
+        if (zoomedIn) {
             backgroundX = 0;
             backgroundY = 0;
-            mapWidth -= 400;
-            mapHeight -= 400;
+            mapWidth /= 2;
+            mapHeight /=2;
+            zoomedIn = false
         }
     }
 }
 
 function createTiles() {
-    for (; y < cnv.height; y += 20, x = 0) {
-        for (; x < cnv.width; x += 20) {
-            ctx.drawImage(background, backgroundX, backgroundY, mapWidth, mapHeight);
-            let imageData = ctx.getImageData(x, y, 20, 20);
-            let containsOcean = false;
-            let r, g, b;
+        for (; y < cnv.height; y += 20, x = 0) {
+            for (; x < cnv.width; x += 20) {
+                ctx.drawImage(background, backgroundX, backgroundY, mapWidth, mapHeight);
+                let imageData = ctx.getImageData(x, y, 20, 20);
+                let containsOcean = false;
+                let r, g, b;
 
-            for (var i = 0; i + 3 < imageData.data.length; i += 4) {
-                r = imageData.data[i];
-                g = imageData.data[i + 1];
-                b = imageData.data[i + 2];
+                for (var i = 0; i + 3 < imageData.data.length; i += 4) {
+                    r = imageData.data[i];
+                    g = imageData.data[i + 1];
+                    b = imageData.data[i + 2];
 
-                if (r === 55 && g === 83 && b === 218) {
-                    containsOcean = true;
+                    if (r === 55 && g === 83 && b === 218) {
+                        containsOcean = true;
+                    }
+                }
+                if (!containsOcean) {
+                    tiles.push(new tile(x * 2, y * 2, 20 * 2, 20 * 2));
                 }
             }
-            if (!containsOcean) {
-                tiles.push(new tile(x, y, 20, 20));
-            }
         }
-    }
 }
-window.onload = createTiles;
+
+background.onload = createTiles()
+
+
