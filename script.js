@@ -23,7 +23,7 @@ let backgroundY = 0;
 let cnvX = backgroundX * -1;
 let cnvY = backgroundY * -1;
 let tiles = []
-let randomInterval = (Math.random() * 100).toFixed()
+let randomInterval = (Math.random() * 10000).toFixed()
 let randomX, randomY;
 let randomIndex
 let repetition = 0;
@@ -31,6 +31,7 @@ let reputation = 1;
 let y = x = 0;
 let zoomedIn = false;
 let trade = false;
+let ratio = 0
 
 
 
@@ -67,14 +68,16 @@ class tile {
         if (zoomedIn) {
             ctx.strokeStyle = this.color;
             ctx.strokeRect(this.x + backgroundX, this.y + backgroundY, this.w, this.h);
-            if (mouseX > this.x && mouseX < this.x + this.w && mouseY > this.y && mouseY < this.y + this.h && dragBool === true && this.status === "open") {
-                document.addEventListener("mousedown", () => {
-                    if (mouseX > this.x && mouseX < this.x + this.w && mouseY > this.y && mouseY < this.y + this.h) {
-                        this.status = "occupied";
-                    }
-                })
-                ctx.drawImage(img, this.x - cnvX, this.y - cnvY, this.w, this.h);
+            if (mouseX > this.x + backgroundX && mouseX < this.x+ this.w + backgroundX && mouseY > this.y + backgroundY && mouseY < this.y + this.h + backgroundY && dragBool === true && this.status === "open") {
+                ctx.drawImage(img, this.x + backgroundX, this.y + backgroundY, this.w, this.h);
                 this.color = "rgb(0, 255, 0)";
+                document.addEventListener("mousedown", () => {
+                if (mouseX > this.x + backgroundX && mouseX < this.x+ this.w + backgroundX && mouseY > this.y + backgroundY && mouseY < this.y + this.h + backgroundY && dragBool === true && this.status === "open") {
+                   this.status = "occupied"; 
+                   dragBool = false;
+
+                }
+                })
             } else {
                 this.color = "rgb(0, 0, 0)";
             }
@@ -118,7 +121,6 @@ function mousedownHandler() {
     moveMap = true
     if (dragBool === true) {
         numberOfRestaurants++;
-        dragBool = false;
     }
 
 }
@@ -127,6 +129,10 @@ requestAnimationFrame(display);
 
 function display() {
     ctx.drawImage(background, backgroundX, backgroundY, mapWidth, mapHeight);
+    // Draw all tiles
+    for (let x = 0; x < tiles.length; x++) {
+        tiles[x].draw();
+    }
     repetition++;
     if (repetition == randomInterval) {
         randomIndex = (Math.random() * 2).toFixed();
@@ -137,18 +143,13 @@ function display() {
 
     if (trade = true) {
         for (let n= 0; n <= 100; n++) {
-            ctx.drawImage(trade1, randomX, randomY, 100, 200);
+            ctx.drawImage(trade1, randomX + backgroundX, randomY + backgroundY, 100, 200);
             randomInterval = (Math.random() * 100).toFixed();
         }
         repetition = 0
         trade = false
     }
     restaurantSum.innerHTML = numberOfRestaurants;
-
-    // Draw all tiles
-    for (let x = 0; x < tiles.length; x++) {
-        tiles[x].draw();
-    }
 
     if (moveMap === true && zoomedIn && mouseX >= 0 && mouseX <= 750 && mouseY >= 0 && mouseY <= 700) {
         backgroundX += mouseMoveX;
@@ -169,7 +170,7 @@ function display() {
 
     if (numberOfRestaurants > 0) {
         for (let n = restaurantxlist.length - 1; n >= 0; n--) {
-            ctx.drawImage(img, restaurantxlist[n], restaurantylist[n], 20, 20);
+            ctx.drawImage(img, restaurantxlist[n], restaurantylist[n], 20 * 2, 20 * 2);
         }
     }
     if (money >= 50) {
@@ -196,6 +197,7 @@ function keydownHandler(event) {
             mapWidth *= 2;
             mapHeight *= 2;
             zoomedIn = true;
+            ratio = 0
         }
     } else if (event.code === "Minus") {
         if (zoomedIn) {
@@ -204,6 +206,7 @@ function keydownHandler(event) {
             mapWidth /= 2;
             mapHeight /=2;
             zoomedIn = false
+            ratio = 2
         }
     }
 }
@@ -232,6 +235,12 @@ function createTiles() {
         }
 }
 
-background.onload = createTiles()
+window.onload = createTiles()
+
+function taxes() {
+alert("TAXES\nTotal:\n")
+}
+setInterval(taxes, 180000)
+
 
 
