@@ -130,6 +130,20 @@ requestAnimationFrame(display);
 function display() {
     ctx.drawImage(background, backgroundX, backgroundY, mapWidth, mapHeight);
     // Draw all tiles
+
+    for (let y = 0; y <= 750; y += 50) {
+        for (let x = 0; x <= 700; x += 50) {
+            ctx.fillRect(x, y, 800, 1)
+        }
+    }
+
+    for (let y = 0; y <= 750; y += 50) {
+        for (let x = 0; x <= 700; x += 50) {
+            ctx.fillRect(x, y, 1, 800)
+        }
+    }
+
+
     for (let x = 0; x < tiles.length; x++) {
         tiles[x].draw();
     }
