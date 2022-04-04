@@ -40,6 +40,7 @@ let grid = document.getElementById("grid");
 let restaurantSum = document.getElementById("restaurantAmount")
 let trade1 = document.getElementById("trade");
 let possibleTrades = [trade1]
+let competition
 
 //Tile class for asset placement 
 class tile {
@@ -51,10 +52,14 @@ class tile {
         this.color = "rgb(0, 0, 0)";
         this.status = "open";
         this.index;
+        this.competition = false
 
     }
 
     draw() {
+        if (this.competition === true) {
+            ctx.drawImage(restaurantImg, this.x, this.y, this.w, this.h)
+        }
         ctx.strokeStyle = this.color;
         ctx.strokeRect(this.x + backgroundX, this.y + backgroundY, this.w, this.h);
         if (mouseX > this.x + backgroundX && mouseX < this.x + this.w + backgroundX && mouseY > this.y + backgroundY && mouseY < this.y + this.h + backgroundY && dragRestaurant === true && this.status === "open") {
@@ -70,7 +75,7 @@ class tile {
         } else {
             this.color = "rgb(0, 0, 0)";
         }
-        if (this.status == "occupied" && this.index === undefined) {
+        if (this.status == "occupied" && this.index === undefined && this.competition === false) {
             this.index = restaurantxlist.length;
         }
         if (this.index !== undefined) {
@@ -133,6 +138,14 @@ function createTiles() {
                 }
             }
         }
+        for(x = 0; x <= tiles.length - 1; x ++) {
+            competition = Math.random() * 100;
+            if (competition <= 50) {
+                tiles[x].competition = true;
+                tiles[x].status = "occupied";
+                console.log("EEE");
+            }
+        }
     } else {
         tryNextFrame = true;
     }
@@ -148,18 +161,17 @@ function display() {
     for (let x = 0; x < tiles.length; x++) {
         tiles[x].draw();
     }
-
     // Decide when to show a trade request
     repetition++;
     if (repetition == randomInterval) {
         randomIndex = (Math.random() * 2).toFixed();
-        randomX = tiles[Math.round(Math.random() * 263)].x;
-        randomY = tiles[Math.round(Math.random() * 263)].y;
+        randomX = tiles[Math.round(Math.random() * 684)].x;
+        randomY = tiles[Math.round(Math.random() * 684)].y;
         trade = true
     }
     if (trade = true) {
         for (let n = 0; n <= 100; n++) {
-            ctx.drawImage(trade1, randomX + backgroundX, randomY + backgroundY, 100, 200);
+            ctx.drawImage(trade1, randomX, randomY, 100, 175);
             randomInterval = (Math.random() * 100).toFixed();
         }
         repetition = 0
