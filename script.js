@@ -3,8 +3,8 @@
 // Set up canvas
 let cnv = document.getElementById("canvas");
 let ctx = cnv.getContext("2d");
-cnv.height = 700;
-cnv.width = 750;
+cnv.height = 980;
+cnv.width = 1200;
 
 // Global variables
 let preventDefault;
@@ -17,8 +17,8 @@ let money = 50;
 let restaurantX, restaurantY
 let worldX = 0;
 let worldY = 0;
-let mapHeight = 700;
-let mapWidth = 750;
+let mapHeight = cnv.height;
+let mapWidth = cnv.width;
 let backgroundX = 0;
 let backgroundY = 0;
 let tiles = []
@@ -44,10 +44,10 @@ let possibleTrades = [trade1]
 //Tile class for asset placement 
 class tile {
     constructor(x, y, w, h) {
-        this.x = x
-        this.y = y
-        this.w = w
-        this.h = h
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
         this.color = "rgb(0, 0, 0)";
         this.status = "open";
         this.index;
