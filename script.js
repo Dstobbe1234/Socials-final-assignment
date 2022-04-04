@@ -3,8 +3,8 @@
 // Set up canvas
 let cnv = document.getElementById("canvas");
 let ctx = cnv.getContext("2d");
-cnv.height = 980;
-cnv.width = 1200;
+cnv.width = 1000;
+cnv.height = cnv.width * 0.6;
 
 // Global variables
 let preventDefault;
@@ -204,6 +204,6 @@ function changeMoney() {
 setInterval(changeMoney, 100);
 
 function taxes() {
-    alert("TAXES\nTotal:\n")
+    console.log("TAXES\nTotal:\n");
 }
 setInterval(taxes, 180000)
