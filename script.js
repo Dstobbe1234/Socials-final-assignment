@@ -22,14 +22,14 @@ let mapWidth = cnv.width;
 let backgroundX = 0;
 let backgroundY = 0;
 let tiles = []
-let randomInterval = (Math.random() * 10000).toFixed()
-let randomX, randomY;
 let randomIndex
 let repetition = 0;
 let reputation = 1;
 let trade = false;
 let ratio = 0
-let tryNextFrame = true;
+let tryNextFrame = false;
+let randomX, randomY
+let randomInterval = (Math.random() * 10000).toFixed()
 
 // Variables for HTML elements
 let buyBtn = document.getElementById("buy");
@@ -69,6 +69,7 @@ class tile {
                 if (mouseX > this.x + backgroundX && mouseX < this.x + this.w + backgroundX && mouseY > this.y + backgroundY && mouseY < this.y + this.h + backgroundY && dragRestaurant === true && this.status === "open") {
                     this.status = "occupied";
                     dragRestaurant = false;
+                    numberOfRestaurants++
 
                 }
             })
@@ -87,7 +88,7 @@ class tile {
 
 //Event Listeners
 buyBtn.addEventListener("click", drag);
-document.addEventListener("mousedown", mousedownHandler);
+//document.addEventListener("mousedown", mousedownHandler);
 document.addEventListener("mousemove", mousemoveHandler);
 background.addEventListener('load', createTiles);
 
@@ -99,11 +100,7 @@ function drag() {
     }
 }
 
-function mousedownHandler() {
-    if (dragRestaurant === true) {
-        numberOfRestaurants++;
-    }
-}
+
 
 function mousemoveHandler(event) {
     mouseX = event.x - cnv.getBoundingClientRect().x;
@@ -135,26 +132,24 @@ function createTiles() {
                 }
                 if (!containsOcean) {
                     tiles.push(new tile(x, y, 20, 20));
+                    console.log(tiles)
                 }
-            }
-        }
-        for(x = 0; x <= tiles.length - 1; x ++) {
-            competition = Math.random() * 100;
-            if (competition <= 50) {
-                tiles[x].competition = true;
-                tiles[x].status = "occupied";
-                console.log("EEE");
             }
         }
     } else {
         tryNextFrame = true;
     }
+    //console.log(tiles[0].color)
+
 }
 
 // Animation loop
 requestAnimationFrame(display);
 
 function display() {
+    console.log(tiles)
+    //console.log(tiles[0].y)
+    opposingcompetition()
     ctx.drawImage(background, backgroundX, backgroundY, mapWidth, mapHeight);
 
     // Draw all the tiles
@@ -164,14 +159,13 @@ function display() {
     // Decide when to show a trade request
     repetition++;
     if (repetition == randomInterval) {
-        randomIndex = (Math.random() * 2).toFixed();
-        randomX = tiles[Math.round(Math.random() * 684)].x;
-        randomY = tiles[Math.round(Math.random() * 684)].y;
+        randomIndex = Math.round(Math.random() * 310)
         trade = true
+        console.log(randomX)
     }
     if (trade = true) {
         for (let n = 0; n <= 100; n++) {
-            ctx.drawImage(trade1, randomX, randomY, 100, 175);
+            ctx.drawImage(trade1, tiles[randomIndex].x, tiles[randomIndex].y, 20, 20);
             randomInterval = (Math.random() * 100).toFixed();
         }
         repetition = 0
@@ -195,6 +189,7 @@ function display() {
         createTiles();
     }
     requestAnimationFrame(display);
+
 }
 
 function changeMoney() {
@@ -207,3 +202,16 @@ function taxes() {
     console.log("TAXES\nTotal:\n");
 }
 setInterval(taxes, 180000)
+
+function opposingcompetition() {
+//    let randomInterval = Math.round(Math.random() * 10000)
+//    console.log("WEEEE")
+//    for(x = 0; x <= tiles.length - 1; x ++) {
+//        competition = Math.random() * 100;
+//        if (competition <= 50) {
+//            tiles[x].competition = true;
+//            tiles[x].status = "occupied";
+//            console.log("EEE");
+//        }
+//    }
+}
