@@ -42,7 +42,7 @@ let trade1 = document.getElementById("trade");
 let possibleTrades = [trade1]
 let competition
 
-//Tile class for asset placement 
+//Tile class for placing stuff
 class tile {
     constructor(x, y, w, h) {
         this.x = x;
@@ -55,7 +55,7 @@ class tile {
         this.competition = false
 
     }
-
+    // Class method
     draw() {
         if (this.competition === true) {
             ctx.drawImage(restaurantImg, this.x, this.y, this.w, this.h)
@@ -138,9 +138,10 @@ function createTiles() {
                 }
             }
         }
+        // randomly generate competition on roughly one third of the tiles
         for(x = 0; x <= tiles.length - 1; x ++) {
             competition = Math.random() * 100;
-            if (competition <= 50) {
+            if (competition <= 25) {
                 tiles[x].competition = true;
                 tiles[x].status = "occupied";
                 console.log("EEE");
@@ -193,6 +194,7 @@ function display() {
     // Retry making the tiles if the image wasn't loaded before
     if (tryNextFrame) {
         createTiles();
+        loadCompetition()
     }
     requestAnimationFrame(display);
 }
@@ -207,3 +209,7 @@ function taxes() {
     console.log("TAXES\nTotal:\n");
 }
 setInterval(taxes, 180000)
+
+function loadCompetition() {
+    
+}
