@@ -22,14 +22,19 @@ let mapWidth = cnv.width;
 let backgroundX = 0;
 let backgroundY = 0;
 let tiles = []
-let randomInterval = (Math.random() * 10000).toFixed()
+let randomInterval = (Math.random() * 1000).toFixed()
 let randomX, randomY;
 let randomIndex
 let repetition = 0;
 let reputation = 1;
-let trade = false;
 let ratio = 0
 let tryNextFrame = false;
+let trade = false;
+let americas = []
+let africaMiddleEast = [] 
+let eurasia = []
+let australia = []
+
 
 // Variables for HTML elements
 let buyBtn = document.getElementById("buy");
@@ -77,6 +82,7 @@ class tile {
         }
         if (this.status == "occupied" && this.index === undefined && this.competition === false) {
             this.index = restaurantxlist.length;
+
         }
         if (this.index !== undefined) {
             restaurantxlist.splice(this.index, 1, this.x + backgroundX);
@@ -135,18 +141,26 @@ function createTiles() {
                 }
                 if (!containsOcean) {
                     tiles.push(new tile(x, y, 20, 20));
+                    if (x >= 0 && x <= 410 && y >= 0 && y <= 550) {
+                        americas.push(new tile(x, y, 20, 20))
+                    } else if (x >= 410 && x <= 630 && y >= 258 && y <= 508) {
+                        africaMiddleEast.push(new tile(x, y, 20, 20))
+                    } //else if (x >= 410 && x <= 890 && y >= )
                 }
             }
         }
         // randomly generate competition on roughly one third of the tiles
-        for(x = 0; x <= tiles.length - 1; x ++) {
-            competition = Math.random() * 100;
-            if (competition <= 25) {
-                tiles[x].competition = true;
-                tiles[x].status = "occupied";
-                console.log("EEE");
-            }
-        }
+        //for(x = 0; x <= tiles.length - 1; x ++) {
+            //competition = Math.random() * 100;
+            //if (competition <= 25) {
+                //tiles[x].competition = true;
+                //tiles[x].status = "occupied";
+                //console.log("EEE");
+            //}
+        //}
+        console.log(americas)
+        console.log(africaMiddleEast)
+
     } else {
         tryNextFrame = true;
     }
@@ -157,7 +171,6 @@ requestAnimationFrame(display);
 
 function display() {
     ctx.drawImage(background, backgroundX, backgroundY, mapWidth, mapHeight);
-
     // Draw all the tiles
     for (let x = 0; x < tiles.length; x++) {
         tiles[x].draw();
@@ -169,15 +182,16 @@ function display() {
         randomX = randomIndex.x
         randomY = randomIndex.y
         trade = true
+        repetition = 0
+        randomInterval = (Math.random() * 1000).toFixed()
     }
-    if (trade = true) {
+
+    if (trade === true) {
         for (let n = 0; n <= 100; n++) {
             ctx.drawImage(trade1, randomX, randomY, 20, 20);
-            randomInterval = (Math.random() * 100).toFixed();
         }
-        repetition = 0
-        trade = false
     }
+
     restaurantSum.innerHTML = numberOfRestaurants;
 
     if (numberOfRestaurants > 0) {
@@ -196,6 +210,8 @@ function display() {
         createTiles();
         loadCompetition()
     }
+
+    ctx.strokeRect(410, 20, 480, 350)
     requestAnimationFrame(display);
 }
 
