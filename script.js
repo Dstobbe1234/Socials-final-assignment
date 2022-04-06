@@ -29,7 +29,7 @@ let repetition = 0;
 let reputation = 1;
 let trade = false;
 let ratio = 0
-let tryNextFrame = true;
+let tryNextFrame = false;
 
 // Variables for HTML elements
 let buyBtn = document.getElementById("buy");
@@ -164,14 +164,14 @@ function display() {
     // Decide when to show a trade request
     repetition++;
     if (repetition == randomInterval) {
-        randomIndex = (Math.random() * 2).toFixed();
-        randomX = tiles[Math.round(Math.random() * 684)].x;
-        randomY = tiles[Math.round(Math.random() * 684)].y;
+        randomIndex = tiles[Math.round(Math.random() * 310)]
+        randomX = randomIndex.x
+        randomY = randomIndex.y
         trade = true
     }
     if (trade = true) {
         for (let n = 0; n <= 100; n++) {
-            ctx.drawImage(trade1, randomX, randomY, 100, 175);
+            ctx.drawImage(trade1, randomX, randomY, 20, 20);
             randomInterval = (Math.random() * 100).toFixed();
         }
         repetition = 0
