@@ -28,7 +28,7 @@ let randomIndex
 let repetition = 0;
 let reputation = 1;
 let ratio = 0
-let tryNextFrame = false;
+let tryNextFrame = true;
 let trade = false;
 let americas = []
 let africaMiddleEast = [] 
@@ -44,6 +44,9 @@ let amountEl = document.getElementById("amount");
 let grid = document.getElementById("grid");
 let restaurantSum = document.getElementById("restaurantAmount")
 let trade1 = document.getElementById("trade");
+let taxModalEl = document.getElementById("taxesModal");
+let taxesAmt = document.getElementById("taxes");
+let modalBtn = document.getElementById("hide")
 let possibleTrades = [trade1]
 let competition
 
@@ -91,11 +94,27 @@ class tile {
     }
 }
 
+class clouds {
+    constructor(x, y, w, h) {
+        this.x = x
+        this.y = y 
+        this.w = w
+        this.h = h
+    }
+
+    draw() {
+        let imageData = ctx.getImageData(x, y, 50, 50)
+    }
+}
+
 //Event Listeners
 buyBtn.addEventListener("click", drag);
 document.addEventListener("mousedown", mousedownHandler);
 document.addEventListener("mousemove", mousemoveHandler);
 background.addEventListener('load', createTiles);
+modalBtn.addEventListener("click", payTaxes)
+
+taxModalEl.style.display = "none"
 
 //Event Functions
 function drag() {
@@ -222,10 +241,19 @@ function changeMoney() {
 setInterval(changeMoney, 100);
 
 function taxes() {
-    console.log("TAXES\nTotal:\n");
+    taxModalEl.style.display = "block"
+    //console.log("TAXES\nTotal:\n");
 }
-setInterval(taxes, 180000)
+setInterval(taxes, 18000)
+
+function payTaxes() {
+    taxModalEl.style.display = "none"
+}
 
 function loadCompetition() {
     
+}
+
+function loadClouds() {
+
 }
