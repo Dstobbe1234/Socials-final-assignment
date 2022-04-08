@@ -30,25 +30,27 @@ let reputation = 1;
 let ratio = 0
 let tryNextFrame = true;
 let trade = false;
-let americas = []
-let africaMiddleEast = [] 
-let eurasia = []
-let australia = []
-
+let americas = [];
+let africaMiddleEast = [] ;
+let eurasia = [];
+let australia = [];
+let clouds = [];
+const tileSize = 20;
 
 // Variables for HTML elements
 let buyBtn = document.getElementById("buy");
 let restaurantImg = document.getElementById("restaurant");
 let background = document.getElementById("background");
+let cloudsImg = document.getElementById("clouds-img");
 let amountEl = document.getElementById("amount");
 let grid = document.getElementById("grid");
-let restaurantSum = document.getElementById("restaurantAmount")
+let restaurantSum = document.getElementById("restaurantAmount");
 let trade1 = document.getElementById("trade");
 let taxModalEl = document.getElementById("taxesModal");
 let taxesAmt = document.getElementById("taxes");
-let modalBtn = document.getElementById("hide")
-let possibleTrades = [trade1]
-let competition
+let modalBtn = document.getElementById("hide");
+let possibleTrades = [trade1];
+let competition;
 
 //Tile class for placing stuff
 class tile {
@@ -63,18 +65,18 @@ class tile {
         this.competition = false
 
     }
-    // Class method
+
     draw() {
         if (this.competition === true) {
             ctx.drawImage(restaurantImg, this.x, this.y, this.w, this.h)
         }
         ctx.strokeStyle = this.color;
-        ctx.strokeRect(this.x + backgroundX, this.y + backgroundY, this.w, this.h);
-        if (mouseX > this.x + backgroundX && mouseX < this.x + this.w + backgroundX && mouseY > this.y + backgroundY && mouseY < this.y + this.h + backgroundY && dragRestaurant === true && this.status === "open") {
-            ctx.drawImage(restaurantImg, this.x + backgroundX, this.y + backgroundY, this.w, this.h);
+        ctx.strokeRect(this.x, this.y, this.w, this.h);
+        if (mouseX > this.x && mouseX < this.x + this.w && mouseY > this.y && mouseY < this.y + this.h && dragRestaurant === true && this.status === "open") {
+            ctx.drawImage(restaurantImg, this.x, this.y, this.w, this.h);
             this.color = "rgb(0, 255, 0)";
             document.addEventListener("mousedown", () => {
-                if (mouseX > this.x + backgroundX && mouseX < this.x + this.w + backgroundX && mouseY > this.y + backgroundY && mouseY < this.y + this.h + backgroundY && dragRestaurant === true && this.status === "open") {
+                if (mouseX > this.x && mouseX < this.x + this.w && mouseY > this.y && mouseY < this.y + this.h && dragRestaurant === true && this.status === "open") {
                     this.status = "occupied";
                     dragRestaurant = false;
 
@@ -88,22 +90,25 @@ class tile {
 
         }
         if (this.index !== undefined) {
-            restaurantxlist.splice(this.index, 1, this.x + backgroundX);
-            restaurantylist.splice(this.index, 1, this.y + backgroundY);
+            restaurantxlist.splice(this.index, 1, this.x);
+            restaurantylist.splice(this.index, 1, this.y);
         }
     }
 }
 
-class clouds {
-    constructor(x, y, w, h) {
-        this.x = x
-        this.y = y 
-        this.w = w
-        this.h = h
+class cloud {
+    constructor(tileIndex) {
+        this.w = 75;
+        this.h = this.w * 0.6136;
+        console.log(tileIndex, this.w, tileSize)
+        this.x = tiles[tileIndex].x - (this.w / 2) + (tileSize / 2);
+        this.y = tiles[tileIndex].y - (this.h / 2) + (tileSize / 2);
+        this.cloudX = Math.floor(Math.random() * 4);
+        this.cloudY = Math.floor(Math.random() * 3);
     }
 
     draw() {
-        let imageData = ctx.getImageData(x, y, 50, 50)
+        ctx.drawImage(cloudsImg, 165 * this.cloudX, 135 * this.cloudY, 165, 135, this.x, this.y, this.w, this.h);
     }
 }
 
@@ -163,7 +168,7 @@ function createTiles() {
                     if (x >= 0 && x <= 410 && y >= 0 && y <= 550) {
                         americas.push(new tile(x, y, 20, 20))
                     } else if (x >= 410 && x <= 630 && y >= 258 && y <= 508) {
-                        africaMiddleEast.push(new tile(x, y, 20, 20))
+                        africaMiddleEast.push(new tile(x, y, tileSize, tileSize))
                     } //else if (x >= 410 && x <= 890 && y >= )
                 }
             }
@@ -177,11 +182,16 @@ function createTiles() {
                 //console.log("EEE");
             //}
         //}
-        console.log(americas)
-        console.log(africaMiddleEast)
 
+        createClouds();
     } else {
         tryNextFrame = true;
+    }
+}
+
+function createClouds() {
+    for (let n = 0; n < tiles.length; n++) {
+        clouds.push(new cloud(n));
     }
 }
 
@@ -190,10 +200,17 @@ requestAnimationFrame(display);
 
 function display() {
     ctx.drawImage(background, backgroundX, backgroundY, mapWidth, mapHeight);
+
     // Draw all the tiles
-    for (let x = 0; x < tiles.length; x++) {
-        tiles[x].draw();
+    for (let n = 0; n < tiles.length; n++) {
+        tiles[n].draw();
     }
+
+    // Draw all the tiles
+    for (let n = 0; n < clouds.length; n++) {
+        clouds[n].draw();
+    }
+    
     // Decide when to show a trade request
     repetition++;
     if (repetition == randomInterval) {
@@ -227,7 +244,7 @@ function display() {
     // Retry making the tiles if the image wasn't loaded before
     if (tryNextFrame) {
         createTiles();
-        loadCompetition()
+        loadCompetition();
     }
 
     ctx.strokeRect(410, 20, 480, 350)
@@ -244,7 +261,7 @@ function taxes() {
     taxModalEl.style.display = "block"
     //console.log("TAXES\nTotal:\n");
 }
-setInterval(taxes, 18000)
+setInterval(taxes, 180000)
 
 function payTaxes() {
     taxModalEl.style.display = "none"
