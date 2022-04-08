@@ -31,7 +31,7 @@ let ratio = 0
 let tryNextFrame = true;
 let trade = false;
 let americas = [];
-let africaMiddleEast = [] ;
+let africaMiddleEast = [];
 let eurasia = [];
 let australia = [];
 let clouds = [];
@@ -101,10 +101,10 @@ class tile {
 
 class cloud {
     constructor(tileIndex, continent) {
-        this.w = 75;
+        this.w = 60;
         this.continent = continent
-        this.h = this.w * 0.6136;
-        console.log(tileIndex, this.w, tileSize)
+        this.h = this.w * 0.9;
+        this.timer = 0;
         if (this.continent === "australia") {
             this.x = australia[tileIndex].x - (this.w / 2) + (tileSize / 2);
             this.y = australia[tileIndex].y - (this.h / 2) + (tileSize / 2);
@@ -115,12 +115,15 @@ class cloud {
             this.x = africaMiddleEast[tileIndex].x - (this.w / 2) + (tileSize / 2);
             this.y = africaMiddleEast[tileIndex].y - (this.h / 2) + (tileSize / 2);
         }
-
-        this.cloudX = Math.floor(Math.random() * 4);
-        this.cloudY = Math.floor(Math.random() * 3);
     }
 
     draw() {
+        this.timer++;
+        if (this.timer === 10) {
+            this.timer = 0;
+            this.cloudX = Math.floor(Math.random() * 4);
+            this.cloudY = Math.floor(Math.random() * 3);
+        }
         ctx.drawImage(cloudsImg, 165 * this.cloudX, 135 * this.cloudY, 165, 135, this.x, this.y, this.w, this.h);
     }
 }
@@ -192,12 +195,12 @@ function createTiles() {
         }
         // randomly generate competition on roughly one third of the tiles
         //for(x = 0; x <= tiles.length - 1; x ++) {
-            //competition = Math.random() * 100;
-            //if (competition <= 25) {
-                //tiles[x].competition = true;
-                //tiles[x].status = "occupied";
-                //console.log("EEE");
-            //}
+        //competition = Math.random() * 100;
+        //if (competition <= 25) {
+        //tiles[x].competition = true;
+        //tiles[x].status = "occupied";
+        //console.log("EEE");
+        //}
         //}
         let randomIndex = Math.round(Math.random() * americas.length - 1)
         tiles[randomIndex].status = "occupied";
@@ -217,11 +220,11 @@ function createClouds() {
         clouds.push(new cloud(n, "eurasia"));
     }
 
-    for(let n = 0; n < australia.length; n++) {
+    for (let n = 0; n < australia.length; n++) {
         clouds.push(new cloud(n, "australia"));
     }
 
-    for(let n = 0; n < africaMiddleEast.length; n++) {
+    for (let n = 0; n < africaMiddleEast.length; n++) {
         clouds.push(new cloud(n, "africaMiddleEast"))
     }
 }
@@ -241,7 +244,7 @@ function display() {
     for (let n = 0; n < clouds.length; n++) {
         clouds[n].draw();
     }
-    
+
     // Decide when to show a trade request
     repetition++;
     if (repetition == randomInterval) {
