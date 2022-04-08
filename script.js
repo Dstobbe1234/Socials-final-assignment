@@ -10,10 +10,10 @@ cnv.height = cnv.width * 0.6;
 let preventDefault;
 let mouseX, mouseY;
 let dragRestaurant = false;
-let numberOfRestaurants = 0;
+let numberOfRestaurants = 1;
 let restaurantxlist = [];
 let restaurantylist = [];
-let money = 50;
+let money = 0;
 let restaurantX, restaurantY
 let worldX = 0;
 let worldY = 0;
@@ -36,6 +36,9 @@ let eurasia = [];
 let australia = [];
 let clouds = [];
 const tileSize = 20;
+let africaClouds = true;
+let australiaClouds = true;
+let eurasiaClouds = true;
 
 // Variables for HTML elements
 let buyBtn = document.getElementById("buy");
@@ -62,12 +65,12 @@ class tile {
         this.color = "rgb(0, 0, 0)";
         this.status = "open";
         this.index;
-        this.competition = false
+        this.startingStore = false
 
     }
 
     draw() {
-        if (this.competition === true) {
+        if (this.startingStore === true) {
             ctx.drawImage(restaurantImg, this.x, this.y, this.w, this.h)
         }
         ctx.strokeStyle = this.color;
@@ -97,12 +100,22 @@ class tile {
 }
 
 class cloud {
-    constructor(tileIndex) {
+    constructor(tileIndex, continent) {
         this.w = 75;
+        this.continent = continent
         this.h = this.w * 0.6136;
         console.log(tileIndex, this.w, tileSize)
-        this.x = tiles[tileIndex].x - (this.w / 2) + (tileSize / 2);
-        this.y = tiles[tileIndex].y - (this.h / 2) + (tileSize / 2);
+        if (this.continent === "australia") {
+            this.x = australia[tileIndex].x - (this.w / 2) + (tileSize / 2);
+            this.y = australia[tileIndex].y - (this.h / 2) + (tileSize / 2);
+        } else if (this.continent === "eurasia") {
+            this.x = eurasia[tileIndex].x - (this.w / 2) + (tileSize / 2);
+            this.y = eurasia[tileIndex].y - (this.h / 2) + (tileSize / 2);
+        } else if (this.continent === "africaMiddleEast") {
+            this.x = africaMiddleEast[tileIndex].x - (this.w / 2) + (tileSize / 2);
+            this.y = africaMiddleEast[tileIndex].y - (this.h / 2) + (tileSize / 2);
+        }
+
         this.cloudX = Math.floor(Math.random() * 4);
         this.cloudY = Math.floor(Math.random() * 3);
     }
@@ -169,7 +182,11 @@ function createTiles() {
                         americas.push(new tile(x, y, 20, 20))
                     } else if (x >= 410 && x <= 630 && y >= 258 && y <= 508) {
                         africaMiddleEast.push(new tile(x, y, tileSize, tileSize))
-                    } //else if (x >= 410 && x <= 890 && y >= )
+                    } else if (x >= 410 && x <= 940 && y >= 20 && y <= 370 && africaMiddleEast.includes(new tile(x, y, tileSize, tileSize)) === false) {
+                        eurasia.push(new tile(x, y, tileSize, tileSize))
+                    } else if (x >= 770 && x <= 970 && y >= 400 && y <= 550) {
+                        australia.push(new tile(x, y, tileSize, tileSize))
+                    }
                 }
             }
         }
@@ -182,16 +199,30 @@ function createTiles() {
                 //console.log("EEE");
             //}
         //}
-
+        let randomIndex = Math.round(Math.random() * americas.length - 1)
+        tiles[randomIndex].status = "occupied";
+        tiles[randomIndex].startingStore = true;
         createClouds();
+        console.log(australia)
+        console.log(americas)
+        console.log(eurasia)
+        console.log(africaMiddleEast)
     } else {
         tryNextFrame = true;
     }
 }
 
 function createClouds() {
-    for (let n = 0; n < tiles.length; n++) {
-        clouds.push(new cloud(n));
+    for (let n = 0; n < eurasia.length; n++) {
+        clouds.push(new cloud(n, "eurasia"));
+    }
+
+    for(let n = 0; n < australia.length; n++) {
+        clouds.push(new cloud(n, "australia"));
+    }
+
+    for(let n = 0; n < africaMiddleEast.length; n++) {
+        clouds.push(new cloud(n, "africaMiddleEast"))
     }
 }
 
@@ -206,7 +237,7 @@ function display() {
         tiles[n].draw();
     }
 
-    // Draw all the tiles
+    // Draw all the clouds
     for (let n = 0; n < clouds.length; n++) {
         clouds[n].draw();
     }
@@ -244,10 +275,8 @@ function display() {
     // Retry making the tiles if the image wasn't loaded before
     if (tryNextFrame) {
         createTiles();
-        loadCompetition();
     }
 
-    ctx.strokeRect(410, 20, 480, 350)
     requestAnimationFrame(display);
 }
 
@@ -265,12 +294,4 @@ setInterval(taxes, 180000)
 
 function payTaxes() {
     taxModalEl.style.display = "none"
-}
-
-function loadCompetition() {
-    
-}
-
-function loadClouds() {
-
 }
