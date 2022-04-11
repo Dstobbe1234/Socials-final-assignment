@@ -39,6 +39,9 @@ const tileSize = 20;
 let africaClouds = true;
 let australiaClouds = true;
 let eurasiaClouds = true;
+let boatDrag = false;
+let nAmerica
+let sAmerica
 
 // Variables for HTML elements
 let buyBtn = document.getElementById("buy");
@@ -53,11 +56,13 @@ let taxModalEl = document.getElementById("taxesModal");
 let taxesAmt = document.getElementById("taxes");
 let modalBtn = document.getElementById("hide");
 let possibleTrades = [trade1];
+let boat = document.getElementById("boat");
+let buyBoatBtn = document.getElementById("buyBoat")
 let competition;
 
 //Tile class for placing stuff
 class tile {
-    constructor(x, y, w, h) {
+    constructor(x, y, w, h, startingStore) {
         this.x = x;
         this.y = y;
         this.w = w;
@@ -65,12 +70,13 @@ class tile {
         this.color = "rgb(0, 0, 0)";
         this.status = "open";
         this.index;
-        this.startingStore = false
+        this.startingStore = startingStore;
 
     }
 
     draw() {
         if (this.startingStore === true) {
+            console.log("EEEEEEE")
             ctx.drawImage(restaurantImg, this.x, this.y, this.w, this.h)
         }
         ctx.strokeStyle = this.color;
@@ -88,7 +94,7 @@ class tile {
         } else {
             this.color = "rgb(0, 0, 0)";
         }
-        if (this.status == "occupied" && this.index === undefined && this.competition === false) {
+        if (this.status == "occupied" && this.index === undefined && this.startingStore === false) {
             this.index = restaurantxlist.length;
 
         }
@@ -134,6 +140,7 @@ document.addEventListener("mousedown", mousedownHandler);
 document.addEventListener("mousemove", mousemoveHandler);
 background.addEventListener('load', createTiles);
 modalBtn.addEventListener("click", payTaxes)
+buyBoatBtn.addEventListener("click", boatPlace)
 
 taxModalEl.style.display = "none"
 
@@ -148,6 +155,9 @@ function drag() {
 function mousedownHandler() {
     if (dragRestaurant === true) {
         numberOfRestaurants++;
+    }
+    if (boatDrag) {
+
     }
 }
 
@@ -180,16 +190,16 @@ function createTiles() {
                     }
                 }
                 if (!containsOcean) {
-                    tiles.push(new tile(x, y, 20, 20));
+                    tiles.push(new tile(x, y, 20, 20, false));
                     if (x >= 0 && x <= 410 && y >= 0 && y <= 550) {
-                        americas.push(new tile(x, y, 20, 20))
+                        americas.push(new tile(x, y, 20, 20, false))
                     } else if (x >= 410 && x <= 630 && y >= 258 && y <= 508) {
-                        africaMiddleEast.push(new tile(x, y, tileSize, tileSize))
+                        africaMiddleEast.push(new tile(x, y, tileSize, tileSize, false))
                     } else if (x >= 410 && x <= 940 && y >= 20 && y <= 370 && africaMiddleEast.includes(new tile(x, y, tileSize, tileSize)) === false) {
-                        eurasia.push(new tile(x, y, tileSize, tileSize))
+                        eurasia.push(new tile(x, y, tileSize, tileSize, false))
                     } else if (x >= 770 && x <= 970 && y >= 400 && y <= 550) {
-                        australia.push(new tile(x, y, tileSize, tileSize))
-                    }
+                        australia.push(new tile(x, y, tileSize, tileSize, false))
+                    } //else if (x >= 250 && x <= 500 && y <=)
                 }
             }
         }
@@ -203,13 +213,13 @@ function createTiles() {
         //}
         //}
         let randomIndex = Math.round(Math.random() * americas.length - 1)
-        tiles[randomIndex].status = "occupied";
-        tiles[randomIndex].startingStore = true;
+        americas[randomIndex].status = "occupied";
+        americas[randomIndex].startingStore = true;
         createClouds();
-        console.log(australia)
         console.log(americas)
-        console.log(eurasia)
-        console.log(africaMiddleEast)
+        console.log(randomIndex)
+        console.log(americas[randomIndex])
+        console.log(americas[randomIndex].startingStore)
     } else {
         tryNextFrame = true;
     }
@@ -280,6 +290,11 @@ function display() {
         createTiles();
     }
 
+    if (boatDrag) {
+        ctx.drawImage(boat, mouseX, mouseY, 30, 30)
+    }
+
+    ctx.strokeRect(250, 350, 150, 200)
     requestAnimationFrame(display);
 }
 
@@ -297,4 +312,8 @@ setInterval(taxes, 180000)
 
 function payTaxes() {
     taxModalEl.style.display = "none"
+}
+
+function boatPlace() {
+    boatDrag = true;
 }
