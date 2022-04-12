@@ -6,42 +6,6 @@ let ctx = cnv.getContext("2d");
 cnv.width = 1000;
 cnv.height = cnv.width * 0.6;
 
-// Global variables
-let preventDefault;
-let mouseX, mouseY;
-let dragRestaurant = false;
-let numberOfRestaurants = 1;
-let restaurantxlist = [];
-let restaurantylist = [];
-let money = 0;
-let restaurantX, restaurantY
-let worldX = 0;
-let worldY = 0;
-let mapHeight = cnv.height;
-let mapWidth = cnv.width;
-let backgroundX = 0;
-let backgroundY = 0;
-let tiles = []
-let randomInterval = (Math.random() * 1000).toFixed()
-let randomX, randomY;
-let randomIndex
-let repetition = 0;
-let reputation = 1;
-let ratio = 0
-let tryNextFrame = true;
-let trade = false;
-let americas = [];
-let africaMiddleEast = [];
-let eurasia = [];
-let australia = [];
-let clouds = [];
-const tileSize = 20;
-let africaClouds = true;
-let australiaClouds = true;
-let eurasiaClouds = true;
-let boatDrag = false;
-let nAmerica
-let sAmerica
 
 // Variables for HTML elements
 let buyBtn = document.getElementById("buy");
@@ -55,10 +19,59 @@ let trade1 = document.getElementById("trade");
 let taxModalEl = document.getElementById("taxesModal");
 let taxesAmt = document.getElementById("taxes");
 let modalBtn = document.getElementById("hide");
-let possibleTrades = [trade1];
 let boat = document.getElementById("boat");
 let buyBoatBtn = document.getElementById("buyBoat")
+
+
+// Global variables
+let preventDefault;
+let mouseX, mouseY;
+let dragRestaurant = false;
+let numberOfRestaurants = 1;
+let restaurantxlist = [];
+let restaurantylist = [];
+let money = 0;
+let mapHeight = cnv.height;
+let mapWidth = cnv.width;
+let backgroundX = 0;
+let backgroundY = 0;
+let tiles = []
+let randomInterval = (Math.random() * 1000).toFixed()
+let randomX, randomY;
+let randomIndex
+let repetition = 0;
+let reputation = 1;
+let ratio = 0
+let tryNextFrame = true;
+let americas = [];
+let africaMiddleEast = [];
+let eurasia = [];
+let australia = [];
+let clouds = [];
+const tileSize = 20;
+let africaClouds = true;
+let australiaClouds = true;
+let eurasiaClouds = true;
+let boatDrag = false;
+let nAmerica = []
+let sAmerica = []
 let competition;
+let possibleTrades = [trade1];
+let displayLength = 1000
+let displayDuration = 0
+let trade = false
+
+
+//Event Listeners
+
+buyBtn.addEventListener("click", drag);
+document.addEventListener("mousedown", mousedownHandler);
+document.addEventListener("mousemove", mousemoveHandler);
+background.addEventListener("load", createTiles);
+modalBtn.addEventListener("click", payTaxes)
+buyBoatBtn.addEventListener("click", boatPlace)
+
+taxModalEl.style.display = "none"
 
 //Tile class for placing stuff
 class tile {
@@ -120,6 +133,9 @@ class cloud {
         } else if (this.continent === "africaMiddleEast") {
             this.x = africaMiddleEast[tileIndex].x - (this.w / 2) + (tileSize / 2);
             this.y = africaMiddleEast[tileIndex].y - (this.h / 2) + (tileSize / 2);
+        } else if (this.continent === "sAmerica") {
+            this.x = sAmerica[tileIndex].x - (this.w / 2) + (tileSize / 2);
+            this.y = sAmerica[tileIndex].y - (this.h / 2) + (tileSize / 2);
         }
     }
 
@@ -133,16 +149,6 @@ class cloud {
         ctx.drawImage(cloudsImg, 165 * this.cloudX, 135 * this.cloudY, 165, 135, this.x, this.y, this.w, this.h);
     }
 }
-
-//Event Listeners
-buyBtn.addEventListener("click", drag);
-document.addEventListener("mousedown", mousedownHandler);
-document.addEventListener("mousemove", mousemoveHandler);
-background.addEventListener('load', createTiles);
-modalBtn.addEventListener("click", payTaxes)
-buyBoatBtn.addEventListener("click", boatPlace)
-
-taxModalEl.style.display = "none"
 
 //Event Functions
 function drag() {
@@ -191,35 +197,22 @@ function createTiles() {
                 }
                 if (!containsOcean) {
                     tiles.push(new tile(x, y, 20, 20, false));
-                    if (x >= 0 && x <= 410 && y >= 0 && y <= 550) {
-                        americas.push(new tile(x, y, 20, 20, false))
+                    if (x >= 250 && x <= 400 && y >= 350 && y <= 550) {
+                        sAmerica.push(new tile(x, y, 20, 20, false))
                     } else if (x >= 410 && x <= 630 && y >= 258 && y <= 508) {
                         africaMiddleEast.push(new tile(x, y, tileSize, tileSize, false))
                     } else if (x >= 410 && x <= 940 && y >= 20 && y <= 370 && africaMiddleEast.includes(new tile(x, y, tileSize, tileSize)) === false) {
                         eurasia.push(new tile(x, y, tileSize, tileSize, false))
                     } else if (x >= 770 && x <= 970 && y >= 400 && y <= 550) {
                         australia.push(new tile(x, y, tileSize, tileSize, false))
-                    } //else if (x >= 250 && x <= 500 && y <=)
+                    } else {
+                        nAmerica.push(new tile(x, y, tileSize, tileSize, false))
+                    }
                 }
             }
         }
-        // randomly generate competition on roughly one third of the tiles
-        //for(x = 0; x <= tiles.length - 1; x ++) {
-        //competition = Math.random() * 100;
-        //if (competition <= 25) {
-        //tiles[x].competition = true;
-        //tiles[x].status = "occupied";
-        //console.log("EEE");
-        //}
-        //}
-        let randomIndex = Math.round(Math.random() * americas.length - 1)
-        americas[randomIndex].status = "occupied";
-        americas[randomIndex].startingStore = true;
         createClouds();
-        console.log(americas)
-        console.log(randomIndex)
-        console.log(americas[randomIndex])
-        console.log(americas[randomIndex].startingStore)
+
     } else {
         tryNextFrame = true;
     }
@@ -237,12 +230,17 @@ function createClouds() {
     for (let n = 0; n < africaMiddleEast.length; n++) {
         clouds.push(new cloud(n, "africaMiddleEast"))
     }
+    for (let n = 0; n < sAmerica.length; n++) {
+        clouds.push(new cloud(n, "sAmerica"))
+    }
 }
 
 // Animation loop
 requestAnimationFrame(display);
 
 function display() {
+
+    // Draw world map
     ctx.drawImage(background, backgroundX, backgroundY, mapWidth, mapHeight);
 
     // Draw all the tiles
@@ -254,7 +252,6 @@ function display() {
     for (let n = 0; n < clouds.length; n++) {
         clouds[n].draw();
     }
-
     // Decide when to show a trade request
     repetition++;
     if (repetition == randomInterval) {
@@ -262,16 +259,18 @@ function display() {
         randomX = randomIndex.x
         randomY = randomIndex.y
         trade = true
-        repetition = 0
-        randomInterval = (Math.random() * 1000).toFixed()
     }
 
     if (trade === true) {
-        for (let n = 0; n <= 100; n++) {
-            ctx.drawImage(trade1, randomX, randomY, 20, 20);
+        ctx.drawImage(trade1, randomX, randomY, 20, 20);
+        displayDuration ++
+        if (displayDuration == displayLength) {
+            trade = false
+            displayDuration = 0
+            repetition = 0
+            randomInterval = (Math.random() * 1000).toFixed()
         }
     }
-
     restaurantSum.innerHTML = numberOfRestaurants;
 
     if (numberOfRestaurants > 0) {
@@ -293,8 +292,6 @@ function display() {
     if (boatDrag) {
         ctx.drawImage(boat, mouseX, mouseY, 30, 30)
     }
-
-    ctx.strokeRect(250, 350, 150, 200)
     requestAnimationFrame(display);
 }
 
