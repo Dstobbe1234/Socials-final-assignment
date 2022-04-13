@@ -196,9 +196,9 @@ function createTiles() {
                     }
                 }
                 if (!containsOcean) {
-                    tiles.push(new tile(x, y, 20, 20, false));
+                    tiles.push(new tile(x, y, tileSize, tileSize, false));
                     if (x >= 250 && x <= 400 && y >= 350 && y <= 550) {
-                        sAmerica.push(new tile(x, y, 20, 20, false))
+                        sAmerica.push(new tile(x, y, tileSize, tileSize, false))
                     } else if (x >= 410 && x <= 630 && y >= 258 && y <= 508) {
                         africaMiddleEast.push(new tile(x, y, tileSize, tileSize, false))
                     } else if (x >= 410 && x <= 940 && y >= 20 && y <= 370 && africaMiddleEast.includes(new tile(x, y, tileSize, tileSize)) === false) {
@@ -212,7 +212,10 @@ function createTiles() {
             }
         }
         createClouds();
-
+        let randomIndex = Math.round(Math.random() * nAmerica.length - 1)
+        nAmerica[randomIndex].startingStore = true;
+        console.log(tiles.indexOf(nAmerica[randomIndex]))
+        
     } else {
         tryNextFrame = true;
     }
@@ -290,8 +293,16 @@ function display() {
     }
 
     if (boatDrag) {
+        ctx.strokeStyle = "rgb(255, 0, 0)"
         ctx.drawImage(boat, mouseX, mouseY, 30, 30)
+        if (mouseX >= 250 && mouseX <= 500 && mouseY >= 200 && mouseY <= 400) {
+            ctx.beginPath()
+            ctx.moveTo(280, 250)
+            ctx.lineTo(450, 250)
+            ctx.stroke()
+        }
     }
+    ctx.strokeRect(250, 200, 250, 200)
     requestAnimationFrame(display);
 }
 
