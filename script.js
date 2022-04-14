@@ -60,7 +60,9 @@ let possibleTrades = [trade1];
 let displayLength = 1000
 let displayDuration = 0
 let trade = false
-
+let preventDuplicates = false
+let competitionGrowthInterval = Math.round(Math.random() * 100000)
+let competitionGrowthDuration = 0 
 
 //Event Listeners
 
@@ -84,12 +86,15 @@ class tile {
         this.status = "open";
         this.index;
         this.startingStore = startingStore;
+        this.competition = false
 
     }
 
     draw() {
-        if (this.startingStore === true) {
+        if (this.startingStore) {
             console.log("EEEEEEE")
+            ctx.drawImage(restaurantImg, this.x, this.y, this.w, this.h)
+        } else if (this.competition) {
             ctx.drawImage(restaurantImg, this.x, this.y, this.w, this.h)
         }
         ctx.strokeStyle = this.color;
@@ -178,8 +183,10 @@ function createTiles() {
     let rTest = testImageData.data[1];
     let gTest = testImageData.data[2];
     let bTest = testImageData.data[3];
-    if (!(rTest === 0 && gTest === 0 && bTest === 0)) {
+    if (!(rTest === 0 && gTest === 0 && bTest === 0) && preventDuplicates === false) {
+        console.log("GFGDF")
         tryNextFrame = false;
+        preventDuplicates = true
         for (let y = 0; y < cnv.height; y += 20, x = 0) {
             for (let x = 0; x < cnv.width; x += 20) {
                 let imageData = ctx.getImageData(x, y, 20, 20);
@@ -197,6 +204,7 @@ function createTiles() {
                 }
                 if (!containsOcean) {
                     tiles.push(new tile(x, y, tileSize, tileSize, false));
+                    //console.log(tiles)
                     if (x >= 250 && x <= 400 && y >= 350 && y <= 550) {
                         sAmerica.push(new tile(x, y, tileSize, tileSize, false))
                     } else if (x >= 410 && x <= 630 && y >= 258 && y <= 508) {
@@ -214,10 +222,7 @@ function createTiles() {
         createClouds();
         let randomIndex = Math.round(Math.random() * nAmerica.length - 1)
         nAmerica[randomIndex].startingStore = true;
-        console.log(tiles.indexOf(nAmerica[randomIndex]))
-        
-    } else {
-        tryNextFrame = true;
+        randomIndex = Math.round(Math.random() * nAmerica.length - 1)
     }
 }
 
@@ -251,6 +256,12 @@ function display() {
         tiles[n].draw();
     }
 
+    for(let n = 0; n < nAmerica.length; n++) {
+        nAmerica[n].draw()
+    }
+
+
+
     // Draw all the clouds
     for (let n = 0; n < clouds.length; n++) {
         clouds[n].draw();
@@ -258,7 +269,7 @@ function display() {
     // Decide when to show a trade request
     repetition++;
     if (repetition == randomInterval) {
-        randomIndex = tiles[Math.round(Math.random() * 310)]
+        randomIndex = nAmerica[Math.round(Math.random() * nAmerica.length - 1)]
         randomX = randomIndex.x
         randomY = randomIndex.y
         trade = true
@@ -302,10 +313,9 @@ function display() {
             ctx.stroke()
         }
     }
-    ctx.strokeRect(250, 200, 250, 200)
     requestAnimationFrame(display);
 }
-
+competitionGrowthDuration ++
 function changeMoney() {
     money += 2 * numberOfRestaurants;
     amountEl.innerHTML = money;
