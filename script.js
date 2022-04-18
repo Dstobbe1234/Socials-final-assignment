@@ -32,6 +32,28 @@ let y = x = 0;
 let zoomedIn = false;
 let trade = false;
 let ratio = 0
+<<<<<<< HEAD
+=======
+let tryNextFrame = true;
+let americas = [];
+let africaMiddleEast = [];
+let eurasia = [];
+let australia = [];
+let clouds = [];
+const tileSize = 20;
+let africaClouds = true;
+let australiaClouds = true;
+let eurasiaClouds = true;
+let boatDrag = false;
+let nAmerica = []
+let sAmerica = []
+let competition;
+let possibleTrades = [trade1];
+let displayLength = 1000
+let displayDuration = 0
+let trade = false
+
+>>>>>>> parent of 43d68d0 (starting store)
 
 
 
@@ -61,10 +83,15 @@ class tile {
         this.color = "rgb(0, 0, 0)";
         this.status = "open";
         this.index;
+<<<<<<< HEAD
+=======
+        this.startingStore = startingStore;
+>>>>>>> parent of 43d68d0 (starting store)
 
     }
 
     draw() {
+<<<<<<< HEAD
         if (zoomedIn) {
             ctx.strokeStyle = this.color;
             ctx.strokeRect(this.x + backgroundX, this.y + backgroundY, this.w, this.h);
@@ -75,6 +102,21 @@ class tile {
                 if (mouseX > this.x + backgroundX && mouseX < this.x+ this.w + backgroundX && mouseY > this.y + backgroundY && mouseY < this.y + this.h + backgroundY && dragBool === true && this.status === "open") {
                    this.status = "occupied"; 
                    dragBool = false;
+=======
+        if (this.startingStore === true) {
+            console.log("EEEEEEE")
+            ctx.drawImage(restaurantImg, this.x, this.y, this.w, this.h)
+        }
+        ctx.strokeStyle = this.color;
+        ctx.strokeRect(this.x, this.y, this.w, this.h);
+        if (mouseX > this.x && mouseX < this.x + this.w && mouseY > this.y && mouseY < this.y + this.h && dragRestaurant === true && this.status === "open") {
+            ctx.drawImage(restaurantImg, this.x, this.y, this.w, this.h);
+            this.color = "rgb(0, 255, 0)";
+            document.addEventListener("mousedown", () => {
+                if (mouseX > this.x && mouseX < this.x + this.w && mouseY > this.y && mouseY < this.y + this.h && dragRestaurant === true && this.status === "open") {
+                    this.status = "occupied";
+                    dragRestaurant = false;
+>>>>>>> parent of 43d68d0 (starting store)
 
                 }
                 })
@@ -117,10 +159,69 @@ function mousemoveHandler(event) {
     mouseMoveY = mouseY - pMouseY;
 }
 
+<<<<<<< HEAD
 function mousedownHandler() {
     moveMap = true
     if (dragBool === true) {
         numberOfRestaurants++;
+=======
+// Checks if a tile would have water in it and if not then creates it
+function createTiles() {
+    let testImageData = ctx.getImageData(0, 0, 1, 1);
+    let rTest = testImageData.data[1];
+    let gTest = testImageData.data[2];
+    let bTest = testImageData.data[3];
+    if (!(rTest === 0 && gTest === 0 && bTest === 0)) {
+        tryNextFrame = false;
+        for (let y = 0; y < cnv.height; y += 20, x = 0) {
+            for (let x = 0; x < cnv.width; x += 20) {
+                let imageData = ctx.getImageData(x, y, 20, 20);
+                let containsOcean = false;
+                let r, g, b;
+
+                for (var i = 0; i + 3 < imageData.data.length; i += 4) {
+                    r = imageData.data[i];
+                    g = imageData.data[i + 1];
+                    b = imageData.data[i + 2];
+
+                    if (r === 55 && g === 83 && b === 218) {
+                        containsOcean = true;
+                    }
+                }
+                if (!containsOcean) {
+                    tiles.push(new tile(x, y, tileSize, tileSize, false));
+                    if (x >= 250 && x <= 400 && y >= 350 && y <= 550) {
+                        sAmerica.push(new tile(x, y, tileSize, tileSize, false))
+                    } else if (x >= 410 && x <= 630 && y >= 258 && y <= 508) {
+                        africaMiddleEast.push(new tile(x, y, tileSize, tileSize, false))
+                    } else if (x >= 410 && x <= 940 && y >= 20 && y <= 370 && africaMiddleEast.includes(new tile(x, y, tileSize, tileSize)) === false) {
+                        eurasia.push(new tile(x, y, tileSize, tileSize, false))
+                    } else if (x >= 770 && x <= 970 && y >= 400 && y <= 550) {
+                        australia.push(new tile(x, y, tileSize, tileSize, false))
+                    } else {
+                        nAmerica.push(new tile(x, y, tileSize, tileSize, false))
+                    }
+                }
+            }
+        }
+        createClouds();
+        let randomIndex = Math.round(Math.random() * nAmerica.length - 1)
+        nAmerica[randomIndex].startingStore = true;
+        console.log(tiles.indexOf(nAmerica[randomIndex]))
+        
+    } else {
+        tryNextFrame = true;
+    }
+}
+
+function createClouds() {
+    for (let n = 0; n < eurasia.length; n++) {
+        clouds.push(new cloud(n, "eurasia"));
+    }
+
+    for (let n = 0; n < australia.length; n++) {
+        clouds.push(new cloud(n, "australia"));
+>>>>>>> parent of 43d68d0 (starting store)
     }
 
 }
@@ -137,6 +238,7 @@ function display() {
         }
     }
 
+<<<<<<< HEAD
     for (let y = 0; y <= 750; y += 50) {
         for (let x = 0; x <= 700; x += 50) {
             ctx.fillRect(x, y, 1, 800)
@@ -146,12 +248,23 @@ function display() {
 
     for (let x = 0; x < tiles.length; x++) {
         tiles[x].draw();
+=======
+    // Draw all the clouds
+    for (let n = 0; n < clouds.length; n++) {
+        clouds[n].draw();
+>>>>>>> parent of 43d68d0 (starting store)
     }
     repetition++;
     if (repetition == randomInterval) {
+<<<<<<< HEAD
         randomIndex = (Math.random() * 2).toFixed();
         randomX = tiles[Math.round(Math.random() * 263)].x;
         randomY = tiles[Math.round(Math.random() * 263)].y;
+=======
+        randomIndex = tiles[Math.round(Math.random() * 310)]
+        randomX = randomIndex.x
+        randomY = randomIndex.y
+>>>>>>> parent of 43d68d0 (starting store)
         trade = true
     }
 
@@ -192,6 +305,26 @@ function display() {
     } else {
         buyBtn.classList.remove("available");
     }
+<<<<<<< HEAD
+=======
+
+    // Retry making the tiles if the image wasn't loaded before
+    if (tryNextFrame) {
+        createTiles();
+    }
+
+    if (boatDrag) {
+        ctx.strokeStyle = "rgb(255, 0, 0)"
+        ctx.drawImage(boat, mouseX, mouseY, 30, 30)
+        if (mouseX >= 250 && mouseX <= 500 && mouseY >= 200 && mouseY <= 400) {
+            ctx.beginPath()
+            ctx.moveTo(280, 250)
+            ctx.lineTo(450, 250)
+            ctx.stroke()
+        }
+    }
+    ctx.strokeRect(250, 200, 250, 200)
+>>>>>>> parent of 43d68d0 (starting store)
     requestAnimationFrame(display);
 }
 
