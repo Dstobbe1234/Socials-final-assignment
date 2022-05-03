@@ -315,7 +315,7 @@ function display() {
 
     if (boatDrag) {
         ctx.strokeStyle = "rgb(255, 0, 0)"
-        ctx.drawImage(boat, mouseX, mouseY, 30, 30)
+        ctx.drawImage(boat, mouseX, mouseY, 100, 100)
         if (mouseX >= 250 && mouseX <= 500 && mouseY >= 200 && mouseY <= 400) {
             ctx.beginPath()
             ctx.moveTo(280, 250)
