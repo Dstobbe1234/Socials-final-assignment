@@ -221,8 +221,11 @@ function createTiles() {
         }
         createClouds();
         let randomIndex = Math.round(Math.random() * nAmerica.length - 1)
+        console.log(randomIndex)
         nAmerica[randomIndex].startingStore = true;
         randomIndex = Math.round(Math.random() * nAmerica.length - 1)
+        console.log(randomIndex)
+        nAmerica[randomIndex].competition = true
     }
 }
 
@@ -266,6 +269,13 @@ function display() {
     for (let n = 0; n < clouds.length; n++) {
         clouds[n].draw();
     }
+
+    if (africaClouds === false)
+        for(let n = 0; n < clouds.length; n ++) {
+            if (clouds[n].continent = "africaMiddleEast") {
+                clouds.splice(n, 1)
+            }
+        }
     // Decide when to show a trade request
     repetition++;
     if (repetition == randomInterval) {
@@ -335,3 +345,12 @@ function payTaxes() {
 function boatPlace() {
     boatDrag = true;
 }
+
+
+function competitionGrowth() {
+    competitionInterval = Math.round(Math.random * 100)
+
+}
+
+let competitionInterval = Math.round(Math.random * 100)
+setInterval(competitionGrowth, competitionInterval)
