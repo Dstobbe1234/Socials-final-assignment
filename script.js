@@ -22,7 +22,6 @@ let modalBtn = document.getElementById("hide");
 let boat = document.getElementById("boat");
 let buyBoatBtn = document.getElementById("buyBoat")
 
-
 // Global variables
 let preventDefault;
 let mouseX, mouseY;
@@ -92,7 +91,6 @@ class tile {
 
     draw() {
         if (this.startingStore) {
-            console.log("EEEEEEE")
             ctx.drawImage(restaurantImg, this.x, this.y, this.w, this.h)
         } else if (this.competition) {
             ctx.drawImage(restaurantImg, this.x, this.y, this.w, this.h)
@@ -244,6 +242,7 @@ function createClouds() {
     for (let n = 0; n < sAmerica.length; n++) {
         clouds.push(new cloud(n, "sAmerica"))
     }
+    console.log(clouds)
 }
 
 // Animation loop
@@ -270,9 +269,12 @@ function display() {
         clouds[n].draw();
     }
 
-    if (africaClouds === false)
+    if (!africaClouds)
         for(let n = 0; n < clouds.length; n ++) {
-            if (clouds[n].continent = "africaMiddleEast") {
+            console.log(n)
+            console.log(clouds[n].continent)
+            if (clouds[n].continent === "eurasia") {
+                console.log("yes")
                 clouds.splice(n, 1)
             }
         }
@@ -315,12 +317,13 @@ function display() {
 
     if (boatDrag) {
         ctx.strokeStyle = "rgb(255, 0, 0)"
-        ctx.drawImage(boat, mouseX, mouseY, 100, 100)
+        ctx.drawImage(boat, mouseX - 20, mouseY - 20, 100, 100)
         if (mouseX >= 250 && mouseX <= 500 && mouseY >= 200 && mouseY <= 400) {
             ctx.beginPath()
             ctx.moveTo(280, 250)
             ctx.lineTo(450, 250)
             ctx.stroke()
+            africaClouds = false
         }
     }
     requestAnimationFrame(display);
@@ -349,8 +352,11 @@ function boatPlace() {
 
 function competitionGrowth() {
     competitionInterval = Math.round(Math.random * 100)
-
+    let randomIndex = Math.round(Math.random * tiles.length - 1)
+    for(let possible = false; possible === false; ) {
+        if (!eurasiaClouds && 
 }
 
 let competitionInterval = Math.round(Math.random * 100)
 setInterval(competitionGrowth, competitionInterval)
+
