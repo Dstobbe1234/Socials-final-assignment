@@ -34,7 +34,6 @@ let mapHeight = cnv.height;
 let mapWidth = cnv.width;
 let backgroundX = 0;
 let backgroundY = 0;
-let tiles = []
 let randomInterval = (Math.random() * 1000).toFixed()
 let randomX, randomY;
 let randomIndex
@@ -46,14 +45,15 @@ let americas = [];
 let africaMiddleEast = [];
 let eurasia = [];
 let australia = [];
+let nAmerica = []
+let sAmerica = []
+let tiles = [eurasia, australia, africaMiddleEast, sAmerica, nAmerica]
 let clouds = [];
 const tileSize = 20;
 let africaClouds = true;
 let australiaClouds = true;
 let eurasiaClouds = true;
 let boatDrag = false;
-let nAmerica = []
-let sAmerica = []
 let competition;
 let possibleTrades = [trade1];
 let displayLength = 1000
@@ -76,23 +76,26 @@ taxModalEl.style.display = "none"
 
 //Tile class for placing stuff
 class tile {
-    constructor(x, y, w, h, startingStore) {
+    constructor(x, y, w, h, status) {
         this.x = x;
         this.y = y;
         this.w = w;
         this.h = h;
         this.color = "rgb(0, 0, 0)";
-        this.status = "open";
+        this.status = status;
         this.index;
-        this.startingStore = startingStore;
+        this.startingStore
         this.competition = false
 
     }
 
     draw() {
+        console.log(restaurantxlist)
         if (this.startingStore) {
+            this.status = "occupied"
             ctx.drawImage(restaurantImg, this.x, this.y, this.w, this.h)
         } else if (this.competition) {
+            this.status = "occupied"
             ctx.drawImage(restaurantImg, this.x, this.y, this.w, this.h)
         }
         ctx.strokeStyle = this.color;
@@ -110,7 +113,7 @@ class tile {
         } else {
             this.color = "rgb(0, 0, 0)";
         }
-        if (this.status == "occupied" && this.index === undefined && this.startingStore === false) {
+        if (this.status == "occupied" && this.index === undefined && this.startingStore === false && this.competition === false) {
             this.index = restaurantxlist.length;
 
         }
@@ -200,19 +203,17 @@ function createTiles() {
                         containsOcean = true;
                     }
                 }
-                if (!containsOcean) {
-                    tiles.push(new tile(x, y, tileSize, tileSize, false));
-                    //console.log(tiles)
+                if (!containsOcean) {;
                     if (x >= 250 && x <= 400 && y >= 350 && y <= 550) {
-                        sAmerica.push(new tile(x, y, tileSize, tileSize, false))
+                        sAmerica.push(new tile(x, y, tileSize, tileSize, "occupied"))
                     } else if (x >= 410 && x <= 630 && y >= 258 && y <= 508) {
-                        africaMiddleEast.push(new tile(x, y, tileSize, tileSize, false))
-                    } else if (x >= 410 && x <= 940 && y >= 20 && y <= 370 && africaMiddleEast.includes(new tile(x, y, tileSize, tileSize)) === false) {
-                        eurasia.push(new tile(x, y, tileSize, tileSize, false))
+                        africaMiddleEast.push(new tile(x, y, tileSize, tileSize, "occupied"))
+                    } else if (x >= 410 && x <= 940 && y >= 20 && y <= 370 && africaMiddleEast.includes(new tile(x, y, tileSize, tileSize, "occupied")) === false) {
+                        eurasia.push(new tile(x, y, tileSize, tileSize, "occupied"))
                     } else if (x >= 770 && x <= 970 && y >= 400 && y <= 550) {
-                        australia.push(new tile(x, y, tileSize, tileSize, false))
+                        australia.push(new tile(x, y, tileSize, tileSize, "occupied"))
                     } else {
-                        nAmerica.push(new tile(x, y, tileSize, tileSize, false))
+                        nAmerica.push(new tile(x, y, tileSize, tileSize, "open"))
                     }
                 }
             }
@@ -221,7 +222,21 @@ function createTiles() {
         let randomIndex = Math.round(Math.random() * nAmerica.length - 1)
         console.log(randomIndex)
         nAmerica[randomIndex].startingStore = true;
-        randomIndex = Math.round(Math.random() * nAmerica.length - 1)
+        let open = false
+        while(open === false) {
+            randomIndex = Math.round(Math.random() * nAmerica.length - 1)
+            //if (nAmerica[randomIndex].status === "open") {
+              //  n = true
+           // }
+           console.log(tiles[4][randomIndex].status)
+           console.log(tiles[4][randomIndex])
+        //}
+        //for(let n = false; n; ) {
+           // randomIndex = Math.round(Math.random() * nAmerica.length - 1)
+            if (tiles[4][randomIndex].status === "open") {
+                open = true
+            }
+        }
         console.log(randomIndex)
         nAmerica[randomIndex].competition = true
     }
@@ -253,17 +268,12 @@ function display() {
     // Draw world map
     ctx.drawImage(background, backgroundX, backgroundY, mapWidth, mapHeight);
 
-    // Draw all the tiles
+    //Draw all the tiles
     for (let n = 0; n < tiles.length; n++) {
-        tiles[n].draw();
+        for(let m = 0; m < tiles[n].length; m++) {
+            tiles[n][m].draw();
+        }
     }
-
-    for(let n = 0; n < nAmerica.length; n++) {
-        nAmerica[n].draw()
-    }
-
-
-
     // Draw all the clouds
     for (let n = 0; n < clouds.length; n++) {
         clouds[n].draw();
@@ -353,8 +363,6 @@ function boatPlace() {
 function competitionGrowth() {
     competitionInterval = Math.round(Math.random * 100)
     let randomIndex = Math.round(Math.random * tiles.length - 1)
-    for(let possible = false; possible === false; ) {
-        if (!eurasiaClouds && 
 }
 
 let competitionInterval = Math.round(Math.random * 100)
