@@ -53,6 +53,7 @@ const tileSize = 20;
 let africaClouds = true;
 let australiaClouds = true;
 let eurasiaClouds = true;
+let sAmericaClouds = true;
 let boatDrag = false;
 let competition;
 let possibleTrades = [trade1];
@@ -62,6 +63,7 @@ let trade = false
 let preventDuplicates = false
 let competitionGrowthInterval = Math.round(Math.random() * 100000)
 let competitionGrowthDuration = 0 
+let availableTiles = []
 
 //Event Listeners
 
@@ -76,21 +78,21 @@ taxModalEl.style.display = "none"
 
 //Tile class for placing stuff
 class tile {
-    constructor(x, y, w, h, status) {
+    constructor(x, y, w, h, continent) {
         this.x = x;
         this.y = y;
         this.w = w;
         this.h = h;
         this.color = "rgb(0, 0, 0)";
-        this.status = status;
+        this.status = "open";
         this.index;
         this.startingStore
         this.competition = false
+        this.continent = continent
 
     }
 
     draw() {
-        console.log(restaurantxlist)
         if (this.startingStore) {
             this.status = "occupied"
             ctx.drawImage(restaurantImg, this.x, this.y, this.w, this.h)
@@ -185,7 +187,6 @@ function createTiles() {
     let gTest = testImageData.data[2];
     let bTest = testImageData.data[3];
     if (!(rTest === 0 && gTest === 0 && bTest === 0) && preventDuplicates === false) {
-        console.log("GFGDF")
         tryNextFrame = false;
         preventDuplicates = true
         for (let y = 0; y < cnv.height; y += 20, x = 0) {
@@ -205,31 +206,26 @@ function createTiles() {
                 }
                 if (!containsOcean) {;
                     if (x >= 250 && x <= 400 && y >= 350 && y <= 550) {
-                        sAmerica.push(new tile(x, y, tileSize, tileSize, "occupied"))
+                        sAmerica.push(new tile(x, y, tileSize, tileSize, "sAmerica"))
                     } else if (x >= 410 && x <= 630 && y >= 258 && y <= 508) {
-                        africaMiddleEast.push(new tile(x, y, tileSize, tileSize, "occupied"))
+                        africaMiddleEast.push(new tile(x, y, tileSize, tileSize, "africaMiddleEast"))
                     } else if (x >= 410 && x <= 940 && y >= 20 && y <= 370 && africaMiddleEast.includes(new tile(x, y, tileSize, tileSize, "occupied")) === false) {
-                        eurasia.push(new tile(x, y, tileSize, tileSize, "occupied"))
+                        eurasia.push(new tile(x, y, tileSize, tileSize, "eurasia"))
                     } else if (x >= 770 && x <= 970 && y >= 400 && y <= 550) {
-                        australia.push(new tile(x, y, tileSize, tileSize, "occupied"))
+                        australia.push(new tile(x, y, tileSize, tileSize, "australia"))
                     } else {
-                        nAmerica.push(new tile(x, y, tileSize, tileSize, "open"))
+                        nAmerica.push(new tile(x, y, tileSize, tileSize, "nAmerica"))
                     }
                 }
             }
         }
         createClouds();
         let randomIndex = Math.round(Math.random() * nAmerica.length - 1)
-        console.log(randomIndex)
         nAmerica[randomIndex].startingStore = true;
         let open = false
-        while(open === false) {
+       
+        while(!open) {
             randomIndex = Math.round(Math.random() * nAmerica.length - 1)
-            //if (nAmerica[randomIndex].status === "open") {
-              //  n = true
-           // }
-           console.log(tiles[4][randomIndex].status)
-           console.log(tiles[4][randomIndex])
         //}
         //for(let n = false; n; ) {
            // randomIndex = Math.round(Math.random() * nAmerica.length - 1)
@@ -237,7 +233,6 @@ function createTiles() {
                 open = true
             }
         }
-        console.log(randomIndex)
         nAmerica[randomIndex].competition = true
     }
 }
@@ -257,14 +252,12 @@ function createClouds() {
     for (let n = 0; n < sAmerica.length; n++) {
         clouds.push(new cloud(n, "sAmerica"))
     }
-    console.log(clouds)
 }
 
 // Animation loop
 requestAnimationFrame(display);
 
 function display() {
-
     // Draw world map
     ctx.drawImage(background, backgroundX, backgroundY, mapWidth, mapHeight);
 
@@ -281,10 +274,7 @@ function display() {
 
     if (!africaClouds)
         for(let n = 0; n < clouds.length; n ++) {
-            console.log(n)
-            console.log(clouds[n].continent)
             if (clouds[n].continent === "eurasia") {
-                console.log("yes")
                 clouds.splice(n, 1)
             }
         }
@@ -309,6 +299,30 @@ function display() {
     }
     restaurantSum.innerHTML = numberOfRestaurants;
 
+    console.log(availableTiles.length)
+
+
+    for (let n = 0; n < tiles.length; n++) {
+        for(let m = 0; m < tiles[n].length; m++) {
+            if (availableTiles.find(element => element === tiles[n][m])) {
+                if (tiles[n][m].status === "occupied") {
+                    availableTiles.splice(availableTiles.indexOf(tiles[n][m]), 1)
+                }
+            } else {
+                if (tiles[n][m].continent === "sAmerica" && tiles[n][m].status === "open" && !sAmericaClouds) {
+                    availableTiles.push(tiles[n][m])
+                } else if(tiles[n][m].continent === "eurasia" && tiles[n][m].status === "open" && !eurasiaClouds) {
+                    availableTiles.push(tiles[n][m])
+                } else if(tiles[n][m].continent === "africaMiddleEast" && tiles[n][m].status === "open" && !africaClouds) {
+                    availableTiles.push(tiles[n][m])
+                } else if(tiles[n][m].continent === "australia" && tiles[n][m].status === "open" && !australiaClouds) {
+                    availableTiles.push(tiles[n][m])
+                } else if (tiles[n][m].continent === "nAmerica" && tiles[n][m].status === "open") {
+                    availableTiles.push(tiles[n][m])
+                }
+            }
+        }
+    }
     if (numberOfRestaurants > 0) {
         for (let n = restaurantxlist.length - 1; n >= 0; n--) {
             ctx.drawImage(restaurantImg, restaurantxlist[n], restaurantylist[n], 20, 20);
@@ -361,10 +375,13 @@ function boatPlace() {
 
 
 function competitionGrowth() {
-    competitionInterval = Math.round(Math.random * 100)
-    let randomIndex = Math.round(Math.random * tiles.length - 1)
+    if(availableTiles.length > 0) {
+        let randomIndex = Math.round(Math.random() * availableTiles.length - 1);
+        availableTiles[randomIndex].competition = true;
+        console.log(randomIndex)
+    }
+    competitionInterval = Math.round(Math.random() * 1000);
 }
 
-let competitionInterval = Math.round(Math.random * 100)
+let competitionInterval = Math.round(Math.random() * 1000)
 setInterval(competitionGrowth, competitionInterval)
-
