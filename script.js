@@ -112,12 +112,13 @@ class tile {
 
                 }
             })
+        } else if(mouseX > this.x && mouseX < this.x + this.w && mouseY > this.y && mouseY < this.y + this.h && this.status === "occupied" && dragRestaurant === true) {
+            this.color = "rgb(255, 0, 0)";
         } else {
             this.color = "rgb(0, 0, 0)";
         }
-        if (this.status == "occupied" && this.index === undefined && this.startingStore === false && this.competition === false) {
+        if (this.status == "occupied" && this.index === undefined && this.startingStore === undefined && this.competition === false) {
             this.index = restaurantxlist.length;
-
         }
         if (this.index !== undefined) {
             restaurantxlist.splice(this.index, 1, this.x);
@@ -220,20 +221,18 @@ function createTiles() {
             }
         }
         createClouds();
-        let randomIndex = Math.round(Math.random() * nAmerica.length - 1)
+        let randomIndex = Math.floor(Math.random() * nAmerica.length)
         nAmerica[randomIndex].startingStore = true;
         let open = false
-       
+        
+        // Loops until it finds an available tile (so that it doesn't end up on startingStore)
         while(!open) {
             randomIndex = Math.round(Math.random() * nAmerica.length - 1)
-        //}
-        //for(let n = false; n; ) {
-           // randomIndex = Math.round(Math.random() * nAmerica.length - 1)
             if (tiles[4][randomIndex].status === "open") {
                 open = true
+                nAmerica[randomIndex].competition = true
             }
         }
-        nAmerica[randomIndex].competition = true
     }
 }
 
@@ -376,12 +375,12 @@ function boatPlace() {
 
 function competitionGrowth() {
     if(availableTiles.length > 0) {
-        let randomIndex = Math.round(Math.random() * availableTiles.length - 1);
+        let randomIndex = Math.floor(Math.random() * availableTiles.length);
         availableTiles[randomIndex].competition = true;
         console.log(randomIndex)
     }
-    competitionInterval = Math.round(Math.random() * 1000);
+    competitionInterval = Math.round(Math.random() * 10000);
 }
 
-let competitionInterval = Math.round(Math.random() * 1000)
+let competitionInterval = Math.round(Math.random() * 10000)
 setInterval(competitionGrowth, competitionInterval)
