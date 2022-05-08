@@ -36,7 +36,7 @@ let backgroundX = 0;
 let backgroundY = 0;
 let randomInterval = (Math.random() * 1000).toFixed()
 let randomX, randomY;
-let randomIndex
+//let randomIndex
 let repetition = 0;
 let reputation = 1;
 let ratio = 0
@@ -98,9 +98,14 @@ class tile {
             ctx.drawImage(restaurantImg, this.x, this.y, this.w, this.h)
         } else if (this.competition) {
             this.status = "occupied"
+            document.addEventListener("mousedown", () => {
+                if (mouseX > this.x && mouseX < this.x + this.w && mouseY > this.y && mouseY < this.y + this.h && this.competition) {
+                    console.log("Buy: 100$")
+                }
+            })
             ctx.drawImage(restaurantImg, this.x, this.y, this.w, this.h)
         }
-        ctx.strokeStyle = this.color;
+        ctx.strokeStyle = this.color; 
         ctx.strokeRect(this.x, this.y, this.w, this.h);
         if (mouseX > this.x && mouseX < this.x + this.w && mouseY > this.y && mouseY < this.y + this.h && dragRestaurant === true && this.status === "open") {
             ctx.drawImage(restaurantImg, this.x, this.y, this.w, this.h);
@@ -109,7 +114,7 @@ class tile {
                 if (mouseX > this.x && mouseX < this.x + this.w && mouseY > this.y && mouseY < this.y + this.h && dragRestaurant === true && this.status === "open") {
                     this.status = "occupied";
                     dragRestaurant = false;
-
+                    numberOfRestaurants++
                 }
             })
         } else if(mouseX > this.x && mouseX < this.x + this.w && mouseY > this.y && mouseY < this.y + this.h && this.status === "occupied" && dragRestaurant === true) {
@@ -168,12 +173,6 @@ function drag() {
 }
 
 function mousedownHandler() {
-    if (dragRestaurant === true) {
-        numberOfRestaurants++;
-    }
-    if (boatDrag) {
-
-    }
 }
 
 function mousemoveHandler(event) {
@@ -227,7 +226,7 @@ function createTiles() {
         
         // Loops until it finds an available tile (so that it doesn't end up on startingStore)
         while(!open) {
-            randomIndex = Math.round(Math.random() * nAmerica.length - 1)
+            randomIndex = Math.round(Math.random() * nAmerica.length)
             if (tiles[4][randomIndex].status === "open") {
                 open = true
                 nAmerica[randomIndex].competition = true
@@ -271,7 +270,7 @@ function display() {
         clouds[n].draw();
     }
 
-    if (!africaClouds)
+    if (!eurasiaClouds)
         for(let n = 0; n < clouds.length; n ++) {
             if (clouds[n].continent === "eurasia") {
                 clouds.splice(n, 1)
@@ -280,7 +279,7 @@ function display() {
     // Decide when to show a trade request
     repetition++;
     if (repetition == randomInterval) {
-        randomIndex = nAmerica[Math.round(Math.random() * nAmerica.length - 1)]
+        let randomIndex = nAmerica[Math.round(Math.random() * nAmerica.length)]
         randomX = randomIndex.x
         randomY = randomIndex.y
         trade = true
@@ -297,8 +296,6 @@ function display() {
         }
     }
     restaurantSum.innerHTML = numberOfRestaurants;
-
-    console.log(availableTiles.length)
 
 
     for (let n = 0; n < tiles.length; n++) {
@@ -346,7 +343,7 @@ function display() {
             ctx.moveTo(280, 250)
             ctx.lineTo(450, 250)
             ctx.stroke()
-            africaClouds = false
+            eurasiaClouds = false
         }
     }
     requestAnimationFrame(display);
@@ -360,7 +357,6 @@ setInterval(changeMoney, 100);
 
 function taxes() {
     taxModalEl.style.display = "block"
-    //console.log("TAXES\nTotal:\n");
 }
 setInterval(taxes, 180000)
 
@@ -377,10 +373,10 @@ function competitionGrowth() {
     if(availableTiles.length > 0) {
         let randomIndex = Math.floor(Math.random() * availableTiles.length);
         availableTiles[randomIndex].competition = true;
-        console.log(randomIndex)
     }
     competitionInterval = Math.round(Math.random() * 10000);
+    setTimeout(competitionGrowth, competitionInterval)
 }
 
 let competitionInterval = Math.round(Math.random() * 10000)
-setInterval(competitionGrowth, competitionInterval)
+setTimeout(competitionGrowth, competitionInterval)
