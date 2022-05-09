@@ -52,7 +52,6 @@ let displayDuration = 0;
 let trade = false;
 let preventDuplicates = false;
 let competitionGrowthInterval = Math.round(Math.random() * 100000);
-let competitionGrowthDuration = 0;
 let availableTiles = [];
 
 taxModalEl.style.display = 'none';
@@ -70,11 +69,17 @@ class tile {
       this.startingStore;
       this.competition = false;
       this.continent = continent;
+      this.restaurantType
    }
 
    draw() {
-      if (this.startingStore || this.competition) {
-         this.status = 'occupied';
+      if (this.startingStore) {
+        this.status = 'occupied'
+        this.restaurantType = restaurantImg
+      } else if (this.competition) {
+        this.status = "occupied"
+        //This will change when Will draw
+        this.restaurantType = restaurantImg
       }
 
       if (this.status === 'occupied') {
@@ -104,6 +109,7 @@ class tile {
             ) {
                this.status = 'occupied';
                dragRestaurant = false;
+               this.restaurantType = restaurantImg
             }
          });
       } else if (
@@ -117,12 +123,6 @@ class tile {
          this.color = 'rgb(255, 0, 0)';
       } else {
          this.color = 'rgb(0, 0, 0)';
-      }
-      if (this.status == 'occupied' && !this.index && !this.startingStore && !this.competition) {
-         this.index = rCoordsList.length;
-      }
-      if (this.index !== undefined) {
-         rCoordsList.splice(this.index, 1, { x: this.x, y: this.y });
       }
    }
 }
@@ -159,17 +159,7 @@ class cloud {
          this.cloudX = Math.floor(Math.random() * 4);
          this.cloudY = Math.floor(Math.random() * 3);
       }
-      ctx.drawImage(
-         cloudsImg,
-         165 * this.cloudX,
-         135 * this.cloudY,
-         165,
-         135,
-         this.x,
-         this.y,
-         this.w,
-         this.h
-      );
+      ctx.drawImage(cloudsImg, 165 * this.cloudX, 135 * this.cloudY, 165, 135, this.x, this.y, this.w, this.h);
    }
 }
 
@@ -190,6 +180,11 @@ function drag() {
 }
 
 function mousedownHandler() {
+    if (!mouseDown) {
+        mouseDown = true
+    } else {
+        mouseDown = false
+    }
    mouseDown = true;
    if (dragRestaurant) {
       numberOfRestaurants++;
@@ -255,7 +250,7 @@ function createTiles() {
 
       // Loops until it finds an available tile (so that it doesn't end up on startingStore)
       while (!open) {
-         randomIndex = Math.round(Math.random() * nAmerica.length - 1);
+         randomIndex = Math.floor(Math.random() * nAmerica.length);
          if (tiles[4][randomIndex].status === 'open') {
             open = true;
             nAmerica[randomIndex].competition = true;
@@ -281,7 +276,6 @@ function createClouds() {
    }
 }
 
-competitionGrowthDuration++;
 function changeMoney() {
    money += 2 * numberOfRestaurants;
    amountEl.innerHTML = money;
@@ -329,7 +323,6 @@ function display() {
    for (let i = 0; i < clouds.length; i++) {
       clouds[i].draw();
    }
-
    // Decide when to show a trade request
    repetition++;
    if (repetition === randomInterval) {
@@ -349,7 +342,7 @@ function display() {
          randomInterval = Math.floor(Math.random() * 999 + 1);
       }
    }
-   restaurantSum.innerHTML = numberOfRestaurants;
+   restaurantSum.innerHTML = numberOfRestaurants
 
    for (let c = 0; c < tiles.length; c++) {
       for (let t = 0; t < tiles[c].length; t++) {
