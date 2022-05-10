@@ -22,7 +22,8 @@ let boat = document.getElementById('boat');
 let buyBoatBtn = document.getElementById('buyBoat');
 
 // Global variables
-let mouseX, mouseY, mouseDown;
+let mouseX, mouseY
+let mouseDown = false
 let dragRestaurant = false;
 let numberOfRestaurants = 1;
 let rCoordsList = [];
@@ -58,11 +59,10 @@ taxModalEl.style.display = 'none';
 
 //Tile class for placing stuff
 class tile {
-   constructor(x, y, w, h, continent) {
+   constructor(x, y, size, continent) {
       this.x = x;
       this.y = y;
-      this.w = w;
-      this.h = h;
+      this.size = size
       this.color = 'rgb(0, 0, 0)';
       this.status = 'open';
       this.index;
@@ -82,48 +82,37 @@ class tile {
         this.restaurantType = restaurantImg
       }
 
-      if (this.status === 'occupied') {
-         ctx.drawImage(restaurantImg, this.x, this.y, this.w, this.h);
-      }
-
       ctx.strokeStyle = this.color;
-      ctx.strokeRect(this.x, this.y, this.w, this.h);
+      ctx.strokeRect(this.x, this.y, this.size, this.size);
       if (
          mouseX > this.x &&
-         mouseX < this.x + this.w &&
+         mouseX < this.x + this.size &&
          mouseY > this.y &&
-         mouseY < this.y + this.h &&
-         dragRestaurant &&
-         this.status === 'open'
-      ) {
-         ctx.drawImage(restaurantImg, this.x, this.y, this.w, this.h);
-         this.color = 'rgb(0, 255, 0)';
-         document.addEventListener('mousedown', () => {
-            if (
-               mouseX > this.x &&
-               mouseX < this.x + this.w &&
-               mouseY > this.y &&
-               mouseY < this.y + this.h &&
-               dragRestaurant &&
-               this.status === 'open'
-            ) {
-               this.status = 'occupied';
-               dragRestaurant = false;
-               this.restaurantType = restaurantImg
-            }
-         });
-      } else if (
-         mouseX > this.x &&
-         mouseX < this.x + this.w &&
-         mouseY > this.y &&
-         mouseY < this.y + this.h &&
-         this.status === 'occupied' &&
+         mouseY < this.y + this.size &&
          dragRestaurant
       ) {
-         this.color = 'rgb(255, 0, 0)';
+         ctx.drawImage(restaurantImg, this.x, this.y, this.size, this.size);
+         if (this.status === "open") {
+            if (mouseDown) {
+               this.status = 'occupied';
+               dragRestaurant = false;
+               mouseDown =false
+               this.restaurantType = restaurantImg
+            }
+            this.color = "rgb(0, 255, 0)"
+         } else if (this.status === "occupied") {
+            this.color = "rgb(255, 0, 0)"
+         }
       } else {
-         this.color = 'rgb(0, 0, 0)';
+         this.color = "rgb(0, 0, 0)"
       }
+
+
+
+      if (this.status === 'occupied') {
+         ctx.drawImage(restaurantImg, this.x, this.y, this.size, this.size);
+      }
+
    }
 }
 
@@ -180,13 +169,8 @@ function drag() {
 }
 
 function mousedownHandler() {
-    if (!mouseDown) {
-        mouseDown = true
-    } else {
-        mouseDown = false
-    }
-   mouseDown = true;
    if (dragRestaurant) {
+      mouseDown = true;
       numberOfRestaurants++;
    }
    if (boatDrag) {
@@ -223,22 +207,22 @@ function createTiles() {
             }
             if (!containsOcean) {
                if (x >= 250 && x <= 400 && y >= 350 && y <= 550) {
-                  sAmerica.push(new tile(x, y, tileSize, tileSize, 'sAmerica'));
+                  sAmerica.push(new tile(x, y, tileSize, 'sAmerica'));
                } else if (x >= 410 && x <= 630 && y >= 258 && y <= 508) {
-                  africaMiddleEast.push(new tile(x, y, tileSize, tileSize, 'africaMiddleEast'));
+                  africaMiddleEast.push(new tile(x, y, tileSize, 'africaMiddleEast'));
                } else if (
                   x >= 410 &&
                   x <= 940 &&
                   y >= 20 &&
                   y <= 370 &&
-                  africaMiddleEast.includes(new tile(x, y, tileSize, tileSize, 'occupied')) ===
+                  africaMiddleEast.includes(new tile(x, y, tileSize, 'occupied')) ===
                      false
                ) {
-                  eurasia.push(new tile(x, y, tileSize, tileSize, 'eurasia'));
+                  eurasia.push(new tile(x, y, tileSize, 'eurasia'));
                } else if (x >= 770 && x <= 970 && y >= 400 && y <= 550) {
-                  australia.push(new tile(x, y, tileSize, tileSize, 'australia'));
+                  australia.push(new tile(x, y, tileSize, 'australia'));
                } else {
-                  nAmerica.push(new tile(x, y, tileSize, tileSize, 'nAmerica'));
+                  nAmerica.push(new tile(x, y, tileSize, 'nAmerica'));
                }
             }
          }
@@ -280,7 +264,7 @@ function changeMoney() {
    money += 2 * numberOfRestaurants;
    amountEl.innerHTML = money;
 }
-setInterval(changeMoney, 100);
+setInterval(changeMoney, 1000);
 
 function taxes() {
    taxModalEl.style.display = 'block';
@@ -299,11 +283,12 @@ function competitionGrowth() {
    if (availableTiles.length > 0) {
       let randomIndex = Math.floor(Math.random() * availableTiles.length);
       availableTiles[randomIndex].competition = true;
+      console.log(competitionInterval)
    }
-   competitionInterval = Math.round(Math.random() * 10000);
+   competitionInterval = Math.round(Math.random() * 10000) + 5000;
 }
 
-let competitionInterval = Math.round(Math.random() * 10000);
+let competitionInterval = Math.round(Math.random() * 10000) + 5000;
 setInterval(competitionGrowth, competitionInterval);
 
 // Animation loop
@@ -331,7 +316,6 @@ function display() {
       randomY = randomIndex.y;
       trade = true;
    }
-
    if (trade) {
       ctx.drawImage(trade1, randomX, randomY, 20, 20);
       displayDuration++;

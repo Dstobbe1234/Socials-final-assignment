@@ -47,3 +47,8 @@ img {
 .alert {
    text-align: center;
 }
+
+#inventory {
+   border:2px solid black;
+   overflow-y: scroll;
+}
