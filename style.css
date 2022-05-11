@@ -30,15 +30,13 @@ img {
 }
 #restaurant {
    width: 100px;
+   margin:0px;
+   padding: 0px;
 }
 
-#coin {
-   width: 17px;
-}
 
-#lumberimg {
-   width: 50px;
-}
+
+
 
 .available {
    border: 5px solid rgb(0, 255, 0);
@@ -51,4 +49,9 @@ img {
 #inventory {
    border:2px solid black;
    overflow-y: scroll;
+}
+
+#buy {
+   margin:0px;
+   width:100px;
 }

@@ -14,7 +14,7 @@ let cloudsImg = document.getElementById('clouds-img');
 let amountEl = document.getElementById('amount');
 let grid = document.getElementById('grid');
 let restaurantSum = document.getElementById('restaurantAmount');
-let trade1 = document.getElementById('trade');
+let trade1 = document.getElementById('sirop');
 let taxModalEl = document.getElementById('taxesModal');
 let taxesAmt = document.getElementById('taxes');
 let modalBtn = document.getElementById('hide');
@@ -54,6 +54,9 @@ let trade = false;
 let preventDuplicates = false;
 let competitionGrowthInterval = Math.round(Math.random() * 100000);
 let availableTiles = [];
+let discoveredContinents = []
+let oceanX = []
+let oceanY = []
 
 taxModalEl.style.display = 'none';
 
@@ -174,6 +177,7 @@ function mousedownHandler() {
       numberOfRestaurants++;
    }
    if (boatDrag) {
+      boatDrag = false
    }
 }
 
@@ -200,9 +204,11 @@ function createTiles() {
                r = imageData.data[i];
                g = imageData.data[i + 1];
                b = imageData.data[i + 2];
-
+            
                if (r === 55 && g === 83 && b === 218) {
                   containsOcean = true;
+                  oceanX.push((i / 4) % cnv.width)
+                  oceanY.push((i / 4) / cnv.width)
                }
             }
             if (!containsOcean) {
@@ -231,6 +237,8 @@ function createTiles() {
       let randomIndex = Math.floor(Math.random() * nAmerica.length);
       nAmerica[randomIndex].startingStore = true;
       let open = false;
+      console.log("oceanX" + oceanX)
+      console.log(oceanY)
 
       // Loops until it finds an available tile (so that it doesn't end up on startingStore)
       while (!open) {
@@ -379,13 +387,8 @@ function display() {
 
    if (boatDrag) {
       ctx.strokeStyle = 'rgb(255, 0, 0)';
-      ctx.drawImage(boat, mouseX - 20, mouseY - 20, 100, 100);
-      if (mouseX >= 250 && mouseX <= 500 && mouseY >= 200 && mouseY <= 400) {
-         ctx.beginPath();
-         ctx.moveTo(280, 250);
-         ctx.lineTo(450, 250);
-         ctx.stroke();
-         africaClouds = false;
+      if (oceanX.includes(2)) {
+         ctx.drawImage(boat, mouseX - 50, mouseY - 50, 100, 100);
       }
    }
    requestAnimationFrame(display);
