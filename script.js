@@ -57,7 +57,7 @@ let availableTiles = [];
 let discoveredContinents = []
 let oceanX = []
 let oceanY = []
-
+let profits = 0
 taxModalEl.style.display = 'none';
 
 //Tile class for placing stuff
@@ -167,6 +167,7 @@ buyBoatBtn.addEventListener('click', boatPlace);
 function drag() {
    if (money >= 50) {
       money -= 50;
+      profits -= 50
       dragRestaurant = true;
    }
 }
@@ -270,12 +271,14 @@ function createClouds() {
 
 function changeMoney() {
    money += 2 * numberOfRestaurants;
+   profits += 2 * numberOfRestaurants;
    amountEl.innerHTML = money;
 }
 setInterval(changeMoney, 1000);
 
 function taxes() {
    taxModalEl.style.display = 'block';
+   profits = 0
 }
 setInterval(taxes, 180000);
 
