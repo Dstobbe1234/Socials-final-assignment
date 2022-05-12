@@ -57,7 +57,7 @@ let availableTiles = [];
 let discoveredContinents = []
 let oceanX = []
 let oceanY = []
-
+let africaStores, eurasiaStores, nAmericaStores, sAmericaStores, australiaStores = 0;
 taxModalEl.style.display = 'none';
 
 //Tile class for placing stuff
@@ -73,6 +73,7 @@ class tile {
       this.competition = false;
       this.continent = continent;
       this.restaurantType
+      this.inside
    }
 
    draw() {
@@ -91,9 +92,16 @@ class tile {
          mouseX > this.x &&
          mouseX < this.x + this.size &&
          mouseY > this.y &&
-         mouseY < this.y + this.size &&
-         dragRestaurant
+         mouseY < this.y + this.size
       ) {
+         this.inside = true
+      } else {
+         this.inside = false
+         this.color = "rgb(0, 0, 0)"
+      }
+
+
+      if (this.inside && dragRestaurant) {
          ctx.drawImage(restaurantImg, this.x, this.y, this.size, this.size);
          if (this.status === "open") {
             if (mouseDown) {
@@ -106,14 +114,29 @@ class tile {
          } else if (this.status === "occupied") {
             this.color = "rgb(255, 0, 0)"
          }
-      } else {
-         this.color = "rgb(0, 0, 0)"
+      } else if (this.inside && boatDrag) {
+         console.log("EEE")
+         if (mouseDown) {
+            boatDrag = false
+            eurasiaClouds = false
+         }
       }
-
-
 
       if (this.status === 'occupied') {
          ctx.drawImage(restaurantImg, this.x, this.y, this.size, this.size);
+         //if (this.competition = false) {
+           // if (this.continent === "nAmerica") {
+           //    nAmericaStores++
+           // } else if (this.continent === "sAmerica") {
+          //     
+         //   } else if (this.continent === "africaMiddleEast") {
+//
+            //} else if (this.continent === "asia") {
+//
+         //   } else if (this.continent === "australia") {
+
+        //    }
+      //   }
       }
 
    }
@@ -173,12 +196,13 @@ function drag() {
 
 function mousedownHandler() {
    if (dragRestaurant) {
+      //if (mouseX >)
       mouseDown = true;
       numberOfRestaurants++;
    }
-   if (boatDrag) {
-      boatDrag = false
-   }
+   //if (boatDrag) {
+    //  boatDrag = false
+   //}
 }
 
 function mousemoveHandler(event) {
@@ -373,7 +397,7 @@ function display() {
          }
       }
    }
-
+   ctx.strokeRect(500, 0, 50, 50)
    if (money >= 50) {
       buyBtn.classList.add('available');
    } else {
@@ -383,6 +407,9 @@ function display() {
    // Retry making the tiles if the image wasn't loaded before
    if (tryNextFrame) {
       createTiles();
+   }
+   if (money >= 10) {
+      buyBoatBtn.classList.add("available");
    }
 
    if (boatDrag) {
