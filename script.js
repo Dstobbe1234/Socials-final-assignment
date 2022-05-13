@@ -55,9 +55,8 @@ let preventDuplicates = false;
 let competitionGrowthInterval = Math.round(Math.random() * 100000);
 let availableTiles = [];
 let discoveredContinents = []
-let oceanX = []
-let oceanY = []
 let africaStores, eurasiaStores, nAmericaStores, sAmericaStores, australiaStores = 0;
+let profits = 0
 taxModalEl.style.display = 'none';
 
 //Tile class for placing stuff
@@ -114,29 +113,24 @@ class tile {
          } else if (this.status === "occupied") {
             this.color = "rgb(255, 0, 0)"
          }
-      } else if (this.inside && boatDrag) {
-         console.log("EEE")
+      } else if (this.inside && boatDrag && this.continent !== "nAmerica") {
          if (mouseDown) {
+            mouseDown = false
             boatDrag = false
-            eurasiaClouds = false
+            if (this.continent === "eurasia") {
+               eurasiaClouds = false
+            } else if (this.continent === "africaMiddleEast") {
+               africaClouds = false
+            } else if (this.continent === "sAmerica") {
+               sAmericaClouds = false
+            } else if (this.continent === "australia") {
+               australiaClouds = false
+            }
          }
       }
 
       if (this.status === 'occupied') {
          ctx.drawImage(restaurantImg, this.x, this.y, this.size, this.size);
-         //if (this.competition = false) {
-           // if (this.continent === "nAmerica") {
-           //    nAmericaStores++
-           // } else if (this.continent === "sAmerica") {
-          //     
-         //   } else if (this.continent === "africaMiddleEast") {
-//
-            //} else if (this.continent === "asia") {
-//
-         //   } else if (this.continent === "australia") {
-
-        //    }
-      //   }
       }
 
    }
@@ -190,19 +184,16 @@ buyBoatBtn.addEventListener('click', boatPlace);
 function drag() {
    if (money >= 50) {
       money -= 50;
+      profits -= 50
       dragRestaurant = true;
    }
 }
 
 function mousedownHandler() {
-   if (dragRestaurant) {
-      //if (mouseX >)
+   if (dragRestaurant || boatDrag) {
       mouseDown = true;
       numberOfRestaurants++;
    }
-   //if (boatDrag) {
-    //  boatDrag = false
-   //}
 }
 
 function mousemoveHandler(event) {
@@ -231,8 +222,6 @@ function createTiles() {
             
                if (r === 55 && g === 83 && b === 218) {
                   containsOcean = true;
-                  oceanX.push((i / 4) % cnv.width)
-                  oceanY.push((i / 4) / cnv.width)
                }
             }
             if (!containsOcean) {
@@ -261,8 +250,6 @@ function createTiles() {
       let randomIndex = Math.floor(Math.random() * nAmerica.length);
       nAmerica[randomIndex].startingStore = true;
       let open = false;
-      console.log("oceanX" + oceanX)
-      console.log(oceanY)
 
       // Loops until it finds an available tile (so that it doesn't end up on startingStore)
       while (!open) {
@@ -294,12 +281,14 @@ function createClouds() {
 
 function changeMoney() {
    money += 2 * numberOfRestaurants;
+   profits += 2 * numberOfRestaurants;
    amountEl.innerHTML = money;
 }
 setInterval(changeMoney, 1000);
 
 function taxes() {
    taxModalEl.style.display = 'block';
+   profits = 0
 }
 setInterval(taxes, 180000);
 
@@ -308,14 +297,16 @@ function payTaxes() {
 }
 
 function boatPlace() {
-   boatDrag = true;
+   if (money >= 1000) {
+      money -= 1000
+      boatDrag = true;
+   }
 }
 
 function competitionGrowth() {
    if (availableTiles.length > 0) {
       let randomIndex = Math.floor(Math.random() * availableTiles.length);
       availableTiles[randomIndex].competition = true;
-      console.log(competitionInterval)
    }
    competitionInterval = Math.round(Math.random() * 10000) + 5000;
 }
@@ -342,24 +333,7 @@ function display() {
    }
    // Decide when to show a trade request
    repetition++;
-   if (repetition === randomInterval) {
-      randomIndex = nAmerica[Math.floor(Math.random() * nAmerica.length)];
-      randomX = randomIndex.x;
-      randomY = randomIndex.y;
-      trade = true;
-   }
-   if (trade) {
-      ctx.drawImage(trade1, randomX, randomY, 20, 20);
-      displayDuration++;
-      if (displayDuration === displayLength) {
-         trade = false;
-         displayDuration = 0;
-         repetition = 0;
-         randomInterval = Math.floor(Math.random() * 999 + 1);
-      }
-   }
    restaurantSum.innerHTML = numberOfRestaurants
-
    for (let c = 0; c < tiles.length; c++) {
       for (let t = 0; t < tiles[c].length; t++) {
          if (availableTiles.find((element) => element === tiles[c][t])) {
@@ -397,7 +371,6 @@ function display() {
          }
       }
    }
-   ctx.strokeRect(500, 0, 50, 50)
    if (money >= 50) {
       buyBtn.classList.add('available');
    } else {
@@ -408,15 +381,71 @@ function display() {
    if (tryNextFrame) {
       createTiles();
    }
-   if (money >= 10) {
+   if (money >= 1000) {
       buyBoatBtn.classList.add("available");
    }
 
    if (boatDrag) {
-      ctx.strokeStyle = 'rgb(255, 0, 0)';
-      if (oceanX.includes(2)) {
          ctx.drawImage(boat, mouseX - 50, mouseY - 50, 100, 100);
+   }
+   discover()
+   trading()
+   requestAnimationFrame(display);
+}
+
+
+function discover() {
+   if (!eurasiaClouds) {
+      for(let i = 0; i < clouds.length; i++) {
+         if (clouds[i].continent === "eurasia") {
+            clouds.splice(i, 1)
+         }
+      }
+   } 
+   
+   if (!sAmericaClouds) {
+      for(let i = 0; i < clouds.length; i++) {
+         if (clouds[i].continent === "sAmerica") {
+            clouds.splice(i, 1)
+         }
+      }
+   } 
+   
+   if (!africaClouds) {
+      for(let i = 0; i < clouds.length; i++) {
+         if (clouds[i].continent === "africaMiddleEast") {
+            clouds.splice(i, 1)
+         }
+      }
+   } 
+   
+   if (!australiaClouds) {
+      for(let i = 0; i < clouds.length; i++) {
+         if (clouds[i].continent === "australia") {
+            clouds.splice(i, 1)
+         }
       }
    }
-   requestAnimationFrame(display);
+}
+
+
+function trading() {
+   if (repetition === randomInterval) {
+      randomIndex = nAmerica[Math.floor(Math.random() * nAmerica.length)];
+      randomX = randomIndex.x;
+      randomY = randomIndex.y;
+      trade = true;
+   }
+   if (trade) {
+      ctx.drawImage(trade1, randomX, randomY - 145, 150, 150);
+      ctx.strokeStyle = "green"
+      ctx.strokeRect(randomX + 47, randomY - 67, 40, 20)
+      displayDuration++;
+      if (displayDuration === displayLength) {
+         trade = false;
+         displayDuration = 0;
+         repetition = 0;
+         randomInterval = Math.floor(Math.random() * 999 + 1);
+      }
+   }
 }
