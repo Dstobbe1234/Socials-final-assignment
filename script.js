@@ -9,6 +9,7 @@ cnv.height = cnv.width * 0.6;
 // Variables for HTML elements
 let buyBtn = document.getElementById('buy');
 let restaurantImg = document.getElementById('restaurant');
+let competitionImg = document.getElementById('competition')
 let background = document.getElementById('background');
 let cloudsImg = document.getElementById('clouds-img');
 let amountEl = document.getElementById('amount');
@@ -82,7 +83,7 @@ class tile {
       } else if (this.competition) {
         this.status = "occupied"
         //This will change when Will draw
-        this.restaurantType = restaurantImg
+        this.restaurantType = competitionImg
       }
 
       ctx.strokeStyle = this.color;
