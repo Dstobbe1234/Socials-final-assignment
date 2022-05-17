@@ -60,6 +60,8 @@ let discoveredContinents = []
 let africaStores, eurasiaStores, nAmericaStores, sAmericaStores, australiaStores = 0;
 let profits = 0
 let nAmericaTrades = [tradeSirop, tradeWatermelon]
+let polution = 0
+let gameOver = false;
 taxModalEl.style.display = 'none';
 
 //Tile class for placing stuff
@@ -110,7 +112,6 @@ class tile {
                numberOfRestaurants++;
                this.status = 'occupied';
                dragRestaurant = false;
-               mouseDown = false
                this.restaurantType = restaurantImg
             }
             this.color = "rgb(0, 255, 0)"
@@ -119,7 +120,6 @@ class tile {
          }
       } else if (this.inside && boatDrag && this.continent !== "nAmerica") {
          if (mouseDown) {
-            mouseDown = false
             boatDrag = false
             if (this.continent === "eurasia") {
                eurasiaClouds = false
@@ -137,6 +137,9 @@ class tile {
          ctx.drawImage(this.restaurantType, this.x, this.y, this.size, this.size);
       }
 
+      if (this.inside && mouseDown && !dragRestaurant) {
+         console.log("BUY")
+      }
    }
 }
 
@@ -180,6 +183,7 @@ class cloud {
 buyBtn.addEventListener('click', drag);
 document.addEventListener('mousedown', mousedownHandler);
 document.addEventListener('mousemove', mousemoveHandler);
+document.addEventListener('mouseup', mouseupHandler);
 background.addEventListener('load', createTiles);
 modalBtn.addEventListener('click', payTaxes);
 buyBoatBtn.addEventListener('click', boatPlace);
@@ -194,9 +198,10 @@ function drag() {
 }
 
 function mousedownHandler() {
-   if (dragRestaurant || boatDrag || trade) {
-      mouseDown = true;
-   }
+   mouseDown = true
+}
+function mouseupHandler() {
+   mouseDown = false
 }
 
 function mousemoveHandler(event) {
@@ -287,13 +292,13 @@ function changeMoney() {
    profits += 2 * numberOfRestaurants;
    amountEl.innerHTML = money;
 }
-setInterval(changeMoney, 1000);
+setInterval(changeMoney, 100);
 
 function taxes() {
    taxModalEl.style.display = 'block';
    profits = 0
 }
-setInterval(taxes, 180000);
+setInterval(taxes, 18000);
 
 function payTaxes() {
    taxModalEl.style.display = 'none';
@@ -334,6 +339,17 @@ function display() {
    for (let i = 0; i < clouds.length; i++) {
       clouds[i].draw();
    }
+   if (!gameOver) {
+      polution += 0.01
+      if (polution === 175) {
+         gameOver = true
+      }
+   }
+   // Draw polution bar 
+   ctx.strokeRect(35, cnv.height - 50, 175, 30)
+   ctx.fillStyle = "green"
+   ctx.fillRect(35.5, cnv.height -50, polution, 29.5)
+
    // Decide when to show a trade request
    repetition++;
    restaurantSum.innerHTML = numberOfRestaurants
@@ -374,9 +390,7 @@ function display() {
          }
       }
    }
-   console.log(money)
    if (money >= 50) {
-      console.log("EE")
       buyBtn.classList.add('available');
    } else {
       buyBtn.classList.remove('available');
@@ -388,6 +402,8 @@ function display() {
    }
    if (money >= 1000) {
       buyBoatBtn.classList.add("available");
+   } else {
+      buyBoatBtn.classList.remove("available");
    }
 
    if (boatDrag) {
@@ -440,8 +456,8 @@ function trading() {
       randomX = randomIndex.x;
       randomY = randomIndex.y;
       trade = true;
-      if (randomIndex.continent = "nAmerica") {
-         trades = nAmericaTrades[Math.round(Math.random() * nAmericaTrades.length)]
+      if (randomIndex.continent === "nAmerica") {
+         trades = nAmericaTrades[Math.floor(Math.random() * nAmericaTrades.length)]
       }
    }
    if (trade) {
@@ -451,12 +467,10 @@ function trading() {
          //ctx.drawImage(sAmericaTrades, randomX, randomY - 145, 150, 150);
       }
       ctx.strokeStyle = "green"
-      ctx.strokeRect(randomX + 47, randomY - 67, 40, 20)
       displayDuration++;
       if (mouseX >= randomX + 47 && mouseX <= randomX + 47 + 40 && mouseY >= randomY - 67 && mouseY <= randomY - 67 + 20) {
          if (mouseDown) {
             trade = false;
-            mouseDown = false;
             displayDuration = 0;
             repetition = 0;
             randomInterval = Math.floor(Math.random() * 999 + 1);
