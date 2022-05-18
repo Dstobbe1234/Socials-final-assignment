@@ -56,7 +56,6 @@ let trade = false;
 let preventDuplicates = false;
 let competitionGrowthInterval = Math.round(Math.random() * 100000);
 let availableTiles = [];
-let discoveredContinents = []
 let africaStores, eurasiaStores, nAmericaStores, sAmericaStores, australiaStores = 0;
 let profits = 0
 let nAmericaTrades = [tradeSirop, tradeWatermelon]
@@ -78,6 +77,7 @@ class tile {
       this.continent = continent;
       this.restaurantType
       this.inside
+      this.taxRate = Math.floor(Math.random() * 10 + 5)
    }
 
    draw() {
@@ -103,7 +103,6 @@ class tile {
          this.inside = false
          this.color = "rgb(0, 0, 0)"
       }
-
 
       if (this.inside && dragRestaurant) {
          ctx.drawImage(restaurantImg, this.x, this.y, this.size, this.size);
@@ -297,8 +296,10 @@ setInterval(changeMoney, 100);
 function taxes() {
    taxModalEl.style.display = 'block';
    profits = 0
+   taxesAmt.innerHTML = "Total # of stores = " + numberOfRestaurants
+
 }
-setInterval(taxes, 18000);
+setInterval(taxes, 180000);
 
 function payTaxes() {
    taxModalEl.style.display = 'none';
@@ -327,6 +328,8 @@ requestAnimationFrame(display);
 
 function display() {
    // Draw world map
+   ctx.fillStyle = "rgb(55, 83, 218)"
+   ctx.fillRect(0, 0, cnv.width, cnv.height)
    ctx.drawImage(background, 0, 0, cnv.width, cnv.height);
 
    //Draw all the tiles
@@ -346,6 +349,7 @@ function display() {
       }
    }
    // Draw polution bar 
+   ctx.strokeStyle = "rgb(0, 0, 0)"
    ctx.strokeRect(35, cnv.height - 50, 175, 30)
    ctx.fillStyle = "green"
    ctx.fillRect(35.5, cnv.height -50, polution, 29.5)
