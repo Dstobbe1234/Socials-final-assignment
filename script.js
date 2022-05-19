@@ -15,8 +15,6 @@ let cloudsImg = document.getElementById('clouds-img');
 let amountEl = document.getElementById('amount');
 let grid = document.getElementById('grid');
 let restaurantSum = document.getElementById('restaurantAmount');
-let tradeSirop = document.getElementById('sirop');
-let tradeWatermelon = document.getElementById('tradeWatermelon')
 let taxModalEl = document.getElementById('taxesModal');
 let taxesAmt = document.getElementById('taxes');
 let modalBtn = document.getElementById('hide');
@@ -58,7 +56,6 @@ let competitionGrowthInterval = Math.round(Math.random() * 100000);
 let availableTiles = [];
 let africaStores, eurasiaStores, nAmericaStores, sAmericaStores, australiaStores = 0;
 let profits = 0
-let nAmericaTrades = [tradeSirop, tradeWatermelon]
 let polution = 0
 let gameOver = false;
 taxModalEl.style.display = 'none';
@@ -78,6 +75,7 @@ class tile {
       this.restaurantType
       this.inside
       this.taxRate = Math.floor(Math.random() * 10 + 5)
+      this.player
    }
 
    draw() {
@@ -88,6 +86,10 @@ class tile {
         this.status = "occupied"
         //This will change when Will draw
         this.restaurantType = competitionImg
+      }
+
+      if (this.status === "occupied" && !this.competition) {
+         this.player = true
       }
 
       ctx.strokeStyle = this.color;
@@ -266,6 +268,8 @@ function createTiles() {
             nAmerica[randomIndex].competition = true;
          }
       }
+   } else {
+      tryNextFrame = true
    }
 }
 
@@ -294,12 +298,20 @@ function changeMoney() {
 setInterval(changeMoney, 100);
 
 function taxes() {
+   let storeNum = 0 
+   for (let i = 0; i < tiles.length; i++) {
+      for (let n = 0; n < tiles[i].length; n++) {
+         if(tiles[i][n].player === true) {
+            taxesAmt.innerHTML += "test"
+         }
+      }
+   }
    taxModalEl.style.display = 'block';
-   profits = 0
-   taxesAmt.innerHTML = "Total # of stores = " + numberOfRestaurants
+   //profits = 0
+   //taxesAmt.innerHTML = "Total # of stores = " + numberOfRestaurants
 
 }
-setInterval(taxes, 180000);
+setInterval(taxes, 1800);
 
 function payTaxes() {
    taxModalEl.style.display = 'none';
@@ -460,16 +472,8 @@ function trading() {
       randomX = randomIndex.x;
       randomY = randomIndex.y;
       trade = true;
-      if (randomIndex.continent === "nAmerica") {
-         trades = nAmericaTrades[Math.floor(Math.random() * nAmericaTrades.length)]
-      }
    }
    if (trade) {
-      if (randomIndex.continent === "nAmerica") {
-         ctx.drawImage(trades, randomX, randomY - 145, 150, 150);
-      } else if (randomIndex.continent === "sAmerica") {
-         //ctx.drawImage(sAmericaTrades, randomX, randomY - 145, 150, 150);
-      }
       ctx.strokeStyle = "green"
       displayDuration++;
       if (mouseX >= randomX + 47 && mouseX <= randomX + 47 + 40 && mouseY >= randomY - 67 && mouseY <= randomY - 67 + 20) {
