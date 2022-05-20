@@ -58,6 +58,7 @@ let africaStores, eurasiaStores, nAmericaStores, sAmericaStores, australiaStores
 let profits = 0
 let polution = 0
 let gameOver = false;
+let income = 0
 taxModalEl.style.display = 'none';
 
 //Tile class for placing stuff
@@ -75,22 +76,18 @@ class tile {
       this.restaurantType
       this.inside
       this.taxRate = Math.floor(Math.random() * 10 + 5)
-      this.player
    }
 
    draw() {
       if (this.startingStore) {
-        this.status = 'occupied'
+        this.status = 'player'
         this.restaurantType = restaurantImg
       } else if (this.competition) {
-        this.status = "occupied"
+        this.status = 'competition'
         //This will change when Will draw
         this.restaurantType = competitionImg
       }
 
-      if (this.status === "occupied" && !this.competition) {
-         this.player = true
-      }
 
       ctx.strokeStyle = this.color;
       ctx.strokeRect(this.x, this.y, this.size, this.size);
@@ -111,12 +108,12 @@ class tile {
          if (this.status === "open") {
             if (mouseDown) {
                numberOfRestaurants++;
-               this.status = 'occupied';
+               this.status = 'player';
                dragRestaurant = false;
                this.restaurantType = restaurantImg
             }
             this.color = "rgb(0, 255, 0)"
-         } else if (this.status === "occupied") {
+         } else if (this.status === "player" || this.status === "competition") {
             this.color = "rgb(255, 0, 0)"
          }
       } else if (this.inside && boatDrag && this.continent !== "nAmerica") {
@@ -134,7 +131,7 @@ class tile {
          }
       }
 
-      if (this.status === 'occupied') {
+      if (this.status === 'player' || this.status === 'competition') {
          ctx.drawImage(this.restaurantType, this.x, this.y, this.size, this.size);
       }
 
@@ -191,9 +188,9 @@ buyBoatBtn.addEventListener('click', boatPlace);
 
 //Event Functions
 function drag() {
-   if (money >= 50) {
+   if (money >= 50 && !dragRestaurant && !boatDrag) {
       money -= 50;
-      profits -= 50
+      income -= 50
       dragRestaurant = true;
    }
 }
@@ -243,7 +240,7 @@ function createTiles() {
                   x <= 940 &&
                   y >= 20 &&
                   y <= 370 &&
-                  africaMiddleEast.includes(new tile(x, y, tileSize, 'occupied')) ===
+                  africaMiddleEast.includes(new tile(x, y, tileSize, 'africaMiddleEast')) ===
                      false
                ) {
                   eurasia.push(new tile(x, y, tileSize, 'eurasia'));
@@ -292,34 +289,38 @@ function createClouds() {
 
 function changeMoney() {
    money += 2 * numberOfRestaurants;
-   profits += 2 * numberOfRestaurants;
+   income += 2 * numberOfRestaurants
    amountEl.innerHTML = money;
 }
 setInterval(changeMoney, 100);
-
+let storeNum = 0
 function taxes() {
-   let storeNum = 0 
    for (let i = 0; i < tiles.length; i++) {
       for (let n = 0; n < tiles[i].length; n++) {
-         if(tiles[i][n].player === true) {
-            taxesAmt.innerHTML += "test"
+         if(tiles[i][n].status === 'player') {
+            storeNum++
+            taxesAmt.innerHTML += "<br> Store #" + storeNum + "<br>Income tax rate: " + tiles[i][n].taxRate
          }
       }
    }
+
    taxModalEl.style.display = 'block';
-   //profits = 0
-   //taxesAmt.innerHTML = "Total # of stores = " + numberOfRestaurants
 
 }
-setInterval(taxes, 1800);
+setTimeout(taxes, 18000)
 
 function payTaxes() {
    taxModalEl.style.display = 'none';
+   taxesAmt.innerHTML = "";
+   storeNum = 0
+   income = 0
+   setTimeout(taxes, 18000)
 }
 
 function boatPlace() {
    if (money >= 1000) {
       money -= 1000
+      income -= 1000
       boatDrag = true;
    }
 }
@@ -372,7 +373,7 @@ function display() {
    for (let c = 0; c < tiles.length; c++) {
       for (let t = 0; t < tiles[c].length; t++) {
          if (availableTiles.find((element) => element === tiles[c][t])) {
-            if (tiles[c][t].status === 'occupied') {
+            if (tiles[c][t].status === 'player' || tiles[c][t].status === 'competition') {
                availableTiles.splice(availableTiles.indexOf(tiles[c][t]), 1);
             }
          } else {

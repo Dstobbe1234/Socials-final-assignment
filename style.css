@@ -9,6 +9,7 @@
 }
 
 #taxesModal {
+   overflow-y:scroll;
    position: fixed;
    left: 0;
    top: 0;
@@ -38,7 +39,6 @@ img {
 
 
 
-
 .available {
    border: 5px solid rgb(0, 255, 0);
 }
@@ -50,6 +50,7 @@ img {
 #inventory {
    border:2px solid black;
    overflow-y: scroll;
+   background:white;
 }
 
 #buy {
