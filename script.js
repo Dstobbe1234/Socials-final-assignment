@@ -16,7 +16,8 @@ let amountEl = document.getElementById('amount');
 let grid = document.getElementById('grid');
 let restaurantSum = document.getElementById('restaurantAmount');
 let taxModalEl = document.getElementById('taxesModal');
-let taxesAmt = document.getElementById('taxes');
+let taxInfo = document.getElementById('taxes');
+let incomeEl = document.getElementById("income")
 let modalBtn = document.getElementById('hide');
 let boat = document.getElementById('boat');
 let buyBoatBtn = document.getElementById('buyBoat');
@@ -56,9 +57,11 @@ let competitionGrowthInterval = Math.round(Math.random() * 100000);
 let availableTiles = [];
 let africaStores, eurasiaStores, nAmericaStores, sAmericaStores, australiaStores = 0;
 let profits = 0
-let polution = 0
+let pollution = 0
+let pollutionPercentage = 0
 let gameOver = false;
 let income = 0
+let taxBool = false
 taxModalEl.style.display = 'none';
 
 //Tile class for placing stuff
@@ -288,18 +291,22 @@ function createClouds() {
 }
 
 function changeMoney() {
-   money += 2 * numberOfRestaurants;
-   income += 2 * numberOfRestaurants
-   amountEl.innerHTML = money;
+    if (!taxBool) {
+        money += 2 * numberOfRestaurants;
+        income += 2 * numberOfRestaurants
+    }
+    amountEl.innerHTML = money;
 }
 setInterval(changeMoney, 100);
 let storeNum = 0
 function taxes() {
+    taxBool = true
    for (let i = 0; i < tiles.length; i++) {
       for (let n = 0; n < tiles[i].length; n++) {
          if(tiles[i][n].status === 'player') {
             storeNum++
-            taxesAmt.innerHTML += "<br> Store #" + storeNum + "<br>Income tax rate: " + tiles[i][n].taxRate
+            incomeEl.innerHTML = income
+            taxInfo.innerHTML += "<br> Store #" + storeNum + "<br>Income tax rate: " + tiles[i][n].taxRate
          }
       }
    }
@@ -311,7 +318,7 @@ setTimeout(taxes, 18000)
 
 function payTaxes() {
    taxModalEl.style.display = 'none';
-   taxesAmt.innerHTML = "";
+   taxInfo.innerHTML = "";
    storeNum = 0
    income = 0
    setTimeout(taxes, 18000)
@@ -340,8 +347,9 @@ setInterval(competitionGrowth, competitionInterval);
 requestAnimationFrame(display);
 
 function display() {
+    let colorPercentage = 1 - pollutionPercentage
    // Draw world map
-   ctx.fillStyle = "rgb(55, 83, 218)"
+   ctx.fillStyle = `rgb(${55 * colorPercentage}, ${83 * colorPercentage}, ${218 * colorPercentage})`
    ctx.fillRect(0, 0, cnv.width, cnv.height)
    ctx.drawImage(background, 0, 0, cnv.width, cnv.height);
 
@@ -356,16 +364,18 @@ function display() {
       clouds[i].draw();
    }
    if (!gameOver) {
-      polution += 0.01
-      if (polution === 175) {
+      pollution += 0.5
+      pollutionPercentage = pollution / 100
+
+      if (pollutionPercentage === 1) {
          gameOver = true
       }
    }
-   // Draw polution bar 
+   // Draw pollution bar 
    ctx.strokeStyle = "rgb(0, 0, 0)"
    ctx.strokeRect(35, cnv.height - 50, 175, 30)
    ctx.fillStyle = "green"
-   ctx.fillRect(35.5, cnv.height -50, polution, 29.5)
+   ctx.fillRect(35.5, cnv.height -50, pollutionPercentage * 175, 29.5)
 
    // Decide when to show a trade request
    repetition++;
