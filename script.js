@@ -21,6 +21,7 @@ let incomeEl = document.getElementById('income');
 let modalBtn = document.getElementById('hide');
 let boat = document.getElementById('boat');
 let buyBoatBtn = document.getElementById('buyBoat');
+let reputationEl = document.getElementById('reputation')
 
 function getRandInt(min, max) {
    // min and max are included
@@ -32,7 +33,6 @@ let mouseX, mouseY;
 let mouseDown = false;
 let dragRestaurant = false;
 let numberOfRestaurants = 1;
-let rCoordsList = [];
 let money = 0;
 let randomInterval = getRandInt(500, 1000);
 let randomX, randomY;
@@ -56,17 +56,12 @@ let displayLength = 1000;
 let displayDuration = 0;
 let trade = false;
 let availableTiles = [];
-let africaStores,
-   eurasiaStores,
-   nAmericaStores,
-   sAmericaStores,
-   australiaStores = 0;
-let profits = 0;
 let pollution = 0;
 let pollutionPercentage = 0;
 let gameOver = false;
 let income = 0;
 let taxBool = false;
+let reputation = 10
 taxModalEl.style.display = 'none';
 
 //Tile class for placing stuff
@@ -118,6 +113,7 @@ class tile {
                this.status = 'player';
                dragRestaurant = false;
                this.restaurantType = restaurantImg;
+               reputation += 10
             }
             this.color = 'rgb(0, 255, 0)';
          } else if (this.status === 'player' || this.status === 'competition') {
@@ -143,7 +139,6 @@ class tile {
       }
 
       if (this.inside && mouseDown && !dragRestaurant) {
-         console.log('BUY');
       }
    }
 }
@@ -277,7 +272,7 @@ function createTiles() {
    nAmerica[randomIndex].startingStore = true;
    let open = false;
 
-   // Loops until it finds an available tile (so that it doesn't end up on startingStore)
+   // Loops until it finds an available tile on the map (so that it doesn't end up on startingStore)
    while (!open) {
       randomIndex = getRandInt(0, nAmerica.length);
       if (tiles[4][randomIndex].status === 'open') {
@@ -333,6 +328,7 @@ function taxes() {
 setTimeout(taxes, 18000);
 
 function payTaxes() {
+   taxBool = false
    taxModalEl.style.display = 'none';
    taxInfo.innerHTML = '';
    storeNum = 0;
@@ -376,7 +372,7 @@ function display() {
          tiles[c][t].draw();
       }
    }
-
+   console.log(availableTiles.length)
    // Draw all the clouds
    for (let i = 0; i < clouds.length; i++) {
       clouds[i].draw();
@@ -451,6 +447,7 @@ function display() {
    if (boatDrag) {
       ctx.drawImage(boat, mouseX - 50, mouseY - 50, 100, 100);
    }
+   reputationEl.innerHTML = reputation
    discover();
    trading();
    requestAnimationFrame(display);

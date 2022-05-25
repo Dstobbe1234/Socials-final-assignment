@@ -19,12 +19,14 @@
 }
 
 .modal-content {
+   overflow-y: scroll;
    background: rgb(255, 255, 255);
    width: 400px;
    height: 500px;
    border-radius: 5px;
    text-align: center;
    margin: 45px 400px;
+   padding-bottom: 20px;
 }
 
 img {
