@@ -16,6 +16,7 @@ let amountEl = document.getElementById('amount');
 let grid = document.getElementById('grid');
 let restaurantSum = document.getElementById('restaurantAmount');
 let taxModalEl = document.getElementById('taxesModal');
+let competitionModal = document.getElementById('competitionModal')
 let taxInfo = document.getElementById('taxes');
 let incomeEl = document.getElementById('income');
 let modalBtn = document.getElementById('hide');
@@ -62,7 +63,6 @@ let gameOver = false;
 let income = 0;
 let taxBool = false;
 let reputation = 10
-taxModalEl.style.display = 'none';
 
 //Tile class for placing stuff
 class tile {
@@ -138,7 +138,8 @@ class tile {
          ctx.drawImage(this.restaurantType, this.x, this.y, this.size, this.size);
       }
 
-      if (this.inside && mouseDown && !dragRestaurant) {
+      if (this.inside && mouseDown && !dragRestaurant && this.competition) {
+         competitionModal.style.display = "block"
       }
    }
 }
@@ -268,13 +269,13 @@ function createTiles() {
       }
    }
    createClouds();
-   let randomIndex = getRandInt(0, nAmerica.length);
+   let randomIndex = getRandInt(0, nAmerica.length - 1);
    nAmerica[randomIndex].startingStore = true;
    let open = false;
 
    // Loops until it finds an available tile on the map (so that it doesn't end up on startingStore)
    while (!open) {
-      randomIndex = getRandInt(0, nAmerica.length);
+      randomIndex = getRandInt(0, nAmerica.length - 1);
       if (tiles[4][randomIndex].status === 'open') {
          open = true;
          nAmerica[randomIndex].competition = true;
@@ -346,7 +347,7 @@ function boatPlace() {
 
 function competitionGrowth() {
    if (availableTiles.length > 0) {
-      let randomIndex = getRandInt(0, availableTiles.length);
+      let randomIndex = getRandInt(0, availableTiles.length - 1);
       availableTiles[randomIndex].competition = true;
    }
    competitionInterval = getRandInt(5000, 15000);
@@ -387,7 +388,7 @@ function display() {
    }
 
    // Draw pollution bar
-   ctx.strokeStyle = 'rgb(0, 0, 0)';
+   ctx.strokeStyle = 'rgb(255, 255, 255)';
    ctx.strokeRect(35, cnv.height - 50, 175, 30);
    ctx.fillStyle = 'green';
    ctx.fillRect(35.5, cnv.height - 50, pollutionPercentage * 175, 29.5);
@@ -488,8 +489,9 @@ function discover() {
 }
 
 function trading() {
+
    if (repetition === randomInterval) {
-      randomIndex = availableTiles[getRandInt(0, availableTiles.length)];
+      randomIndex = availableTiles[getRandInt(0, availableTiles.length - 1)];
       randomX = randomIndex.x;
       randomY = randomIndex.y;
       trade = true;
