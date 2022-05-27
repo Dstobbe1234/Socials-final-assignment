@@ -22,7 +22,9 @@ let incomeEl = document.getElementById('income');
 let modalBtn = document.getElementById('hide');
 let boat = document.getElementById('boat');
 let buyBoatBtn = document.getElementById('buyBoat');
-let reputationEl = document.getElementById('reputation')
+let reputationEl = document.getElementById('reputation');
+let cancelBtn = document.getElementById('cancel');
+let buyCompetitionBtn = document.getElementById('buyCompetition')
 
 function getRandInt(min, max) {
    // min and max are included
@@ -63,6 +65,7 @@ let gameOver = false;
 let income = 0;
 let taxBool = false;
 let reputation = 10
+let buyCompetitionBool = false
 
 //Tile class for placing stuff
 class tile {
@@ -74,19 +77,18 @@ class tile {
       this.status = 'open';
       this.index;
       this.startingStore;
-      this.competition = false;
       this.continent = continent;
       this.restaurantType;
       this.inside;
       this.taxRate = getRandInt(5, 15);
+      this.competitionClicked = false;
    }
 
    draw() {
       if (this.startingStore) {
          this.status = 'player';
          this.restaurantType = restaurantImg;
-      } else if (this.competition) {
-         this.status = 'competition';
+      } else if (this.status === "competition") {
          //This will change when Will draw
          this.restaurantType = competitionImg;
       }
@@ -138,9 +140,29 @@ class tile {
          ctx.drawImage(this.restaurantType, this.x, this.y, this.size, this.size);
       }
 
-      if (this.inside && mouseDown && !dragRestaurant && this.competition) {
+      if (this.inside && mouseDown && !dragRestaurant && this.status === "competition") {
+         this.competitionClicked = true
          competitionModal.style.display = "block"
       }
+
+      if (this.competitionClicked && buyCompetitionBool === true) {
+         this.status = "player"
+         numberOfRestaurants++
+         this.restaurantType = restaurantImg
+         buyCompetitionBool = false
+      }
+   }
+}
+
+function cancel() {
+   competitionModal.style.display = "none"
+}
+function buyCompetition() {
+   if (money >= 100 && buyCompetitionBool === false) {
+      money -= 100
+      reputation += 20
+      buyCompetitionBool = true
+      competitionModal.style.display = "none"
    }
 }
 
@@ -204,6 +226,8 @@ document.addEventListener('mouseup', mouseupHandler);
 background.addEventListener('load', createTiles);
 modalBtn.addEventListener('click', payTaxes);
 buyBoatBtn.addEventListener('click', boatPlace);
+cancelBtn.addEventListener('click', cancel)
+buyCompetitionBtn.addEventListener('click', buyCompetition)
 
 //Event Functions
 function drag() {
@@ -278,7 +302,7 @@ function createTiles() {
       randomIndex = getRandInt(0, nAmerica.length - 1);
       if (tiles[4][randomIndex].status === 'open') {
          open = true;
-         nAmerica[randomIndex].competition = true;
+         nAmerica[randomIndex].status = "competition";
       }
    }
 
@@ -348,7 +372,7 @@ function boatPlace() {
 function competitionGrowth() {
    if (availableTiles.length > 0) {
       let randomIndex = getRandInt(0, availableTiles.length - 1);
-      availableTiles[randomIndex].competition = true;
+      availableTiles[randomIndex].status = "competition";
    }
    competitionInterval = getRandInt(5000, 15000);
 }
@@ -395,6 +419,7 @@ function display() {
 
    // Decide when to show a trade request
    repetition++;
+   console.log(buyCompetitionBool)
    restaurantSum.innerHTML = numberOfRestaurants;
    for (let c = 0; c < tiles.length; c++) {
       for (let t = 0; t < tiles[c].length; t++) {
