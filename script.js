@@ -24,7 +24,8 @@ let boat = document.getElementById('boat');
 let buyBoatBtn = document.getElementById('buyBoat');
 let reputationEl = document.getElementById('reputation');
 let cancelBtn = document.getElementById('cancel');
-let buyCompetitionBtn = document.getElementById('buyCompetition')
+let buyCompetitionBtn = document.getElementById('buyCompetition');
+let competitionTaxRate = document.getElementById('rate');
 
 function getRandInt(min, max) {
    // min and max are included
@@ -89,7 +90,6 @@ class tile {
          this.status = 'player';
          this.restaurantType = restaurantImg;
       } else if (this.status === "competition") {
-         //This will change when Will draw
          this.restaurantType = competitionImg;
       }
 
@@ -136,20 +136,30 @@ class tile {
          }
       }
 
+      if (this.inside && this.status === 'open') {
+         ctx.fillStyle = 'rgb(255, 255, 255)'
+         ctx.fillRect(this.x, this.y - 20, this.size, this.size)
+         ctx.fillStyle = 'rgb(0, 0, 0)'
+         ctx.fillText(this.taxRate, this.x + 5, this.y - 5, this.size, this.size)
+      }
+
       if (this.status === 'player' || this.status === 'competition') {
          ctx.drawImage(this.restaurantType, this.x, this.y, this.size, this.size);
       }
 
-      if (this.inside && mouseDown && !dragRestaurant && this.status === "competition") {
+      if (this.inside && mouseDown && !dragRestaurant && this.status === "competition" && taxBool === false) {
          this.competitionClicked = true
+         competitionTaxRate.innerHTML = this.taxRate
          competitionModal.style.display = "block"
       }
 
       if (this.competitionClicked && buyCompetitionBool === true) {
+         console.log("EEEEEEEEEEEEEEEEE")
          this.status = "player"
          numberOfRestaurants++
          this.restaurantType = restaurantImg
          buyCompetitionBool = false
+         this.competitionClicked = false
       }
    }
 }
@@ -397,7 +407,6 @@ function display() {
          tiles[c][t].draw();
       }
    }
-   console.log(availableTiles.length)
    // Draw all the clouds
    for (let i = 0; i < clouds.length; i++) {
       clouds[i].draw();
@@ -419,7 +428,6 @@ function display() {
 
    // Decide when to show a trade request
    repetition++;
-   console.log(buyCompetitionBool)
    restaurantSum.innerHTML = numberOfRestaurants;
    for (let c = 0; c < tiles.length; c++) {
       for (let t = 0; t < tiles[c].length; t++) {
@@ -433,6 +441,7 @@ function display() {
                tiles[c][t].status === 'open' &&
                !sAmericaClouds
             ) {
+
                availableTiles.push(tiles[c][t]);
             } else if (
                tiles[c][t].continent === 'eurasia' &&
@@ -484,6 +493,7 @@ function discover() {
       for (let i = 0; i < clouds.length; i++) {
          if (clouds[i].continent === 'eurasia') {
             clouds.splice(i, 1);
+            tiles[0].status = 'open'
          }
       }
    }
