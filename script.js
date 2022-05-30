@@ -26,6 +26,16 @@ let reputationEl = document.getElementById('reputation');
 let cancelBtn = document.getElementById('cancel');
 let buyCompetitionBtn = document.getElementById('buyCompetition');
 let competitionTaxRate = document.getElementById('rate');
+let continents = []
+
+
+
+let avocado = document.getElementById('avocado')
+let avocadoTrade = document.getElementById('avocadoTrade')
+let sweetPotato = document.getElementById('sweetPotato')
+let sweetPotatoTrade = document.getElementById('sweetPotatoTrade')
+
+
 
 function getRandInt(min, max) {
    // min and max are included
@@ -126,12 +136,16 @@ class tile {
             boatDrag = false;
             if (this.continent === 'eurasia') {
                eurasiaClouds = false;
+               continents.push([avocadoTrade, tiles[1][5]] , [sweetPotatoTrade, tiles[1][50]])
             } else if (this.continent === 'africaMiddleEast') {
                africaClouds = false;
+               continents.push('africaMiddleEast')
             } else if (this.continent === 'sAmerica') {
                sAmericaClouds = false;
+               continents.push('sAmerica')
             } else if (this.continent === 'australia') {
                australiaClouds = false;
+               continents.push('australia')
             }
          }
       }
@@ -392,6 +406,7 @@ setInterval(competitionGrowth, competitionInterval);
 
 // Animation loop
 function display() {
+   console.log(continents[0])
    // Draw world map
    const colorPercentage = 1 - pollutionPercentage;
 
@@ -496,6 +511,7 @@ function discover() {
             tiles[0].status = 'open'
          }
       }
+
    }
 
    if (!sAmericaClouds) {
@@ -524,29 +540,30 @@ function discover() {
 }
 
 function trading() {
-
-   if (repetition === randomInterval) {
-      randomIndex = availableTiles[getRandInt(0, availableTiles.length - 1)];
-      randomX = randomIndex.x;
-      randomY = randomIndex.y;
+   let avocado = document.getElementById('avocado')
+   let avocadoTrade = document.getElementById('avocadoTrade')
+   let sweetPotato = document.getElementById('sweetPotato')
+   let sweetPotatoTrade = document.getElementById('sweetPotatoTrade')
+   if (repetition === randomInterval && continents.length > 0) {
+      let randomContinent = continents[getRandInt(0, continents.length - 1)]
+      ctx.drawImage(continents[randomContinent][0], continents[randomContinent][1].x, continents[randomContinent][1].y, 50, 50)
       trade = true;
    }
    if (trade) {
-      ctx.strokeStyle = 'green';
       displayDuration++;
-      if (
-         mouseX >= randomX + 47 &&
-         mouseX <= randomX + 47 + 40 &&
-         mouseY >= randomY - 67 &&
-         mouseY <= randomY - 67 + 20
-      ) {
-         if (mouseDown) {
-            trade = false;
-            displayDuration = 0;
-            repetition = 0;
-            randomInterval = getRandInt(500, 1000);
-         }
-      }
+      //if (
+       //  mouseX >= randomX + 47 &&
+       ////  mouseX <= randomX + 47 + 40 &&
+        // mouseY >= randomY - 67 &&
+        // mouseY <= randomY - 67 + 20
+      //) {
+         //if (mouseDown) {
+         //   trade = false;
+         //   displayDuration = 0;
+         //   repetition = 0;
+         //   randomInterval = getRandInt(500, 1000);
+         //}
+      //}
       if (displayDuration === displayLength) {
          trade = false;
          displayDuration = 0;
