@@ -80,7 +80,7 @@ let buyCompetitionBool = false
 
 //Tile class for placing stuff
 class tile {
-   constructor(x, y, size, continent) {
+   constructor(x, y, size, continent, trade) {
       this.x = x;
       this.y = y;
       this.size = size;
@@ -93,8 +93,9 @@ class tile {
       this.inside;
       this.taxRate = getRandInt(5, 15);
       this.competitionClicked = false;
+      this.trade = trade;
+      this.clouded = false;
    }
-
    draw() {
       if (this.startingStore) {
          this.status = 'player';
@@ -117,9 +118,13 @@ class tile {
          this.color = 'rgb(0, 0, 0)';
       }
 
-      if (this.inside && dragRestaurant) {
+      if (this.x === 300 && this.y === 420) {
+         this.trade = document.getElementById('avocadoTrade')
+      }
+
+      if (this.inside && dragRestaurant && !this.clouded) {
          ctx.drawImage(restaurantImg, this.x, this.y, this.size, this.size);
-         if (this.status === 'open') {
+         if (this.status !== 'player' && this.status !== 'competition') {
             if (mouseDown) {
                numberOfRestaurants++;
                this.status = 'player';
@@ -128,7 +133,7 @@ class tile {
                reputation += 10
             }
             this.color = 'rgb(0, 255, 0)';
-         } else if (this.status === 'player' || this.status === 'competition') {
+         } else {
             this.color = 'rgb(255, 0, 0)';
          }
       } else if (this.inside && boatDrag && this.continent !== 'nAmerica') {
@@ -150,7 +155,28 @@ class tile {
          }
       }
 
-      if (this.inside && this.status === 'open') {
+      if (this.continent === 'sAmerica' && sAmericaClouds) {
+         this.clouded = true;
+      } else if (this.continent === 'sAmerica' && !sAmericaClouds) {
+         this.clouded = false;
+      } else if (this.continent === 'africaMiddleEast' && africaClouds) {
+         this.clouded = true;
+      } else if (this.continent === 'africaMiddleEast' && !africaClouds) {
+         this.clouded = false;
+      } else if (this.continent === 'eurasia' && eurasiaClouds) {
+         this.clouded = true;
+      } else if (this.continent === 'eurasia' && !eurasiaClouds) {
+         this.clouded = false;
+      } else if (this.continent === 'australia' && australia) {
+         this.clouded = true;
+      } else if (this.continent === 'australia' && !australia) {
+         this.clouded = false;
+      }
+
+
+
+      if (this.inside && this.status === 'open' && !this.clouded) {
+         console.log(this.x, this.y)
          ctx.fillStyle = 'rgb(255, 255, 255)'
          ctx.fillRect(this.x, this.y - 20, this.size, this.size)
          ctx.fillStyle = 'rgb(0, 0, 0)'
@@ -168,7 +194,6 @@ class tile {
       }
 
       if (this.competitionClicked && buyCompetitionBool === true) {
-         console.log("EEEEEEEEEEEEEEEEE")
          this.status = "player"
          numberOfRestaurants++
          this.restaurantType = restaurantImg
@@ -406,7 +431,6 @@ setInterval(competitionGrowth, competitionInterval);
 
 // Animation loop
 function display() {
-   console.log(continents[0])
    // Draw world map
    const colorPercentage = 1 - pollutionPercentage;
 
@@ -452,9 +476,8 @@ function display() {
             }
          } else {
             if (
-               tiles[c][t].continent === 'sAmerica' &&
-               tiles[c][t].status === 'open' &&
-               !sAmericaClouds
+               tiles[c][t].clouded === false &&
+               tiles[c][t].status === 'open'
             ) {
 
                availableTiles.push(tiles[c][t]);
@@ -540,10 +563,17 @@ function discover() {
 }
 
 function trading() {
+   for(let m = 0; m < tiles.length; m++) {
+      for(let n = 0; n < tiles[m].length; n++) {
+         if(tiles[m][n].continent === "sAmerica" && !sAmericaClouds) {
+            if(tiles[m][n].trade !== undefined) {
+               console.log("EE")
+            }
+         }
+      }
+   }
    let avocado = document.getElementById('avocado')
-   let avocadoTrade = document.getElementById('avocadoTrade')
-   let sweetPotato = document.getElementById('sweetPotato')
-   let sweetPotatoTrade = document.getElementById('sweetPotatoTrade')
+
    if (repetition === randomInterval && continents.length > 0) {
       let randomContinent = continents[getRandInt(0, continents.length - 1)]
       ctx.drawImage(continents[randomContinent][0], continents[randomContinent][1].x, continents[randomContinent][1].y, 50, 50)
