@@ -26,7 +26,6 @@ let reputationEl = document.getElementById('reputation');
 let cancelBtn = document.getElementById('cancel');
 let buyCompetitionBtn = document.getElementById('buyCompetition');
 let competitionTaxRate = document.getElementById('rate');
-let continents = []
 
 
 
@@ -76,14 +75,16 @@ let gameOver = false;
 let income = 0;
 let taxBool = false;
 let reputation = 10
-let buyCompetitionBool = false
+let buyCompetitionBool = false;
+let discoveredContinents
 
 //Tile class for placing stuff
 class tile {
-   constructor(x, y, size, continent, trade) {
+   constructor(x, y, size, continent, id) {
       this.x = x;
       this.y = y;
       this.size = size;
+      this.id = id;
       this.color = 'rgb(0, 0, 0)';
       this.status = 'open';
       this.index;
@@ -93,7 +94,7 @@ class tile {
       this.inside;
       this.taxRate = getRandInt(5, 15);
       this.competitionClicked = false;
-      this.trade = trade;
+      this.trade = 'none'
       this.clouded = false;
    }
    draw() {
@@ -118,7 +119,7 @@ class tile {
          this.color = 'rgb(0, 0, 0)';
       }
 
-      if (this.x === 300 && this.y === 420) {
+      if (this.id === 289 && !this.clouded) {
          this.trade = document.getElementById('avocadoTrade')
       }
 
@@ -141,16 +142,13 @@ class tile {
             boatDrag = false;
             if (this.continent === 'eurasia') {
                eurasiaClouds = false;
-               continents.push([avocadoTrade, tiles[1][5]] , [sweetPotatoTrade, tiles[1][50]])
             } else if (this.continent === 'africaMiddleEast') {
                africaClouds = false;
-               continents.push('africaMiddleEast')
             } else if (this.continent === 'sAmerica') {
                sAmericaClouds = false;
-               continents.push('sAmerica')
+               possibleTradeLocations.push(189)
             } else if (this.continent === 'australia') {
                australiaClouds = false;
-               continents.push('australia')
             }
          }
       }
@@ -176,7 +174,7 @@ class tile {
 
 
       if (this.inside && this.status === 'open' && !this.clouded) {
-         console.log(this.x, this.y)
+         console.log(this.id)
          ctx.fillStyle = 'rgb(255, 255, 255)'
          ctx.fillRect(this.x, this.y - 20, this.size, this.size)
          ctx.fillStyle = 'rgb(0, 0, 0)'
@@ -298,7 +296,7 @@ function mousemoveHandler(event) {
    mouseX = event.x - cnv.getBoundingClientRect().x;
    mouseY = event.y - cnv.getBoundingClientRect().y;
 }
-
+let tileIdentifier = 0
 // Checks if a tile would have water in it and if not then creates it
 function createTiles() {
    ctx.fillStyle = 'rgb(55, 83, 218)';
@@ -321,10 +319,12 @@ function createTiles() {
             }
          }
          if (!containsOcean) {
+            tileIdentifier ++
+            console.log(tileIdentifier)
             if (x >= 250 && x <= 400 && y >= 350 && y <= 550) {
-               sAmerica.push(new tile(x, y, tileSize, 'sAmerica'));
+               sAmerica.push(new tile(x, y, tileSize, 'sAmerica', tileIdentifier));
             } else if (x >= 410 && x <= 630 && y >= 258 && y <= 508) {
-               africaMiddleEast.push(new tile(x, y, tileSize, 'africaMiddleEast'));
+               africaMiddleEast.push(new tile(x, y, tileSize, 'africaMiddleEast', tileIdentifier));
             } else if (
                x >= 410 &&
                x <= 940 &&
@@ -332,11 +332,11 @@ function createTiles() {
                y <= 370 &&
                africaMiddleEast.includes(new tile(x, y, tileSize, 'africaMiddleEast')) === false
             ) {
-               eurasia.push(new tile(x, y, tileSize, 'eurasia'));
+               eurasia.push(new tile(x, y, tileSize, 'eurasia', tileIdentifier));
             } else if (x >= 770 && x <= 970 && y >= 400 && y <= 550) {
-               australia.push(new tile(x, y, tileSize, 'australia'));
+               australia.push(new tile(x, y, tileSize, 'australia', tileIdentifier));
             } else {
-               nAmerica.push(new tile(x, y, tileSize, 'nAmerica'));
+               nAmerica.push(new tile(x, y, tileSize, 'nAmerica', tileIdentifier));
             }
          }
       }
@@ -446,6 +446,9 @@ function display() {
          tiles[c][t].draw();
       }
    }
+
+   let d = tiles[4].find(tile => tile.id === 2)
+   console.log(d)
    // Draw all the clouds
    for (let i = 0; i < clouds.length; i++) {
       clouds[i].draw();
@@ -475,31 +478,7 @@ function display() {
                availableTiles.splice(availableTiles.indexOf(tiles[c][t]), 1);
             }
          } else {
-            if (
-               tiles[c][t].clouded === false &&
-               tiles[c][t].status === 'open'
-            ) {
-
-               availableTiles.push(tiles[c][t]);
-            } else if (
-               tiles[c][t].continent === 'eurasia' &&
-               tiles[c][t].status === 'open' &&
-               !eurasiaClouds
-            ) {
-               availableTiles.push(tiles[c][t]);
-            } else if (
-               tiles[c][t].continent === 'africaMiddleEast' &&
-               tiles[c][t].status === 'open' &&
-               !africaClouds
-            ) {
-               availableTiles.push(tiles[c][t]);
-            } else if (
-               tiles[c][t].continent === 'australia' &&
-               tiles[c][t].status === 'open' &&
-               !australiaClouds
-            ) {
-               availableTiles.push(tiles[c][t]);
-            } else if (tiles[c][t].continent === 'nAmerica' && tiles[c][t].status === 'open') {
+            if (tiles[c][t].clouded === false && tiles[c][t].status === 'open') {
                availableTiles.push(tiles[c][t]);
             }
          }
@@ -561,23 +540,14 @@ function discover() {
       }
    }
 }
-
+let possibleTrades = []
 function trading() {
-   for(let m = 0; m < tiles.length; m++) {
-      for(let n = 0; n < tiles[m].length; n++) {
-         if(tiles[m][n].continent === "sAmerica" && !sAmericaClouds) {
-            if(tiles[m][n].trade !== undefined) {
-               console.log("EE")
-            }
-         }
-      }
-   }
-   let avocado = document.getElementById('avocado')
 
-   if (repetition === randomInterval && continents.length > 0) {
-      let randomContinent = continents[getRandInt(0, continents.length - 1)]
-      ctx.drawImage(continents[randomContinent][0], continents[randomContinent][1].x, continents[randomContinent][1].y, 50, 50)
-      trade = true;
+   if (repetition === randomInterval && possibleTradeLocations > 0) {
+      // let chosenTradeId = possibleTradeLocations[getRandInt(0, possibleTradeLocations.length -1)]
+      // tiles[3].find(tile => tile.id === chosenTradeId)
+
+
    }
    if (trade) {
       displayDuration++;
@@ -602,3 +572,4 @@ function trading() {
       }
    }
 }
+
