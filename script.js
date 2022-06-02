@@ -26,6 +26,9 @@ let reputationEl = document.getElementById('reputation');
 let cancelBtn = document.getElementById('cancel');
 let buyCompetitionBtn = document.getElementById('buyCompetition');
 let competitionTaxRate = document.getElementById('rate');
+let storeIncome = document.getElementById('storeIncome');
+let totalTaxAmtEl = document.getElementById('total')
+
 
 
 
@@ -75,8 +78,8 @@ let gameOver = false;
 let income = 0;
 let taxBool = false;
 let reputation = 10
-let buyCompetitionBool = false;
-let discoveredContinents
+let buyCompetitionBool = false
+let totalTaxAmt = 0
 
 //Tile class for placing stuff
 class tile {
@@ -119,10 +122,6 @@ class tile {
          this.color = 'rgb(0, 0, 0)';
       }
 
-      if (this.id === 289 && !this.clouded) {
-         this.trade = document.getElementById('avocadoTrade')
-      }
-
       if (this.inside && dragRestaurant && !this.clouded) {
          ctx.drawImage(restaurantImg, this.x, this.y, this.size, this.size);
          if (this.status !== 'player' && this.status !== 'competition') {
@@ -146,7 +145,6 @@ class tile {
                africaClouds = false;
             } else if (this.continent === 'sAmerica') {
                sAmericaClouds = false;
-               possibleTradeLocations.push(189)
             } else if (this.continent === 'australia') {
                australiaClouds = false;
             }
@@ -171,10 +169,13 @@ class tile {
          this.clouded = false;
       }
 
+      if (this.id === 189 && !this.clouded) {
+         this.trade = document.getElementById('avocadoTrade')
+      }
+
 
 
       if (this.inside && this.status === 'open' && !this.clouded) {
-         console.log(this.id)
          ctx.fillStyle = 'rgb(255, 255, 255)'
          ctx.fillRect(this.x, this.y - 20, this.size, this.size)
          ctx.fillStyle = 'rgb(0, 0, 0)'
@@ -320,7 +321,6 @@ function createTiles() {
          }
          if (!containsOcean) {
             tileIdentifier ++
-            console.log(tileIdentifier)
             if (x >= 250 && x <= 400 && y >= 350 && y <= 550) {
                sAmerica.push(new tile(x, y, tileSize, 'sAmerica', tileIdentifier));
             } else if (x >= 410 && x <= 630 && y >= 258 && y <= 508) {
@@ -390,24 +390,30 @@ function taxes() {
       for (let n = 0; n < tiles[i].length; n++) {
          if (tiles[i][n].status === 'player') {
             storeNum++;
+            totalTaxAmt += Math.round((income/numberOfRestaurants) * (tiles[i][n].taxRate / 100))
             incomeEl.innerHTML = income;
+            storeIncome.innerHTML = Math.round(income/numberOfRestaurants)
             taxInfo.innerHTML +=
                '<br> Store #' + storeNum + '<br>Income tax rate: ' + tiles[i][n].taxRate;
+            totalTaxAmtEl.innerHTML = totalTaxAmt
+
          }
       }
    }
 
    taxModalEl.style.display = 'block';
 }
-setTimeout(taxes, 18000);
+setTimeout(taxes, 1800);
 
 function payTaxes() {
    taxBool = false
    taxModalEl.style.display = 'none';
    taxInfo.innerHTML = '';
+   totalTaxAmt = 0
    storeNum = 0;
    income = 0;
-   setTimeout(taxes, 18000);
+   money -= totalTaxAmt
+   setTimeout(taxes, 1800);
 }
 
 function boatPlace() {
@@ -447,8 +453,6 @@ function display() {
       }
    }
 
-   let d = tiles[4].find(tile => tile.id === 2)
-   console.log(d)
    // Draw all the clouds
    for (let i = 0; i < clouds.length; i++) {
       clouds[i].draw();
@@ -461,6 +465,15 @@ function display() {
          gameOver = true;
       }
    }
+
+   let mergedTiles = tiles.flat(1)
+   let possibleTrades = mergedTiles.filter(tile => tile.trade !== "none")
+   let chosenTrade = possibleTrades[getRandInt(0, possibleTrades.length - 1)]
+   console.log(possibleTrades)
+   console.log(chosenTrade)
+   
+
+
 
    // Draw pollution bar
    ctx.strokeStyle = 'rgb(255, 255, 255)';
@@ -540,13 +553,16 @@ function discover() {
       }
    }
 }
-let possibleTrades = []
 function trading() {
 
-   if (repetition === randomInterval && possibleTradeLocations > 0) {
-      // let chosenTradeId = possibleTradeLocations[getRandInt(0, possibleTradeLocations.length -1)]
-      // tiles[3].find(tile => tile.id === chosenTradeId)
+   if (repetition === randomInterval) {
+      //let mergedTiles = tiles.flat(1)
+      //let possibleTrades = mergedTiles.filter(tile => tile.trade !== "none")
+      //let chosenTrade = possibleTrades[getRandInt(0, possibleTrades.length - 1)]
+      //console.log(chosenTrade)
 
+
+      
 
    }
    if (trade) {
