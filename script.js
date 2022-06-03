@@ -169,8 +169,9 @@ class tile {
          this.clouded = false;
       }
 
-      if (this.id === 189 && !this.clouded) {
+      if (this.id === 289 && !this.clouded) {
          this.trade = document.getElementById('avocadoTrade')
+         console.log("EEEEEEEE")
       }
 
 
@@ -403,7 +404,7 @@ function taxes() {
 
    taxModalEl.style.display = 'block';
 }
-setTimeout(taxes, 1800);
+setTimeout(taxes, 18000);
 
 function payTaxes() {
    taxBool = false
@@ -413,7 +414,7 @@ function payTaxes() {
    storeNum = 0;
    income = 0;
    money -= totalTaxAmt
-   setTimeout(taxes, 1800);
+   setTimeout(taxes, 18000);
 }
 
 function boatPlace() {
@@ -465,12 +466,6 @@ function display() {
          gameOver = true;
       }
    }
-
-   let mergedTiles = tiles.flat(1)
-   let possibleTrades = mergedTiles.filter(tile => tile.trade !== "none")
-   let chosenTrade = possibleTrades[getRandInt(0, possibleTrades.length - 1)]
-   console.log(possibleTrades)
-   console.log(chosenTrade)
    
 
 
@@ -553,13 +548,23 @@ function discover() {
       }
    }
 }
-function trading() {
 
+let mergedTiles = []
+let possibleTrades = []
+let chosenTrade
+function trading() {
    if (repetition === randomInterval) {
-      //let mergedTiles = tiles.flat(1)
-      //let possibleTrades = mergedTiles.filter(tile => tile.trade !== "none")
-      //let chosenTrade = possibleTrades[getRandInt(0, possibleTrades.length - 1)]
-      //console.log(chosenTrade)
+      console.log('dfv')
+      mergedTiles = tiles.flat(1)
+      possibleTrades = mergedTiles.filter(tile => tile.trade !== "none")
+      chosenTrade = possibleTrades[getRandInt(0, possibleTrades.length - 1)]
+      if (typeof(chosenTrade) !== 'undefined') {
+         console.log(chosenTrade)
+         trade = true
+      } else {
+         randomInterval = getRandInt(500, 1000)
+         repetition = 0
+      }
 
 
       
@@ -567,18 +572,13 @@ function trading() {
    }
    if (trade) {
       displayDuration++;
-      //if (
-       //  mouseX >= randomX + 47 &&
-       ////  mouseX <= randomX + 47 + 40 &&
-        // mouseY >= randomY - 67 &&
-        // mouseY <= randomY - 67 + 20
-      //) {
-         //if (mouseDown) {
-         //   trade = false;
-         //   displayDuration = 0;
-         //   repetition = 0;
-         //   randomInterval = getRandInt(500, 1000);
-         //}
+      ctx.drawImage(chosenTrade.trade, chosenTrade.x, chosenTrade.y - 100, 100, 100);
+      if (mouseDown) {
+         trade = false;
+         displayDuration = 0;
+         repetition = 0;
+         randomInterval = getRandInt(500, 1000);
+      }
       //}
       if (displayDuration === displayLength) {
          trade = false;
