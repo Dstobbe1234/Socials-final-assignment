@@ -1,11 +1,15 @@
+body {
+   width: max-content;
+}
+
 #sidebar {
+   margin-left: 10px;
    padding-top: 20px;
-   padding-bottom: 500px;
    width: 200px;
+   height: 580px;
    text-align: center;
    float: right;
    background-color: rgb(175, 175, 175);
-   border-radius: 20px;
 }
 
 #taxesModal {
@@ -47,9 +51,6 @@ img {
    margin:0px;
    padding: 0px;
 }
-
-
-
 
 .available {
    border: 5px solid rgb(0, 255, 0);

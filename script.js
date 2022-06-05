@@ -4,13 +4,12 @@
 let cnv = document.getElementById('canvas');
 let ctx = cnv.getContext('2d');
 cnv.width = 1000;
-cnv.height = cnv.width * 0.6;
+cnv.height = 600;
 
 // Variables for HTML elements
 let buyBtn = document.getElementById('buy');
 let restaurantImg = document.getElementById('restaurant');
 let competitionImg = document.getElementById('competition');
-let background = document.getElementById('background');
 let cloudsImg = document.getElementById('clouds-img');
 let amountEl = document.getElementById('amount');
 let grid = document.getElementById('grid');
@@ -28,16 +27,18 @@ let buyCompetitionBtn = document.getElementById('buyCompetition');
 let competitionTaxRate = document.getElementById('rate');
 let storeIncome = document.getElementById('storeIncome');
 let totalTaxAmtEl = document.getElementById('total')
-
-
-
-
 let avocado = document.getElementById('avocado')
 let avocadoTrade = document.getElementById('avocadoTrade')
 let sweetPotato = document.getElementById('sweetPotato')
 let sweetPotatoTrade = document.getElementById('sweetPotatoTrade')
 
-
+// load background
+const backgroundEl = document.getElementById('background');
+const background = new Image;
+background.onload = function() {
+    backgroundEl.src = this.src;
+}
+background.src = 'img/world-map.png';
 
 function getRandInt(min, max) {
    // min and max are included
@@ -171,12 +172,12 @@ class tile {
 
       if (this.id === 289 && !this.clouded) {
          this.trade = document.getElementById('avocadoTrade')
-         console.log("EEEEEEEE")
+      } else if (this.id === 249 && !this.clouded) {
+         this.trade = document.getElementById('citronTrade')
       }
 
-
-
       if (this.inside && this.status === 'open' && !this.clouded) {
+         console.log(this.id)
          ctx.fillStyle = 'rgb(255, 255, 255)'
          ctx.fillRect(this.x, this.y - 20, this.size, this.size)
          ctx.fillStyle = 'rgb(0, 0, 0)'
@@ -299,6 +300,7 @@ function mousemoveHandler(event) {
    mouseY = event.y - cnv.getBoundingClientRect().y;
 }
 let tileIdentifier = 0
+
 // Checks if a tile would have water in it and if not then creates it
 function createTiles() {
    ctx.fillStyle = 'rgb(55, 83, 218)';
@@ -321,7 +323,7 @@ function createTiles() {
             }
          }
          if (!containsOcean) {
-            tileIdentifier ++
+            tileIdentifier++;
             if (x >= 250 && x <= 400 && y >= 350 && y <= 550) {
                sAmerica.push(new tile(x, y, tileSize, 'sAmerica', tileIdentifier));
             } else if (x >= 410 && x <= 630 && y >= 258 && y <= 508) {
@@ -386,23 +388,26 @@ function changeMoney() {
 setInterval(changeMoney, 100);
 let storeNum = 0;
 function taxes() {
-   taxBool = true;
-   for (let i = 0; i < tiles.length; i++) {
-      for (let n = 0; n < tiles[i].length; n++) {
-         if (tiles[i][n].status === 'player') {
-            storeNum++;
-            totalTaxAmt += Math.round((income/numberOfRestaurants) * (tiles[i][n].taxRate / 100))
-            incomeEl.innerHTML = income;
-            storeIncome.innerHTML = Math.round(income/numberOfRestaurants)
-            taxInfo.innerHTML +=
-               '<br> Store #' + storeNum + '<br>Income tax rate: ' + tiles[i][n].taxRate;
-            totalTaxAmtEl.innerHTML = totalTaxAmt
-
+   if (income >= 0) {
+      taxBool = true;
+      for (let i = 0; i < tiles.length; i++) {
+         for (let n = 0; n < tiles[i].length; n++) {
+            if (tiles[i][n].status === 'player') {
+               storeNum++;
+               totalTaxAmt += Math.round((income/numberOfRestaurants) * (tiles[i][n].taxRate / 100))
+               incomeEl.innerHTML = income;
+               storeIncome.innerHTML = Math.round(income/numberOfRestaurants)
+               taxInfo.innerHTML +=
+                  '<br> Store #' + storeNum + '<br>Income tax rate: ' + tiles[i][n].taxRate;
+               totalTaxAmtEl.innerHTML = totalTaxAmt
+            }
          }
       }
+      taxModalEl.style.display = 'block';
+   } else {
+      setTimeout(taxes, 18000)
    }
 
-   taxModalEl.style.display = 'block';
 }
 setTimeout(taxes, 18000);
 
@@ -410,10 +415,10 @@ function payTaxes() {
    taxBool = false
    taxModalEl.style.display = 'none';
    taxInfo.innerHTML = '';
+   money -= totalTaxAmt
    totalTaxAmt = 0
    storeNum = 0;
    income = 0;
-   money -= totalTaxAmt
    setTimeout(taxes, 18000);
 }
 
@@ -466,9 +471,6 @@ function display() {
          gameOver = true;
       }
    }
-   
-
-
 
    // Draw pollution bar
    ctx.strokeStyle = 'rgb(255, 255, 255)';
@@ -554,32 +556,27 @@ let possibleTrades = []
 let chosenTrade
 function trading() {
    if (repetition === randomInterval) {
-      console.log('dfv')
       mergedTiles = tiles.flat(1)
       possibleTrades = mergedTiles.filter(tile => tile.trade !== "none")
       chosenTrade = possibleTrades[getRandInt(0, possibleTrades.length - 1)]
       if (typeof(chosenTrade) !== 'undefined') {
-         console.log(chosenTrade)
          trade = true
       } else {
          randomInterval = getRandInt(500, 1000)
          repetition = 0
       }
-
-
-      
-
    }
    if (trade) {
       displayDuration++;
-      ctx.drawImage(chosenTrade.trade, chosenTrade.x, chosenTrade.y - 100, 100, 100);
+      ctx.drawImage(chosenTrade.trade, chosenTrade.x, chosenTrade.y - 150, 150, 150);
+      ctx.strokeStyle = 'green'
+      ctx.strokeRect(chosenTrade.x + 150 /2, chosenTrade.y + 150 / 2, 30, 30)
       if (mouseDown) {
          trade = false;
          displayDuration = 0;
          repetition = 0;
          randomInterval = getRandInt(500, 1000);
       }
-      //}
       if (displayDuration === displayLength) {
          trade = false;
          displayDuration = 0;
