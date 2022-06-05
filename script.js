@@ -15,7 +15,7 @@ let amountEl = document.getElementById('amount');
 let grid = document.getElementById('grid');
 let restaurantSum = document.getElementById('restaurantAmount');
 let taxModalEl = document.getElementById('taxesModal');
-let competitionModal = document.getElementById('competitionModal')
+let competitionModal = document.getElementById('competitionModal');
 let taxInfo = document.getElementById('taxes');
 let incomeEl = document.getElementById('income');
 let modalBtn = document.getElementById('hide');
@@ -26,18 +26,18 @@ let cancelBtn = document.getElementById('cancel');
 let buyCompetitionBtn = document.getElementById('buyCompetition');
 let competitionTaxRate = document.getElementById('rate');
 let storeIncome = document.getElementById('storeIncome');
-let totalTaxAmtEl = document.getElementById('total')
-let avocado = document.getElementById('avocado')
-let avocadoTrade = document.getElementById('avocadoTrade')
-let sweetPotato = document.getElementById('sweetPotato')
-let sweetPotatoTrade = document.getElementById('sweetPotatoTrade')
+let totalTaxAmtEl = document.getElementById('total');
+let avocado = document.getElementById('avocado');
+let avocadoTrade = document.getElementById('avocadoTrade');
+let sweetPotato = document.getElementById('sweetPotato');
+let sweetPotatoTrade = document.getElementById('sweetPotatoTrade');
 
 // load background
 const backgroundEl = document.getElementById('background');
-const background = new Image;
-background.onload = function() {
-    backgroundEl.src = this.src;
-}
+const background = new Image();
+background.onload = function () {
+   backgroundEl.src = this.src;
+};
 background.src = 'img/world-map.png';
 
 function getRandInt(min, max) {
@@ -78,9 +78,9 @@ let pollutionPercentage = 0;
 let gameOver = false;
 let income = 0;
 let taxBool = false;
-let reputation = 10
-let buyCompetitionBool = false
-let totalTaxAmt = 0
+let reputation = 10;
+let buyCompetitionBool = false;
+let totalTaxAmt = 0;
 
 //Tile class for placing stuff
 class tile {
@@ -98,19 +98,23 @@ class tile {
       this.inside;
       this.taxRate = getRandInt(5, 15);
       this.competitionClicked = false;
-      this.trade = 'none'
+      this.trade = 'none';
       this.clouded = false;
    }
+
+   drawOutline() {
+      ctx.strokeStyle = this.color;
+      ctx.strokeRect(this.x, this.y, this.size, this.size);
+   }
+
    draw() {
       if (this.startingStore) {
          this.status = 'player';
          this.restaurantType = restaurantImg;
-      } else if (this.status === "competition") {
+      } else if (this.status === 'competition') {
          this.restaurantType = competitionImg;
       }
 
-      ctx.strokeStyle = this.color;
-      ctx.strokeRect(this.x, this.y, this.size, this.size);
       if (
          mouseX > this.x &&
          mouseX < this.x + this.size &&
@@ -131,7 +135,7 @@ class tile {
                this.status = 'player';
                dragRestaurant = false;
                this.restaurantType = restaurantImg;
-               reputation += 10
+               reputation += 10;
             }
             this.color = 'rgb(0, 255, 0)';
          } else {
@@ -171,48 +175,74 @@ class tile {
       }
 
       if (this.id === 289 && !this.clouded) {
-         this.trade = document.getElementById('avocadoTrade')
+         this.trade = document.getElementById('avocadoTrade');
       } else if (this.id === 249 && !this.clouded) {
-         this.trade = document.getElementById('citronTrade')
+         this.trade = document.getElementById('citronTrade');
       }
 
-      if (this.inside && this.status === 'open' && !this.clouded) {
-         console.log(this.id)
-         ctx.fillStyle = 'rgb(255, 255, 255)'
-         ctx.fillRect(this.x, this.y - 20, this.size, this.size)
-         ctx.fillStyle = 'rgb(0, 0, 0)'
-         ctx.fillText(this.taxRate, this.x + 5, this.y - 5, this.size, this.size)
+      if (this.inside && this.status === 'open' && !this.clouded && mouseDown) {
+         const info = {
+            x: mouseX - 60,
+            y: mouseY < 80 ? mouseY : mouseY - 80,
+            w: 60,
+            h: 80,
+         };
+
+         function centerText(text) {
+            return info.x + info.w / 2 - ctx.measureText(text).width / 2;
+         }
+
+         ctx.lineWidth = 2;
+         ctx.strokeStyle = 'rgb(0, 0, 255)';
+         ctx.strokeRect(this.x, this.y, this.size, this.size);
+         ctx.lineWidth = 1;
+
+         ctx.fillStyle = 'rgb(0, 0, 0, 0.5)';
+         ctx.fillRect(info.x, info.y, info.w, info.h);
+
+         ctx.fillStyle = 'rgb(230, 230, 230)';
+         const titleText = 'Tile Info';
+         ctx.fillText(titleText, centerText(titleText), info.y + 10);
+
+         const taxText = `Tax rate: ${this.taxRate}%`;
+         ctx.fillText(taxText, centerText(taxText), info.y + 25);
       }
 
       if (this.status === 'player' || this.status === 'competition') {
          ctx.drawImage(this.restaurantType, this.x, this.y, this.size, this.size);
       }
 
-      if (this.inside && mouseDown && !dragRestaurant && this.status === "competition" && taxBool === false) {
-         this.competitionClicked = true
-         competitionTaxRate.innerHTML = this.taxRate
-         competitionModal.style.display = "block"
+      if (
+         this.inside &&
+         mouseDown &&
+         !dragRestaurant &&
+         this.status === 'competition' &&
+         taxBool === false
+      ) {
+         this.competitionClicked = true;
+         competitionTaxRate.innerHTML = this.taxRate;
+         competitionModal.style.display = 'block';
       }
 
       if (this.competitionClicked && buyCompetitionBool === true) {
-         this.status = "player"
-         numberOfRestaurants++
-         this.restaurantType = restaurantImg
-         buyCompetitionBool = false
-         this.competitionClicked = false
+         this.status = 'player';
+         numberOfRestaurants++;
+         this.restaurantType = restaurantImg;
+         buyCompetitionBool = false;
+         this.competitionClicked = false;
       }
    }
 }
 
 function cancel() {
-   competitionModal.style.display = "none"
+   competitionModal.style.display = 'none';
 }
 function buyCompetition() {
    if (money >= 100 && buyCompetitionBool === false) {
-      money -= 100
-      reputation += 20
-      buyCompetitionBool = true
-      competitionModal.style.display = "none"
+      money -= 100;
+      reputation += 20;
+      buyCompetitionBool = true;
+      competitionModal.style.display = 'none';
    }
 }
 
@@ -276,8 +306,8 @@ document.addEventListener('mouseup', mouseupHandler);
 background.addEventListener('load', createTiles);
 modalBtn.addEventListener('click', payTaxes);
 buyBoatBtn.addEventListener('click', boatPlace);
-cancelBtn.addEventListener('click', cancel)
-buyCompetitionBtn.addEventListener('click', buyCompetition)
+cancelBtn.addEventListener('click', cancel);
+buyCompetitionBtn.addEventListener('click', buyCompetition);
 
 //Event Functions
 function drag() {
@@ -299,7 +329,7 @@ function mousemoveHandler(event) {
    mouseX = event.x - cnv.getBoundingClientRect().x;
    mouseY = event.y - cnv.getBoundingClientRect().y;
 }
-let tileIdentifier = 0
+let tileIdentifier = 0;
 
 // Checks if a tile would have water in it and if not then creates it
 function createTiles() {
@@ -354,7 +384,7 @@ function createTiles() {
       randomIndex = getRandInt(0, nAmerica.length - 1);
       if (tiles[4][randomIndex].status === 'open') {
          open = true;
-         nAmerica[randomIndex].status = "competition";
+         nAmerica[randomIndex].status = 'competition';
       }
    }
 
@@ -394,29 +424,30 @@ function taxes() {
          for (let n = 0; n < tiles[i].length; n++) {
             if (tiles[i][n].status === 'player') {
                storeNum++;
-               totalTaxAmt += Math.round((income/numberOfRestaurants) * (tiles[i][n].taxRate / 100))
+               totalTaxAmt += Math.round(
+                  (income / numberOfRestaurants) * (tiles[i][n].taxRate / 100)
+               );
                incomeEl.innerHTML = income;
-               storeIncome.innerHTML = Math.round(income/numberOfRestaurants)
+               storeIncome.innerHTML = Math.round(income / numberOfRestaurants);
                taxInfo.innerHTML +=
                   '<br> Store #' + storeNum + '<br>Income tax rate: ' + tiles[i][n].taxRate;
-               totalTaxAmtEl.innerHTML = totalTaxAmt
+               totalTaxAmtEl.innerHTML = totalTaxAmt;
             }
          }
       }
       taxModalEl.style.display = 'block';
    } else {
-      setTimeout(taxes, 18000)
+      setTimeout(taxes, 18000);
    }
-
 }
 setTimeout(taxes, 18000);
 
 function payTaxes() {
-   taxBool = false
+   taxBool = false;
    taxModalEl.style.display = 'none';
    taxInfo.innerHTML = '';
-   money -= totalTaxAmt
-   totalTaxAmt = 0
+   money -= totalTaxAmt;
+   totalTaxAmt = 0;
    storeNum = 0;
    income = 0;
    setTimeout(taxes, 18000);
@@ -433,7 +464,7 @@ function boatPlace() {
 function competitionGrowth() {
    if (availableTiles.length > 0) {
       let randomIndex = getRandInt(0, availableTiles.length - 1);
-      availableTiles[randomIndex].status = "competition";
+      availableTiles[randomIndex].status = 'competition';
    }
    competitionInterval = getRandInt(5000, 15000);
 }
@@ -454,6 +485,9 @@ function display() {
 
    // Draw all the tiles
    for (let c = 0; c < tiles.length; c++) {
+      for (let t = 0; t < tiles[c].length; t++) {
+         tiles[c][t].drawOutline();
+      }
       for (let t = 0; t < tiles[c].length; t++) {
          tiles[c][t].draw();
       }
@@ -509,7 +543,7 @@ function display() {
    if (boatDrag) {
       ctx.drawImage(boat, mouseX - 50, mouseY - 50, 100, 100);
    }
-   reputationEl.innerHTML = reputation
+   reputationEl.innerHTML = reputation;
    discover();
    trading();
    requestAnimationFrame(display);
@@ -520,10 +554,9 @@ function discover() {
       for (let i = 0; i < clouds.length; i++) {
          if (clouds[i].continent === 'eurasia') {
             clouds.splice(i, 1);
-            tiles[0].status = 'open'
+            tiles[0].status = 'open';
          }
       }
-
    }
 
    if (!sAmericaClouds) {
@@ -551,26 +584,26 @@ function discover() {
    }
 }
 
-let mergedTiles = []
-let possibleTrades = []
-let chosenTrade
+let mergedTiles = [];
+let possibleTrades = [];
+let chosenTrade;
 function trading() {
    if (repetition === randomInterval) {
-      mergedTiles = tiles.flat(1)
-      possibleTrades = mergedTiles.filter(tile => tile.trade !== "none")
-      chosenTrade = possibleTrades[getRandInt(0, possibleTrades.length - 1)]
-      if (typeof(chosenTrade) !== 'undefined') {
-         trade = true
+      mergedTiles = tiles.flat(1);
+      possibleTrades = mergedTiles.filter((tile) => tile.trade !== 'none');
+      chosenTrade = possibleTrades[getRandInt(0, possibleTrades.length - 1)];
+      if (typeof chosenTrade !== 'undefined') {
+         trade = true;
       } else {
-         randomInterval = getRandInt(500, 1000)
-         repetition = 0
+         randomInterval = getRandInt(500, 1000);
+         repetition = 0;
       }
    }
    if (trade) {
       displayDuration++;
       ctx.drawImage(chosenTrade.trade, chosenTrade.x, chosenTrade.y - 150, 150, 150);
-      ctx.strokeStyle = 'green'
-      ctx.strokeRect(chosenTrade.x + 150 /2, chosenTrade.y + 150 / 2, 30, 30)
+      ctx.strokeStyle = 'green';
+      ctx.strokeRect(chosenTrade.x + 150 / 2, chosenTrade.y + 150 / 2, 30, 30);
       if (mouseDown) {
          trade = false;
          displayDuration = 0;
@@ -585,4 +618,3 @@ function trading() {
       }
    }
 }
-
