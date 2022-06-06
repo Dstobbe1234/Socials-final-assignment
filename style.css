@@ -1,5 +1,7 @@
 body {
    width: max-content;
+   margin: auto;
+   margin-top: 10px;
 }
 
 #sidebar {
@@ -13,7 +15,7 @@ body {
 }
 
 #taxesModal {
-   display:none;
+   display: none;
    position: fixed;
    left: 0;
    top: 0;
@@ -23,7 +25,7 @@ body {
 }
 
 #competitionModal {
-   display:none;
+   display: none;
    position: fixed;
    left: 0;
    top: 0;
@@ -48,7 +50,7 @@ img {
 }
 #restaurant {
    width: 100px;
-   margin:0px;
+   margin: 0px;
    padding: 0px;
 }
 
@@ -61,12 +63,12 @@ img {
 }
 
 #inventory {
-   border:2px solid black;
+   border: 2px solid black;
    overflow-y: scroll;
-   background:white;
+   background: white;
 }
 
 #buy {
-   margin:0px;
-   width:100px;
+   margin: 0px;
+   width: 100px;
 }

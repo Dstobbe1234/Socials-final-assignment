@@ -69,7 +69,7 @@ let eurasiaClouds = true;
 let sAmericaClouds = true;
 let boatDrag = false;
 let competition;
-let displayLength = 1000;
+let displayLength = 10000;
 let displayDuration = 0;
 let trade = false;
 let availableTiles = [];
@@ -100,6 +100,12 @@ class tile {
       this.competitionClicked = false;
       this.trade = 'none';
       this.clouded = false;
+
+      this.viewInfo = {
+         bool: false,
+         w: 60,
+         h: 80,
+      };
    }
 
    drawOutline() {
@@ -129,6 +135,7 @@ class tile {
 
       if (this.inside && dragRestaurant && !this.clouded) {
          ctx.drawImage(restaurantImg, this.x, this.y, this.size, this.size);
+         console.log('inside');
          if (this.status !== 'player' && this.status !== 'competition') {
             if (mouseDown) {
                numberOfRestaurants++;
@@ -168,9 +175,9 @@ class tile {
          this.clouded = true;
       } else if (this.continent === 'eurasia' && !eurasiaClouds) {
          this.clouded = false;
-      } else if (this.continent === 'australia' && australia) {
+      } else if (this.continent === 'australia' && australiaClouds) {
          this.clouded = true;
-      } else if (this.continent === 'australia' && !australia) {
+      } else if (this.continent === 'australia' && !australiaClouds) {
          this.clouded = false;
       }
 
@@ -181,15 +188,16 @@ class tile {
       }
 
       if (this.inside && this.status === 'open' && !this.clouded && mouseDown) {
-         const info = {
-            x: mouseX - 60,
-            y: mouseY < 80 ? mouseY : mouseY - 80,
-            w: 60,
-            h: 80,
-         };
+         this.viewInfo.bool = true;
+         this.viewInfo.x = mouseX - this.viewInfo.w;
+         this.viewInfo.y = mouseY < this.viewInfo.h ? mouseY : mouseY - this.viewInfo.h;
+      } else if (mouseDown) {
+         this.viewInfo.bool = false;
+      }
 
-         function centerText(text) {
-            return info.x + info.w / 2 - ctx.measureText(text).width / 2;
+      if (this.viewInfo.bool) {
+         function centerText(text, viewInfo) {
+            return viewInfo.x + viewInfo.w / 2 - ctx.measureText(text).width / 2;
          }
 
          ctx.lineWidth = 2;
@@ -198,14 +206,14 @@ class tile {
          ctx.lineWidth = 1;
 
          ctx.fillStyle = 'rgb(0, 0, 0, 0.5)';
-         ctx.fillRect(info.x, info.y, info.w, info.h);
+         ctx.fillRect(this.viewInfo.x, this.viewInfo.y, this.viewInfo.w, this.viewInfo.h);
 
          ctx.fillStyle = 'rgb(230, 230, 230)';
          const titleText = 'Tile Info';
-         ctx.fillText(titleText, centerText(titleText), info.y + 10);
+         ctx.fillText(titleText, centerText(titleText, this.viewInfo), this.viewInfo.y + 10);
 
          const taxText = `Tax rate: ${this.taxRate}%`;
-         ctx.fillText(taxText, centerText(taxText), info.y + 25);
+         ctx.fillText(taxText, centerText(taxText, this.viewInfo), this.viewInfo.y + 25);
       }
 
       if (this.status === 'player' || this.status === 'competition') {
@@ -513,7 +521,6 @@ function display() {
    ctx.fillRect(35.5, cnv.height - 50, pollutionPercentage * 175, 29.5);
 
    // Decide when to show a trade request
-   repetition++;
    restaurantSum.innerHTML = numberOfRestaurants;
    for (let c = 0; c < tiles.length; c++) {
       for (let t = 0; t < tiles[c].length; t++) {
@@ -588,6 +595,8 @@ let mergedTiles = [];
 let possibleTrades = [];
 let chosenTrade;
 function trading() {
+   repetition++;
+
    if (repetition === randomInterval) {
       mergedTiles = tiles.flat(1);
       possibleTrades = mergedTiles.filter((tile) => tile.trade !== 'none');
@@ -602,13 +611,23 @@ function trading() {
    if (trade) {
       displayDuration++;
       ctx.drawImage(chosenTrade.trade, chosenTrade.x, chosenTrade.y - 150, 150, 150);
-      ctx.strokeStyle = 'green';
-      ctx.strokeRect(chosenTrade.x + 150 / 2, chosenTrade.y + 150 / 2, 30, 30);
-      if (mouseDown) {
-         trade = false;
-         displayDuration = 0;
-         repetition = 0;
-         randomInterval = getRandInt(500, 1000);
+      if (
+         mouseX > chosenTrade.x + 47 &&
+         mouseX < chosenTrade.x + 86 &&
+         mouseY > chosenTrade.y - 69 &&
+         mouseY < chosenTrade.y - 55
+      ) {
+         document.body.style.cursor = 'pointer';
+         if (mouseDown) {
+            document.body.style.cursor = 'default';
+
+            trade = false;
+            displayDuration = 0;
+            repetition = 0;
+            randomInterval = getRandInt(500, 1000);
+         }
+      } else {
+         document.body.style.cursor = 'default';
       }
       if (displayDuration === displayLength) {
          trade = false;
