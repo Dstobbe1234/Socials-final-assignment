@@ -31,6 +31,7 @@ let avocado = document.getElementById('avocado');
 let avocadoTrade = document.getElementById('avocadoTrade');
 let sweetPotato = document.getElementById('sweetPotato');
 let sweetPotatoTrade = document.getElementById('sweetPotatoTrade');
+let monthlyExpenses = document.getElementById('monthlyExpenses')
 
 // load background
 const backgroundEl = document.getElementById('background');
@@ -181,10 +182,12 @@ class tile {
          this.clouded = false;
       }
 
-      if (this.id === 289 && !this.clouded) {
-         this.trade = document.getElementById('avocadoTrade');
-      } else if (this.id === 249 && !this.clouded) {
-         this.trade = document.getElementById('citronTrade');
+      if(this.trade !== 'done') {
+         if (this.id === 289 && !this.clouded) {
+            this.trade = document.getElementById('avocadoTrade');
+         } else if (this.id === 249 && !this.clouded) {
+            this.trade = document.getElementById('citronTrade');
+         }
       }
 
       if (this.inside && this.status === 'open' && !this.clouded && mouseDown) {
@@ -601,7 +604,7 @@ function trading() {
       mergedTiles = tiles.flat(1);
       possibleTrades = mergedTiles.filter((tile) => tile.trade !== 'none');
       chosenTrade = possibleTrades[getRandInt(0, possibleTrades.length - 1)];
-      if (typeof chosenTrade !== 'undefined') {
+      if (typeof chosenTrade !== 'undefined' && chosenTrade.trade !== 'done') {
          trade = true;
       } else {
          randomInterval = getRandInt(500, 1000);
@@ -620,11 +623,13 @@ function trading() {
          document.body.style.cursor = 'pointer';
          if (mouseDown) {
             document.body.style.cursor = 'default';
-
+            avocado.style.display = 'block'
             trade = false;
+            chosenTrade.trade = 'done'
             displayDuration = 0;
             repetition = 0;
             randomInterval = getRandInt(500, 1000);
+
          }
       } else {
          document.body.style.cursor = 'default';

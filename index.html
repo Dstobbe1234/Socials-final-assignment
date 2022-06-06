@@ -15,10 +15,7 @@
     <img src="img/clouds.png" id="clouds-img" alt="clouds" style="display:none">
     <img src="img/boat.png" alt="boat" id="boat" style="display:none">
 
-
-    <img src="img/Avocat.png" alt="avocado" id="avocado" style="display:none">
     <img src="img/Trade Avocat.png" alt="avocadoTrade" id="avocadoTrade" style="display:none">
-    <img src="img/Sweet Potato.png" alt="sweetPotato" id="sweetPotato" style="display:none">
     <img src="img/Trade Sweet Potato.png" alt="sweetPotatoTrade" id="sweetPotatoTrade" style="display:none">
     <img src="img/Citron.png" alt="citron" id="citron" style="display:none">
     <img src="img/Trade Citron.png" alt="citronTrade" id="citronTrade" style="display:none">
@@ -30,9 +27,14 @@
 
         <button id="buyBoat">Buy Boat</button>
 
-        <p>Transnational Products:</p>
         <div id="inventory">
-            <p>IMGs</p>
+            <h4>Transnational Products</h4>
+            <p>South America</p>
+            <p><img src="img/Avocat.png" alt="avocado" id="avocado" style="display:none"></p>
+            <p>Eurasia</p>
+            <p></p>
+            <p>Africa / Middle East</p>
+            <p>Australia</p>
         </div>
     </div>
 
@@ -55,6 +57,17 @@
             <p>Tile tax rate: <span id="rate"></span>%</p>
             <p><button id="buyCompetition">Buy</button> <button id="cancel">Cancel</button></p>
         </div>
+    </div>
+
+    <div id="tradeOptions">
+        <button>Exploitated harvesters (+20 pop, -10$ per month)</button>
+        <button>Fair Trade (+40 pop, -20$ per month)</button>
+    </div>
+
+    <div id="monthlyExpenses">
+        <h1>Monthly Expenses</h1>
+        <p>Trades: <span id="tradeInfo"></span></p>
+        <p>Worker Salaries: <span id="salaryInfo"></span></p>
     </div>
 <script src="script.js"></script>
 </body>
