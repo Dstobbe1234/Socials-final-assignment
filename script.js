@@ -27,11 +27,11 @@ let buyCompetitionBtn = document.getElementById('buyCompetition');
 let competitionTaxRate = document.getElementById('rate');
 let storeIncome = document.getElementById('storeIncome');
 let totalTaxAmtEl = document.getElementById('total');
-let avocado = document.getElementById('avocado');
 let avocadoTrade = document.getElementById('avocadoTrade');
 let sweetPotato = document.getElementById('sweetPotato');
 let sweetPotatoTrade = document.getElementById('sweetPotatoTrade');
 let monthlyExpenses = document.getElementById('monthlyExpenses')
+let page = document.getElementById('page')
 
 // load background
 const backgroundEl = document.getElementById('background');
@@ -82,6 +82,8 @@ let taxBool = false;
 let reputation = 10;
 let buyCompetitionBool = false;
 let totalTaxAmt = 0;
+let avocado = false
+let lemon = false
 
 //Tile class for placing stuff
 class tile {
@@ -101,6 +103,7 @@ class tile {
       this.competitionClicked = false;
       this.trade = 'none';
       this.clouded = false;
+      this.minimumWage
 
       this.viewInfo = {
          bool: false,
@@ -132,6 +135,18 @@ class tile {
       } else {
          this.inside = false;
          this.color = 'rgb(0, 0, 0)';
+      }
+
+      if (typeof this.minimumWage === 'undefined') {
+         if (this.continent === 'nAmerica') {
+            this.minimumWage = getRandInt(500, 1000)
+         } else if(this.continent === 'sAmerica') {
+            this.minimumWage = getRandInt(300, 700)
+         } else if(this.continent === 'eurasia') {
+            this.minimumWage = 5
+         } else if(this.continent === 'australia') {
+            this.minimumWage = getRandInt(600, 1200)
+         }
       }
 
       if (this.inside && dragRestaurant && !this.clouded) {
@@ -182,13 +197,19 @@ class tile {
          this.clouded = false;
       }
 
-      if(this.trade !== 'done') {
          if (this.id === 289 && !this.clouded) {
-            this.trade = document.getElementById('avocadoTrade');
+            if(this.trade !== 'done') {
+               this.trade = document.getElementById('avocadoTrade');
+            } else {
+               avocado = true;
+            }
          } else if (this.id === 249 && !this.clouded) {
-            this.trade = document.getElementById('citronTrade');
+            if (this.trade !== 'done') {
+               this.trade = document.getElementById('citronTrade');
+            } else {
+               lemon = true;
+            }
          }
-      }
 
       if (this.inside && this.status === 'open' && !this.clouded && mouseDown) {
          this.viewInfo.bool = true;
@@ -217,6 +238,9 @@ class tile {
 
          const taxText = `Tax rate: ${this.taxRate}%`;
          ctx.fillText(taxText, centerText(taxText, this.viewInfo), this.viewInfo.y + 25);
+
+         const wageText = `Minimum wage: $${this.minimumWage}`
+         ctx.fillText(wageText, centerText(wageText, this.viewInfo), this.viewInfo.y + 35)
       }
 
       if (this.status === 'player' || this.status === 'competition') {
@@ -491,8 +515,14 @@ function display() {
    ctx.fillStyle = `rgb(${55 * colorPercentage}, ${83 * colorPercentage}, ${
       218 * colorPercentage
    })`;
+
+   page.style.backgroundColor = `rgb(${55 * colorPercentage}, ${83 * colorPercentage}, ${
+      218 * colorPercentage
+   })`;
+
    ctx.fillRect(0, 0, cnv.width, cnv.height);
    ctx.drawImage(background, 0, 0, cnv.width, cnv.height);
+   
 
    // Draw all the tiles
    for (let c = 0; c < tiles.length; c++) {
@@ -515,6 +545,14 @@ function display() {
       if (pollutionPercentage === 1) {
          gameOver = true;
       }
+   }
+
+   if(avocado) {
+      document.getElementById('avocado').style.display='block'
+   }
+
+   if(lemon) {
+      document.getElementById('citron').style.display='block'
    }
 
    // Draw pollution bar
@@ -623,7 +661,6 @@ function trading() {
          document.body.style.cursor = 'pointer';
          if (mouseDown) {
             document.body.style.cursor = 'default';
-            avocado.style.display = 'block'
             trade = false;
             chosenTrade.trade = 'done'
             displayDuration = 0;
