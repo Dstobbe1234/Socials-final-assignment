@@ -57,16 +57,18 @@ let randomX, randomY;
 let randomIndex;
 let repetition = 0;
 let africaMiddleEast = [];
-let eurasia = [];
+let asia = [];
 let australia = [];
 let nAmerica = [];
 let sAmerica = [];
-let tiles = [eurasia, australia, africaMiddleEast, sAmerica, nAmerica];
+let europe = []
+let tiles = [asia, australia, africaMiddleEast, sAmerica, nAmerica, europe];
 let clouds = [];
 const tileSize = 20;
 let africaClouds = true;
 let australiaClouds = true;
-let eurasiaClouds = true;
+let asiaClouds = true;
+let europeClouds = true;
 let sAmericaClouds = true;
 let boatDrag = false;
 let competition;
@@ -132,6 +134,7 @@ class tile {
          mouseY < this.y + this.size
       ) {
          this.inside = true;
+         console.log(this.id)
       } else {
          this.inside = false;
          this.color = 'rgb(0, 0, 0)';
@@ -142,7 +145,7 @@ class tile {
             this.minimumWage = getRandInt(500, 1000)
          } else if(this.continent === 'sAmerica') {
             this.minimumWage = getRandInt(300, 700)
-         } else if(this.continent === 'eurasia') {
+         } else if(this.continent === 'asia') {
             this.minimumWage = 5
          } else if(this.continent === 'australia') {
             this.minimumWage = getRandInt(600, 1200)
@@ -167,14 +170,16 @@ class tile {
       } else if (this.inside && boatDrag && this.continent !== 'nAmerica') {
          if (mouseDown) {
             boatDrag = false;
-            if (this.continent === 'eurasia') {
-               eurasiaClouds = false;
+            if (this.continent === 'asia') {
+               asiaClouds = false;
             } else if (this.continent === 'africaMiddleEast') {
                africaClouds = false;
             } else if (this.continent === 'sAmerica') {
                sAmericaClouds = false;
             } else if (this.continent === 'australia') {
                australiaClouds = false;
+            } else if (this.continent === 'europe') {
+               europeClouds = false;
             }
          }
       }
@@ -187,29 +192,33 @@ class tile {
          this.clouded = true;
       } else if (this.continent === 'africaMiddleEast' && !africaClouds) {
          this.clouded = false;
-      } else if (this.continent === 'eurasia' && eurasiaClouds) {
+      } else if (this.continent === 'asia' && asiaClouds) {
          this.clouded = true;
-      } else if (this.continent === 'eurasia' && !eurasiaClouds) {
+      } else if (this.continent === 'asia' && !asiaClouds) {
          this.clouded = false;
       } else if (this.continent === 'australia' && australiaClouds) {
          this.clouded = true;
       } else if (this.continent === 'australia' && !australiaClouds) {
          this.clouded = false;
+      } else if (this.continent === 'europe' && europeClouds) {
+         this.clouded = true;
+      } else if (this.continent === 'europe' && !europeClouds) {
+         this.clouded = false;
       }
 
-         if (this.id === 289 && !this.clouded) {
-            if(this.trade !== 'done') {
-               this.trade = document.getElementById('avocadoTrade');
-            } else {
-               avocado = true;
-            }
-         } else if (this.id === 249 && !this.clouded) {
-            if (this.trade !== 'done') {
-               this.trade = document.getElementById('citronTrade');
-            } else {
-               lemon = true;
-            }
+      if (this.id === 289 && !this.clouded) {
+         if(this.trade !== 'done') {
+            this.trade = document.getElementById('avocadoTrade');
+         } else {
+            avocado = true;
          }
+      } else if (this.id === 249 && !this.clouded) {
+         if (this.trade !== 'done') {
+            this.trade = document.getElementById('citronTrade');
+         } else {
+            lemon = true;
+         }
+      }
 
       if (this.inside && this.status === 'open' && !this.clouded && mouseDown) {
          this.viewInfo.bool = true;
@@ -283,7 +292,7 @@ function buyCompetition() {
 
 class cloud {
    constructor(tileIndex, continent) {
-      this.w = 60;
+      this.w = 45;
       this.continent = continent;
       this.h = this.w * 0.9;
       this.timer = 0;
@@ -295,8 +304,8 @@ class cloud {
          this.tile = australia[tileIndex];
          this.x = this.tile.x - this.w / 2 + this.tile.size / 2;
          this.y = this.tile.y - this.h / 2 + this.tile.size / 2;
-      } else if (this.continent === 'eurasia') {
-         this.tile = eurasia[tileIndex];
+      } else if (this.continent === 'asia') {
+         this.tile = asia[tileIndex];
          this.x = this.tile.x - this.w / 2 + this.tile.size / 2;
          this.y = this.tile.y - this.h / 2 + this.tile.size / 2;
       } else if (this.continent === 'africaMiddleEast') {
@@ -305,6 +314,10 @@ class cloud {
          this.y = this.tile.y - this.h / 2 + this.tile.size / 2;
       } else if (this.continent === 'sAmerica') {
          this.tile = sAmerica[tileIndex];
+         this.x = this.tile.x - this.w / 2 + this.tile.size / 2;
+         this.y = this.tile.y - this.h / 2 + this.tile.size / 2;
+      } else if (this.continent === 'europe') {
+         this.tile = europe[tileIndex];
          this.x = this.tile.x - this.w / 2 + this.tile.size / 2;
          this.y = this.tile.y - this.h / 2 + this.tile.size / 2;
       }
@@ -391,18 +404,20 @@ function createTiles() {
             tileIdentifier++;
             if (x >= 250 && x <= 400 && y >= 350 && y <= 550) {
                sAmerica.push(new tile(x, y, tileSize, 'sAmerica', tileIdentifier));
-            } else if (x >= 410 && x <= 630 && y >= 258 && y <= 508) {
+            } else if (x >= 410 && x <= 590 && y >= 258 && y <= 508 && tileIdentifier !== 217 && tileIdentifier !== 231 && tileIdentifier !== 247) {
                africaMiddleEast.push(new tile(x, y, tileSize, 'africaMiddleEast', tileIdentifier));
+            } else if (x >= 770 && x <= 970 && y >= 400 && y <= 550) {
+               australia.push(new tile(x, y, tileSize, 'australia', tileIdentifier));
+            } else if (x >= 480 && x <= 660 && y >= 80 && y <= 200 || tileIdentifier === 200 || tileIdentifier === 179 || tileIdentifier === 180) {
+               europe.push(new tile(x, y, tileSize, 'europe', tileIdentifier))
             } else if (
                x >= 410 &&
                x <= 940 &&
                y >= 20 &&
-               y <= 370 &&
-               africaMiddleEast.includes(new tile(x, y, tileSize, 'africaMiddleEast')) === false
+               y <= 370 
+               //africaMiddleEast.includes(new tile(x, y, tileSize, 'africaMiddleEast')) === false
             ) {
-               eurasia.push(new tile(x, y, tileSize, 'eurasia', tileIdentifier));
-            } else if (x >= 770 && x <= 970 && y >= 400 && y <= 550) {
-               australia.push(new tile(x, y, tileSize, 'australia', tileIdentifier));
+               asia.push(new tile(x, y, tileSize, 'asia', tileIdentifier));
             } else {
                nAmerica.push(new tile(x, y, tileSize, 'nAmerica', tileIdentifier));
             }
@@ -427,8 +442,8 @@ function createTiles() {
 }
 
 function createClouds() {
-   for (let n = 0; n < eurasia.length; n++) {
-      clouds.push(new cloud(n, 'eurasia'));
+   for (let n = 0; n < asia.length; n++) {
+      clouds.push(new cloud(n, 'asia'));
    }
 
    for (let n = 0; n < australia.length; n++) {
@@ -440,6 +455,9 @@ function createClouds() {
    }
    for (let n = 0; n < sAmerica.length; n++) {
       clouds.push(new cloud(n, 'sAmerica'));
+   }
+   for (let n = 0; n < europe.length; n++) {
+      clouds.push(new cloud(n, 'europe'))
    }
 }
 
@@ -598,9 +616,9 @@ function display() {
 }
 
 function discover() {
-   if (!eurasiaClouds) {
+   if (!asiaClouds) {
       for (let i = 0; i < clouds.length; i++) {
-         if (clouds[i].continent === 'eurasia') {
+         if (clouds[i].continent === 'asia') {
             clouds.splice(i, 1);
             tiles[0].status = 'open';
          }
@@ -626,6 +644,14 @@ function discover() {
    if (!australiaClouds) {
       for (let i = 0; i < clouds.length; i++) {
          if (clouds[i].continent === 'australia') {
+            clouds.splice(i, 1);
+         }
+      }
+   }
+
+   if (!europeClouds) {
+      for (let i = 0; i < clouds.length; i++) {
+         if (clouds[i].continent === 'europe') {
             clouds.splice(i, 1);
          }
       }
