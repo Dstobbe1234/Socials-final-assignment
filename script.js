@@ -30,8 +30,9 @@ let totalTaxAmtEl = document.getElementById('total');
 let avocadoTrade = document.getElementById('avocadoTrade');
 let sweetPotato = document.getElementById('sweetPotato');
 let sweetPotatoTrade = document.getElementById('sweetPotatoTrade');
-let monthlyExpenses = document.getElementById('monthlyExpenses')
+let monthlyExpensesEl = document.getElementById('monthlyExpenses')
 let page = document.getElementById('page')
+let salaryInfo = document.getElementById('salaryInfo')
 
 // load background
 const backgroundEl = document.getElementById('background');
@@ -86,6 +87,7 @@ let buyCompetitionBool = false;
 let totalTaxAmt = 0;
 let avocado = false
 let lemon = false
+let borderTiles = [26, 27, 41, 42, 69, 70, 97, 98, 120, 121, 141, 142, 164, 165, 186, 185, 184, 183, 182, 181, 160, 161, 162, 163, 164, 165]
 
 //Tile class for placing stuff
 class tile {
@@ -146,15 +148,18 @@ class tile {
          } else if(this.continent === 'sAmerica') {
             this.minimumWage = getRandInt(300, 700)
          } else if(this.continent === 'asia') {
-            this.minimumWage = 5
+            this.minimumWage = getRandInt(12, 200)
          } else if(this.continent === 'australia') {
             this.minimumWage = getRandInt(600, 1200)
+         } else if(this.continent === 'europe') {
+            this.minimumWage = getRandInt(300, 2110)
+         } else if(this.continent === 'africa') {
+            this.minimumWage = getRandInt(12, 200)
          }
       }
 
       if (this.inside && dragRestaurant && !this.clouded) {
          ctx.drawImage(restaurantImg, this.x, this.y, this.size, this.size);
-         console.log('inside');
          if (this.status !== 'player' && this.status !== 'competition') {
             if (mouseDown) {
                numberOfRestaurants++;
@@ -292,7 +297,7 @@ function buyCompetition() {
 
 class cloud {
    constructor(tileIndex, continent) {
-      this.w = 45;
+      this.w = 60;
       this.continent = continent;
       this.h = this.w * 0.9;
       this.timer = 0;
@@ -321,7 +326,13 @@ class cloud {
          this.x = this.tile.x - this.w / 2 + this.tile.size / 2;
          this.y = this.tile.y - this.h / 2 + this.tile.size / 2;
       }
+
+      if (borderTiles.includes(this.tile.id)) {
+         this.w = 40
+         this.h = 40
+      }
    }
+
 
    draw() {
       this.timer++;
@@ -408,7 +419,7 @@ function createTiles() {
                africaMiddleEast.push(new tile(x, y, tileSize, 'africaMiddleEast', tileIdentifier));
             } else if (x >= 770 && x <= 970 && y >= 400 && y <= 550) {
                australia.push(new tile(x, y, tileSize, 'australia', tileIdentifier));
-            } else if (x >= 480 && x <= 660 && y >= 80 && y <= 200 || tileIdentifier === 200 || tileIdentifier === 179 || tileIdentifier === 180) {
+            } else if (x >= 480 && x <= 660 && y >= 80 && y <= 200) {
                europe.push(new tile(x, y, tileSize, 'europe', tileIdentifier))
             } else if (
                x >= 410 &&
@@ -505,6 +516,20 @@ function payTaxes() {
    income = 0;
    setTimeout(taxes, 18000);
 }
+
+function monthlyExpenses() {
+   let totalSalaryCosts = 0 
+   monthlyExpensesEl.style.display = 'block';
+   mergedTiles = tiles.flat(1)
+   for(let x = 0; x < mergedTiles.length; x++) {
+      if(mergedTiles[x].status === 'player') {
+         totalSalaryCosts += (mergedTiles[x].minimumWage * 5)
+      }
+   }
+   salaryInfo.innerHTML = totalSalaryCosts
+   
+}
+setTimeout(monthlyExpenses, 4500)
 
 function boatPlace() {
    if (money >= 1000) {
