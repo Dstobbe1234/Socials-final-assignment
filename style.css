@@ -83,3 +83,7 @@ img {
 #monthlyExpenses {
    display: none;
 }
+
+.tnProduct {
+   width: 100px;
+}

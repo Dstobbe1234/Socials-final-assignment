@@ -107,13 +107,13 @@ class tile {
          w: 60,
          h: 80,
       };
-
+      // If the continent of the tile isn't north America, create a cloud
       if (continent != 'nAmerica') {
          this.clouded = true;
          this.cloud = new cloud(this);
       }
    }
-
+   //  Draws tile
    drawOutline() {
       ctx.strokeStyle = this.color;
       ctx.strokeRect(this.x, this.y, this.size, this.size);
@@ -141,7 +141,7 @@ class tile {
       const taxText = `Tax rate: ${this.taxRate}%`;
       ctx.fillText(taxText, centerText(taxText, this.viewInfo), this.viewInfo.y + 25);
 
-      const wageText = `Minimum wage: $${this.minimumWage}`;
+      const wageText = `MW: $${this.minimumWage}`;
       ctx.fillText(wageText, centerText(wageText, this.viewInfo), this.viewInfo.y + 35);
    }
 
@@ -160,7 +160,8 @@ class tile {
          mouseY < this.y + this.size
       ) {
          this.inside = true;
-         console.log(this.id);
+         console.log(this.x);
+         console.log(this.y)
       } else {
          this.inside = false;
          this.color = 'rgb(0, 0, 0)';
@@ -323,6 +324,8 @@ class cloud {
          this.imageH,
          this.x,
          this.y,
+
+         
          this.borderTile.sides.includes('right') && !cloudBools.asia ? this.w - 15 : this.w,
          this.borderTile.sides.includes('bottom') && !cloudBools.asia ? this.h - 15 : this.h
       );
@@ -399,7 +402,7 @@ function createTiles() {
                africaMiddleEast.push(new tile(x, y, tileSize, 'africaMiddleEast', tileIdentifier));
             } else if (x >= 770 && x <= 970 && y >= 400 && y <= 550) {
                australia.push(new tile(x, y, tileSize, 'australia', tileIdentifier));
-            } else if (x >= 480 && x <= 660 && y >= 80 && y <= 200) {
+            } else if (x >= 480 && x <= 660 && y >= 80 && y <= 200 || x >= 280 && x <= 380 && y >= 0 && y <= 100) {
                europe.push(new tile(x, y, tileSize, 'europe', tileIdentifier));
             } else if (
                x >= 410 &&
@@ -551,11 +554,11 @@ function display() {
    }
 
    if (avocado) {
-      document.getElementById('avocado').style.display = 'block';
+      document.getElementById('avocado').src = 'img/Avocat.png';
    }
 
    if (lemon) {
-      document.getElementById('citron').style.display = 'block';
+      document.getElementById('citron').src = 'img/Citron.png';
    }
 
    // Draw pollution bar
