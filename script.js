@@ -7,40 +7,34 @@ cnv.width = 1000;
 cnv.height = 600;
 
 // Variables for HTML elements
-let buyBtn = document.getElementById('buy');
-let restaurantImg = document.getElementById('restaurant');
-let competitionImg = document.getElementById('competition');
-let cloudsImg = document.getElementById('clouds-img');
-let amountEl = document.getElementById('amount');
-let grid = document.getElementById('grid');
-let restaurantSum = document.getElementById('restaurantAmount');
-let taxModalEl = document.getElementById('taxesModal');
-let competitionModal = document.getElementById('competitionModal');
-let taxInfo = document.getElementById('taxes');
-let incomeEl = document.getElementById('income');
-let modalBtn = document.getElementById('hide');
-let boat = document.getElementById('boat');
-let buyBoatBtn = document.getElementById('buyBoat');
-let reputationEl = document.getElementById('reputation');
-let cancelBtn = document.getElementById('cancel');
-let buyCompetitionBtn = document.getElementById('buyCompetition');
-let competitionTaxRate = document.getElementById('rate');
-let storeIncome = document.getElementById('storeIncome');
-let totalTaxAmtEl = document.getElementById('total');
-let avocadoTrade = document.getElementById('avocadoTrade');
-let sweetPotato = document.getElementById('sweetPotato');
-let sweetPotatoTrade = document.getElementById('sweetPotatoTrade');
-let monthlyExpensesEl = document.getElementById('monthlyExpenses')
-let page = document.getElementById('page')
-let salaryInfo = document.getElementById('salaryInfo')
-
-// load background
-const backgroundEl = document.getElementById('background');
-const background = new Image();
-background.onload = function () {
-   backgroundEl.src = this.src;
-};
-background.src = 'img/world-map.png';
+const buyBtn = document.getElementById('buy');
+const restaurantImg = document.getElementById('restaurant');
+const competitionImg = document.getElementById('competition');
+const cloudsImg = document.getElementById('clouds-img');
+const borderCloudsImg = document.getElementById('border-clouds-img');
+const amountEl = document.getElementById('amount');
+const grid = document.getElementById('grid');
+const restaurantSum = document.getElementById('restaurantAmount');
+const taxModalEl = document.getElementById('taxesModal');
+const competitionModal = document.getElementById('competitionModal');
+const taxInfo = document.getElementById('taxes');
+const incomeEl = document.getElementById('income');
+const modalBtn = document.getElementById('hide');
+const boat = document.getElementById('boat');
+const buyBoatBtn = document.getElementById('buyBoat');
+const reputationEl = document.getElementById('reputation');
+const cancelBtn = document.getElementById('cancel');
+const buyCompetitionBtn = document.getElementById('buyCompetition');
+const competitionTaxRate = document.getElementById('rate');
+const storeIncome = document.getElementById('storeIncome');
+const totalTaxAmtEl = document.getElementById('total');
+const avocadoTrade = document.getElementById('avocadoTrade');
+const sweetPotato = document.getElementById('sweetPotato');
+const sweetPotatoTrade = document.getElementById('sweetPotatoTrade');
+const monthlyExpensesEl = document.getElementById('monthlyExpenses');
+const page = document.getElementById('page');
+const salaryInfo = document.getElementById('salaryInfo');
+const background = document.getElementById('background');
 
 function getRandInt(min, max) {
    // min and max are included
@@ -62,15 +56,9 @@ let asia = [];
 let australia = [];
 let nAmerica = [];
 let sAmerica = [];
-let europe = []
+let europe = [];
 let tiles = [asia, australia, africaMiddleEast, sAmerica, nAmerica, europe];
-let clouds = [];
 const tileSize = 20;
-let africaClouds = true;
-let australiaClouds = true;
-let asiaClouds = true;
-let europeClouds = true;
-let sAmericaClouds = true;
 let boatDrag = false;
 let competition;
 let displayLength = 10000;
@@ -85,9 +73,15 @@ let taxBool = false;
 let reputation = 10;
 let buyCompetitionBool = false;
 let totalTaxAmt = 0;
-let avocado = false
-let lemon = false
-let borderTiles = [26, 27, 41, 42, 69, 70, 97, 98, 120, 121, 141, 142, 164, 165, 186, 185, 184, 183, 182, 181, 160, 161, 162, 163, 164, 165]
+let avocado = false;
+let lemon = false;
+let cloudBools = {
+   sAmerica: true,
+   europe: true,
+   africaMiddleEast: true,
+   asia: true,
+   australia: true,
+};
 
 //Tile class for placing stuff
 class tile {
@@ -106,19 +100,49 @@ class tile {
       this.taxRate = getRandInt(5, 15);
       this.competitionClicked = false;
       this.trade = 'none';
-      this.clouded = false;
-      this.minimumWage
+      this.minimumWage;
 
       this.viewInfo = {
          bool: false,
          w: 60,
          h: 80,
       };
+
+      if (continent != 'nAmerica') {
+         this.clouded = true;
+         this.cloud = new cloud(this);
+      }
    }
 
    drawOutline() {
       ctx.strokeStyle = this.color;
       ctx.strokeRect(this.x, this.y, this.size, this.size);
+   }
+
+   drawInfo() {
+      if (!this.viewInfo.bool) return;
+
+      function centerText(text, viewInfo) {
+         return viewInfo.x + viewInfo.w / 2 - ctx.measureText(text).width / 2;
+      }
+
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = 'rgb(0, 0, 255)';
+      ctx.strokeRect(this.x, this.y, this.size, this.size);
+      ctx.lineWidth = 1;
+
+      ctx.fillStyle = 'rgb(0, 0, 0, 0.5)';
+      ctx.fillRect(this.viewInfo.x, this.viewInfo.y, this.viewInfo.w, this.viewInfo.h);
+
+      ctx.fillStyle = 'rgb(230, 230, 230)';
+      const titleText = 'Tile Info';
+      ctx.fillText(titleText, centerText(titleText, this.viewInfo), this.viewInfo.y + 10);
+
+      const taxText = `Tax rate: ${this.taxRate}%`;
+      ctx.fillText(taxText, centerText(taxText, this.viewInfo), this.viewInfo.y + 25);
+
+      const wageText = `Minimum wage: $${this.minimumWage}`;
+      ctx.fillText(wageText, centerText(wageText, this.viewInfo), this.viewInfo.y + 35);
    }
 
    draw() {
@@ -136,7 +160,7 @@ class tile {
          mouseY < this.y + this.size
       ) {
          this.inside = true;
-         console.log(this.id)
+         console.log(this.id);
       } else {
          this.inside = false;
          this.color = 'rgb(0, 0, 0)';
@@ -144,17 +168,17 @@ class tile {
 
       if (typeof this.minimumWage === 'undefined') {
          if (this.continent === 'nAmerica') {
-            this.minimumWage = getRandInt(500, 1000)
-         } else if(this.continent === 'sAmerica') {
-            this.minimumWage = getRandInt(300, 700)
-         } else if(this.continent === 'asia') {
-            this.minimumWage = getRandInt(12, 200)
-         } else if(this.continent === 'australia') {
-            this.minimumWage = getRandInt(600, 1200)
-         } else if(this.continent === 'europe') {
-            this.minimumWage = getRandInt(300, 2110)
-         } else if(this.continent === 'africa') {
-            this.minimumWage = getRandInt(12, 200)
+            this.minimumWage = getRandInt(500, 1000);
+         } else if (this.continent === 'sAmerica') {
+            this.minimumWage = getRandInt(300, 700);
+         } else if (this.continent === 'asia') {
+            this.minimumWage = getRandInt(12, 200);
+         } else if (this.continent === 'australia') {
+            this.minimumWage = getRandInt(600, 1200);
+         } else if (this.continent === 'europe') {
+            this.minimumWage = getRandInt(300, 2110);
+         } else if (this.continent === 'africa') {
+            this.minimumWage = getRandInt(12, 200);
          }
       }
 
@@ -175,44 +199,13 @@ class tile {
       } else if (this.inside && boatDrag && this.continent !== 'nAmerica') {
          if (mouseDown) {
             boatDrag = false;
-            if (this.continent === 'asia') {
-               asiaClouds = false;
-            } else if (this.continent === 'africaMiddleEast') {
-               africaClouds = false;
-            } else if (this.continent === 'sAmerica') {
-               sAmericaClouds = false;
-            } else if (this.continent === 'australia') {
-               australiaClouds = false;
-            } else if (this.continent === 'europe') {
-               europeClouds = false;
-            }
+            this.clouded = false;
+            cloudBools[this.continent] = false;
          }
       }
 
-      if (this.continent === 'sAmerica' && sAmericaClouds) {
-         this.clouded = true;
-      } else if (this.continent === 'sAmerica' && !sAmericaClouds) {
-         this.clouded = false;
-      } else if (this.continent === 'africaMiddleEast' && africaClouds) {
-         this.clouded = true;
-      } else if (this.continent === 'africaMiddleEast' && !africaClouds) {
-         this.clouded = false;
-      } else if (this.continent === 'asia' && asiaClouds) {
-         this.clouded = true;
-      } else if (this.continent === 'asia' && !asiaClouds) {
-         this.clouded = false;
-      } else if (this.continent === 'australia' && australiaClouds) {
-         this.clouded = true;
-      } else if (this.continent === 'australia' && !australiaClouds) {
-         this.clouded = false;
-      } else if (this.continent === 'europe' && europeClouds) {
-         this.clouded = true;
-      } else if (this.continent === 'europe' && !europeClouds) {
-         this.clouded = false;
-      }
-
       if (this.id === 289 && !this.clouded) {
-         if(this.trade !== 'done') {
+         if (this.trade !== 'done') {
             this.trade = document.getElementById('avocadoTrade');
          } else {
             avocado = true;
@@ -231,30 +224,6 @@ class tile {
          this.viewInfo.y = mouseY < this.viewInfo.h ? mouseY : mouseY - this.viewInfo.h;
       } else if (mouseDown) {
          this.viewInfo.bool = false;
-      }
-
-      if (this.viewInfo.bool) {
-         function centerText(text, viewInfo) {
-            return viewInfo.x + viewInfo.w / 2 - ctx.measureText(text).width / 2;
-         }
-
-         ctx.lineWidth = 2;
-         ctx.strokeStyle = 'rgb(0, 0, 255)';
-         ctx.strokeRect(this.x, this.y, this.size, this.size);
-         ctx.lineWidth = 1;
-
-         ctx.fillStyle = 'rgb(0, 0, 0, 0.5)';
-         ctx.fillRect(this.viewInfo.x, this.viewInfo.y, this.viewInfo.w, this.viewInfo.h);
-
-         ctx.fillStyle = 'rgb(230, 230, 230)';
-         const titleText = 'Tile Info';
-         ctx.fillText(titleText, centerText(titleText, this.viewInfo), this.viewInfo.y + 10);
-
-         const taxText = `Tax rate: ${this.taxRate}%`;
-         ctx.fillText(taxText, centerText(taxText, this.viewInfo), this.viewInfo.y + 25);
-
-         const wageText = `Minimum wage: $${this.minimumWage}`
-         ctx.fillText(wageText, centerText(wageText, this.viewInfo), this.viewInfo.y + 35)
       }
 
       if (this.status === 'player' || this.status === 'competition') {
@@ -280,12 +249,20 @@ class tile {
          buyCompetitionBool = false;
          this.competitionClicked = false;
       }
+
+      // Draw tile's cloud
+      if (!cloudBools[this.continent]) {
+         this.clouded = false;
+      } else {
+         this.cloud.draw();
+      }
    }
 }
 
 function cancel() {
    competitionModal.style.display = 'none';
 }
+
 function buyCompetition() {
    if (money >= 100 && buyCompetitionBool === false) {
       money -= 100;
@@ -296,43 +273,37 @@ function buyCompetition() {
 }
 
 class cloud {
-   constructor(tileIndex, continent) {
+   constructor(tile) {
       this.w = 60;
-      this.continent = continent;
       this.h = this.w * 0.9;
       this.timer = 0;
       this.imageX = 0;
       this.imageY = 0;
       this.imageW = 165;
       this.imageH = 135;
-      if (this.continent === 'australia') {
-         this.tile = australia[tileIndex];
-         this.x = this.tile.x - this.w / 2 + this.tile.size / 2;
-         this.y = this.tile.y - this.h / 2 + this.tile.size / 2;
-      } else if (this.continent === 'asia') {
-         this.tile = asia[tileIndex];
-         this.x = this.tile.x - this.w / 2 + this.tile.size / 2;
-         this.y = this.tile.y - this.h / 2 + this.tile.size / 2;
-      } else if (this.continent === 'africaMiddleEast') {
-         this.tile = africaMiddleEast[tileIndex];
-         this.x = this.tile.x - this.w / 2 + this.tile.size / 2;
-         this.y = this.tile.y - this.h / 2 + this.tile.size / 2;
-      } else if (this.continent === 'sAmerica') {
-         this.tile = sAmerica[tileIndex];
-         this.x = this.tile.x - this.w / 2 + this.tile.size / 2;
-         this.y = this.tile.y - this.h / 2 + this.tile.size / 2;
-      } else if (this.continent === 'europe') {
-         this.tile = europe[tileIndex];
-         this.x = this.tile.x - this.w / 2 + this.tile.size / 2;
-         this.y = this.tile.y - this.h / 2 + this.tile.size / 2;
-      }
+      this.tileId = tile.id;
 
-      if (borderTiles.includes(this.tile.id)) {
-         this.w = 40
-         this.h = 40
+      this.x = tile.x - this.w / 2 + tile.size / 2;
+      this.y = tile.y - this.h / 2 + tile.size / 2;
+
+      const borderTilesB = [160, 161, 162, 163, 164];
+
+      const borderTilesR = [26, 41, 69, 97, 120, 141, 159, 164];
+
+      this.borderTile = {
+         bool: false,
+         sides: [],
+      };
+
+      if (borderTilesB.includes(this.tileId)) {
+         this.borderTile.bool = true;
+         this.borderTile.sides.push('bottom');
+      }
+      if (borderTilesR.includes(this.tileId)) {
+         this.borderTile.bool = true;
+         this.borderTile.sides.push('right');
       }
    }
-
 
    draw() {
       this.timer++;
@@ -343,16 +314,17 @@ class cloud {
             this.imageY = getRandInt(0, 2);
          }
       }
+
       ctx.drawImage(
-         cloudsImg,
+         this.borderTile.bool && cloudBools.asia ? borderCloudsImg : cloudsImg,
          this.imageX * this.imageW,
          this.imageY * this.imageH,
          this.imageW,
          this.imageH,
          this.x,
          this.y,
-         this.w,
-         this.h
+         this.borderTile.sides.includes('right') && !cloudBools.asia ? this.w - 15 : this.w,
+         this.borderTile.sides.includes('bottom') && !cloudBools.asia ? this.h - 15 : this.h
       );
    }
 }
@@ -415,17 +387,25 @@ function createTiles() {
             tileIdentifier++;
             if (x >= 250 && x <= 400 && y >= 350 && y <= 550) {
                sAmerica.push(new tile(x, y, tileSize, 'sAmerica', tileIdentifier));
-            } else if (x >= 410 && x <= 590 && y >= 258 && y <= 508 && tileIdentifier !== 217 && tileIdentifier !== 231 && tileIdentifier !== 247) {
+            } else if (
+               x >= 410 &&
+               x <= 590 &&
+               y >= 258 &&
+               y <= 508 &&
+               tileIdentifier !== 217 &&
+               tileIdentifier !== 231 &&
+               tileIdentifier !== 247
+            ) {
                africaMiddleEast.push(new tile(x, y, tileSize, 'africaMiddleEast', tileIdentifier));
             } else if (x >= 770 && x <= 970 && y >= 400 && y <= 550) {
                australia.push(new tile(x, y, tileSize, 'australia', tileIdentifier));
             } else if (x >= 480 && x <= 660 && y >= 80 && y <= 200) {
-               europe.push(new tile(x, y, tileSize, 'europe', tileIdentifier))
+               europe.push(new tile(x, y, tileSize, 'europe', tileIdentifier));
             } else if (
                x >= 410 &&
                x <= 940 &&
                y >= 20 &&
-               y <= 370 
+               y <= 370
                //africaMiddleEast.includes(new tile(x, y, tileSize, 'africaMiddleEast')) === false
             ) {
                asia.push(new tile(x, y, tileSize, 'asia', tileIdentifier));
@@ -435,7 +415,7 @@ function createTiles() {
          }
       }
    }
-   createClouds();
+
    let randomIndex = getRandInt(0, nAmerica.length - 1);
    nAmerica[randomIndex].startingStore = true;
    let open = false;
@@ -450,26 +430,6 @@ function createTiles() {
    }
 
    display();
-}
-
-function createClouds() {
-   for (let n = 0; n < asia.length; n++) {
-      clouds.push(new cloud(n, 'asia'));
-   }
-
-   for (let n = 0; n < australia.length; n++) {
-      clouds.push(new cloud(n, 'australia'));
-   }
-
-   for (let n = 0; n < africaMiddleEast.length; n++) {
-      clouds.push(new cloud(n, 'africaMiddleEast'));
-   }
-   for (let n = 0; n < sAmerica.length; n++) {
-      clouds.push(new cloud(n, 'sAmerica'));
-   }
-   for (let n = 0; n < europe.length; n++) {
-      clouds.push(new cloud(n, 'europe'))
-   }
 }
 
 function changeMoney() {
@@ -518,18 +478,17 @@ function payTaxes() {
 }
 
 function monthlyExpenses() {
-   let totalSalaryCosts = 0 
+   let totalSalaryCosts = 0;
    monthlyExpensesEl.style.display = 'block';
-   mergedTiles = tiles.flat(1)
-   for(let x = 0; x < mergedTiles.length; x++) {
-      if(mergedTiles[x].status === 'player') {
-         totalSalaryCosts += (mergedTiles[x].minimumWage * 5)
+   mergedTiles = tiles.flat(1);
+   for (let x = 0; x < mergedTiles.length; x++) {
+      if (mergedTiles[x].status === 'player') {
+         totalSalaryCosts += mergedTiles[x].minimumWage * 5;
       }
    }
-   salaryInfo.innerHTML = totalSalaryCosts
-   
+   salaryInfo.innerHTML = totalSalaryCosts;
 }
-setTimeout(monthlyExpenses, 4500)
+setTimeout(monthlyExpenses, 4500);
 
 function boatPlace() {
    if (money >= 1000) {
@@ -565,7 +524,6 @@ function display() {
 
    ctx.fillRect(0, 0, cnv.width, cnv.height);
    ctx.drawImage(background, 0, 0, cnv.width, cnv.height);
-   
 
    // Draw all the tiles
    for (let c = 0; c < tiles.length; c++) {
@@ -577,10 +535,12 @@ function display() {
       }
    }
 
-   // Draw all the clouds
-   for (let i = 0; i < clouds.length; i++) {
-      clouds[i].draw();
+   for (let c = 0; c < tiles.length; c++) {
+      for (let t = 0; t < tiles[c].length; t++) {
+         tiles[c][t].drawInfo();
+      }
    }
+
    if (!gameOver) {
       pollution += 0.5;
       pollutionPercentage = pollution / 1000;
@@ -590,12 +550,12 @@ function display() {
       }
    }
 
-   if(avocado) {
-      document.getElementById('avocado').style.display='block'
+   if (avocado) {
+      document.getElementById('avocado').style.display = 'block';
    }
 
-   if(lemon) {
-      document.getElementById('citron').style.display='block'
+   if (lemon) {
+      document.getElementById('citron').style.display = 'block';
    }
 
    // Draw pollution bar
@@ -635,52 +595,9 @@ function display() {
       ctx.drawImage(boat, mouseX - 50, mouseY - 50, 100, 100);
    }
    reputationEl.innerHTML = reputation;
-   discover();
    trading();
+
    requestAnimationFrame(display);
-}
-
-function discover() {
-   if (!asiaClouds) {
-      for (let i = 0; i < clouds.length; i++) {
-         if (clouds[i].continent === 'asia') {
-            clouds.splice(i, 1);
-            tiles[0].status = 'open';
-         }
-      }
-   }
-
-   if (!sAmericaClouds) {
-      for (let i = 0; i < clouds.length; i++) {
-         if (clouds[i].continent === 'sAmerica') {
-            clouds.splice(i, 1);
-         }
-      }
-   }
-
-   if (!africaClouds) {
-      for (let i = 0; i < clouds.length; i++) {
-         if (clouds[i].continent === 'africaMiddleEast') {
-            clouds.splice(i, 1);
-         }
-      }
-   }
-
-   if (!australiaClouds) {
-      for (let i = 0; i < clouds.length; i++) {
-         if (clouds[i].continent === 'australia') {
-            clouds.splice(i, 1);
-         }
-      }
-   }
-
-   if (!europeClouds) {
-      for (let i = 0; i < clouds.length; i++) {
-         if (clouds[i].continent === 'europe') {
-            clouds.splice(i, 1);
-         }
-      }
-   }
 }
 
 let mergedTiles = [];
@@ -713,11 +630,10 @@ function trading() {
          if (mouseDown) {
             document.body.style.cursor = 'default';
             trade = false;
-            chosenTrade.trade = 'done'
+            chosenTrade.trade = 'done';
             displayDuration = 0;
             repetition = 0;
             randomInterval = getRandInt(500, 1000);
-
          }
       } else {
          document.body.style.cursor = 'default';
