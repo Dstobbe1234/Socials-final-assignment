@@ -172,7 +172,7 @@ class tile {
          this.color = 'rgb(0, 0, 0)';
       }
 
-      if (typeof this.minimumWage === 'undefined') {
+      if (!this.minimumWage) {
          if (this.continent === 'nAmerica') {
             this.minimumWage = getRandInt(1800, 3500);
          } else if (this.continent === 'sAmerica') {
@@ -226,7 +226,7 @@ class tile {
 
       if (this.inside && this.status === 'open' && !this.clouded && mouseDown) {
          this.viewInfo.bool = true;
-         this.viewInfo.x = mouseX - this.viewInfo.w;
+         this.viewInfo.x = mouseX - this.viewInfo.w < 0 ? mouseX : mouseX - this.viewInfo.w;
          this.viewInfo.y = mouseY < this.viewInfo.h ? mouseY : mouseY - this.viewInfo.h;
       } else if (mouseDown) {
          this.viewInfo.bool = false;
