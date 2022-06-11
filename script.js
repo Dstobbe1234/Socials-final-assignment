@@ -86,6 +86,7 @@ let cloudBools = {
    australia: true,
 };
 let fairTrade;
+let monthlyTradeCosts = 0
 
 //Tile class for placing stuff
 class tile {
@@ -173,17 +174,17 @@ class tile {
 
       if (typeof this.minimumWage === 'undefined') {
          if (this.continent === 'nAmerica') {
-            this.minimumWage = getRandInt(500, 1000);
+            this.minimumWage = getRandInt(1800, 3500);
          } else if (this.continent === 'sAmerica') {
-            this.minimumWage = getRandInt(300, 700);
+            this.minimumWage = getRandInt(7, 600);
          } else if (this.continent === 'asia') {
-            this.minimumWage = getRandInt(12, 200);
+            this.minimumWage = getRandInt(6, 550);
          } else if (this.continent === 'australia') {
-            this.minimumWage = getRandInt(600, 1200);
+            this.minimumWage = getRandInt(1800, 3500);
          } else if (this.continent === 'europe') {
-            this.minimumWage = getRandInt(300, 2110);
+            this.minimumWage = getRandInt(500, 3000);
          } else if (this.continent === 'africa') {
-            this.minimumWage = getRandInt(12, 200);
+            this.minimumWage = getRandInt(7, 550);
          }
       }
 
@@ -663,7 +664,7 @@ function trading() {
 
 function chooseTradeOption() {
    if(fairTrade) {
-
+      monthlyTradeCosts += 100
    } else {
 
    }
