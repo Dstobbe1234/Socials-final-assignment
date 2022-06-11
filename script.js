@@ -35,6 +35,9 @@ const monthlyExpensesEl = document.getElementById('monthlyExpenses');
 const page = document.getElementById('page');
 const salaryInfo = document.getElementById('salaryInfo');
 const background = document.getElementById('background');
+const tradeOptions = document.getElementById('tradeOptions');
+const exploitedTradeOption = document.getElementById('exploitedTradeOption');
+const fairTradeOption = document.getElementById('fairTradeOption');
 
 function getRandInt(min, max) {
    // min and max are included
@@ -82,6 +85,7 @@ let cloudBools = {
    asia: true,
    australia: true,
 };
+let fairTrade;
 
 //Tile class for placing stuff
 class tile {
@@ -341,6 +345,14 @@ modalBtn.addEventListener('click', payTaxes);
 buyBoatBtn.addEventListener('click', boatPlace);
 cancelBtn.addEventListener('click', cancel);
 buyCompetitionBtn.addEventListener('click', buyCompetition);
+fairTradeOption.addEventListener('click', () => {
+   fairTrade = true;
+   chooseTradeOption()
+})
+exploitedTradeOption.addEventListener('click', () => {
+   fairTrade = false;
+   chooseTradeOption()
+})
 
 //Event Functions
 function drag() {
@@ -634,11 +646,7 @@ function trading() {
          document.body.style.cursor = 'pointer';
          if (mouseDown) {
             document.body.style.cursor = 'default';
-            trade = false;
-            chosenTrade.trade = 'done';
-            displayDuration = 0;
-            repetition = 0;
-            randomInterval = getRandInt(500, 1000);
+            tradeOptions.style.display = 'block'
          }
       } else {
          document.body.style.cursor = 'default';
@@ -650,4 +658,19 @@ function trading() {
          randomInterval = getRandInt(500, 1000);
       }
    }
+}
+
+
+function chooseTradeOption() {
+   if(fairTrade) {
+
+   } else {
+
+   }
+   trade = false;
+   chosenTrade.trade = 'done';
+   displayDuration = 0;
+   repetition = 0;
+   randomInterval = getRandInt(500, 1000);
+   tradeOptions.style.display = 'none';
 }
