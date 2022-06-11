@@ -161,7 +161,7 @@ class tile {
       ) {
          this.inside = true;
          console.log(this.x);
-         console.log(this.y)
+         console.log(this.y);
       } else {
          this.inside = false;
          this.color = 'rgb(0, 0, 0)';
@@ -317,7 +317,7 @@ class cloud {
       }
 
       ctx.drawImage(
-         this.borderTile.bool && cloudBools.asia ? borderCloudsImg : cloudsImg,
+         cloudsImg,
          this.imageX * this.imageW,
          this.imageY * this.imageH,
          this.imageW,
@@ -325,7 +325,6 @@ class cloud {
          this.x,
          this.y,
 
-         
          this.borderTile.sides.includes('right') && !cloudBools.asia ? this.w - 15 : this.w,
          this.borderTile.sides.includes('bottom') && !cloudBools.asia ? this.h - 15 : this.h
       );
@@ -402,7 +401,10 @@ function createTiles() {
                africaMiddleEast.push(new tile(x, y, tileSize, 'africaMiddleEast', tileIdentifier));
             } else if (x >= 770 && x <= 970 && y >= 400 && y <= 550) {
                australia.push(new tile(x, y, tileSize, 'australia', tileIdentifier));
-            } else if (x >= 480 && x <= 660 && y >= 80 && y <= 200 || x >= 280 && x <= 380 && y >= 0 && y <= 100) {
+            } else if (
+               (x >= 480 && x <= 660 && y >= 80 && y <= 200) ||
+               (x >= 280 && x <= 380 && y >= 0 && y <= 100)
+            ) {
                europe.push(new tile(x, y, tileSize, 'europe', tileIdentifier));
             } else if (
                x >= 410 &&
