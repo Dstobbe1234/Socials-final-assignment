@@ -38,6 +38,8 @@ const background = document.getElementById('background');
 const tradeOptions = document.getElementById('tradeOptions');
 const exploitedTradeOption = document.getElementById('exploitedTradeOption');
 const fairTradeOption = document.getElementById('fairTradeOption');
+const tradeInfo = document.getElementById('tradeInfo');
+const payMEBtn = document.getElementById('payMonthlyExpenses');
 
 function getRandInt(min, max) {
    // min and max are included
@@ -54,13 +56,13 @@ let randomInterval = getRandInt(500, 1000);
 let randomX, randomY;
 let randomIndex;
 let repetition = 0;
-let africaMiddleEast = [];
+let africa = [];
 let asia = [];
 let australia = [];
 let nAmerica = [];
 let sAmerica = [];
 let europe = [];
-let tiles = [asia, australia, africaMiddleEast, sAmerica, nAmerica, europe];
+let tiles = [asia, australia, africa, sAmerica, nAmerica, europe];
 const tileSize = 20;
 let boatDrag = false;
 let competition;
@@ -81,11 +83,33 @@ let lemon = false;
 let cloudBools = {
    sAmerica: true,
    europe: true,
-   africaMiddleEast: true,
+   africa: true,
    asia: true,
    australia: true,
 };
 let fairTrade;
+let monthlyTradeCosts = 0;
+let totalSalaryCosts;
+
+//Event Listeners
+buyBtn.addEventListener('click', drag);
+document.addEventListener('mousedown', mousedownHandler);
+document.addEventListener('mousemove', mousemoveHandler);
+document.addEventListener('mouseup', mouseupHandler);
+background.addEventListener('load', createTiles);
+modalBtn.addEventListener('click', payTaxes);
+buyBoatBtn.addEventListener('click', boatPlace);
+cancelBtn.addEventListener('click', cancel);
+buyCompetitionBtn.addEventListener('click', buyCompetition);
+fairTradeOption.addEventListener('click', () => {
+   fairTrade = true;
+   chooseTradeOption();
+});
+exploitedTradeOption.addEventListener('click', () => {
+   fairTrade = false;
+   chooseTradeOption();
+});
+payMEBtn.addEventListener('click', payMonthlyExpenses);
 
 //Tile class for placing stuff
 class tile {
@@ -126,27 +150,30 @@ class tile {
    drawInfo() {
       if (!this.viewInfo.bool) return;
 
-      function centerText(text, viewInfo) {
-         return viewInfo.x + viewInfo.w / 2 - ctx.measureText(text).width / 2;
-      }
+      ctx.fillStyle = 'red';
+      ctx.fillRect(this.x, this.y, this.size, this.size);
 
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = 'rgb(0, 0, 255)';
-      ctx.strokeRect(this.x, this.y, this.size, this.size);
-      ctx.lineWidth = 1;
+      // function centerText(text, viewInfo) {
+      //    return viewInfo.x + viewInfo.w / 2 - ctx.measureText(text).width / 2;
+      // }
 
-      ctx.fillStyle = 'rgb(0, 0, 0, 0.5)';
-      ctx.fillRect(this.viewInfo.x, this.viewInfo.y, this.viewInfo.w, this.viewInfo.h);
+      // ctx.lineWidth = 2;
+      // ctx.strokeStyle = 'rgb(0, 0, 255)';
+      // ctx.strokeRect(this.x, this.y, this.size, this.size);
+      // ctx.lineWidth = 1;
 
-      ctx.fillStyle = 'rgb(230, 230, 230)';
-      const titleText = 'Tile Info';
-      ctx.fillText(titleText, centerText(titleText, this.viewInfo), this.viewInfo.y + 10);
+      // ctx.fillStyle = 'rgb(0, 0, 0, 0.5)';
+      // ctx.fillRect(this.viewInfo.x, this.viewInfo.y, this.viewInfo.w, this.viewInfo.h);
 
-      const taxText = `Tax rate: ${this.taxRate}%`;
-      ctx.fillText(taxText, centerText(taxText, this.viewInfo), this.viewInfo.y + 25);
+      // ctx.fillStyle = 'rgb(230, 230, 230)';
+      // const titleText = 'Tile Info';
+      // ctx.fillText(titleText, centerText(titleText, this.viewInfo), this.viewInfo.y + 10);
 
-      const wageText = `MW: $${this.minimumWage}`;
-      ctx.fillText(wageText, centerText(wageText, this.viewInfo), this.viewInfo.y + 35);
+      // const taxText = `Tax rate: ${this.taxRate}%`;
+      // ctx.fillText(taxText, centerText(taxText, this.viewInfo), this.viewInfo.y + 25);
+
+      // const wageText = `MW: $${this.minimumWage}`;
+      // ctx.fillText(wageText, centerText(wageText, this.viewInfo), this.viewInfo.y + 35);
    }
 
    draw() {
@@ -164,8 +191,6 @@ class tile {
          mouseY < this.y + this.size
       ) {
          this.inside = true;
-         console.log(this.x);
-         console.log(this.y);
       } else {
          this.inside = false;
          this.color = 'rgb(0, 0, 0)';
@@ -173,17 +198,17 @@ class tile {
 
       if (!this.minimumWage) {
          if (this.continent === 'nAmerica') {
-            this.minimumWage = getRandInt(500, 1000);
+            this.minimumWage = getRandInt(1800, 3500);
          } else if (this.continent === 'sAmerica') {
-            this.minimumWage = getRandInt(300, 700);
+            this.minimumWage = getRandInt(7, 600);
          } else if (this.continent === 'asia') {
-            this.minimumWage = getRandInt(12, 200);
+            this.minimumWage = getRandInt(6, 550);
          } else if (this.continent === 'australia') {
-            this.minimumWage = getRandInt(600, 1200);
+            this.minimumWage = getRandInt(1800, 3500);
          } else if (this.continent === 'europe') {
-            this.minimumWage = getRandInt(300, 2110);
+            this.minimumWage = getRandInt(1000, 3000);
          } else if (this.continent === 'africa') {
-            this.minimumWage = getRandInt(12, 200);
+            this.minimumWage = getRandInt(7, 550);
          }
       }
 
@@ -227,9 +252,11 @@ class tile {
          this.viewInfo.bool = true;
          this.viewInfo.x = mouseX - this.viewInfo.w < 0 ? mouseX : mouseX - this.viewInfo.w;
          this.viewInfo.y = mouseY < this.viewInfo.h ? mouseY : mouseY - this.viewInfo.h;
-      } else if (mouseDown) {
-         this.viewInfo.bool = false;
+         console.log(this.id);
       }
+      // else if (mouseDown) {
+      //    this.viewInfo.bool = false;
+      // }
 
       if (this.status === 'player' || this.status === 'competition') {
          ctx.drawImage(this.restaurantType, this.x, this.y, this.size, this.size);
@@ -335,25 +362,6 @@ class cloud {
    }
 }
 
-//Event Listeners
-buyBtn.addEventListener('click', drag);
-document.addEventListener('mousedown', mousedownHandler);
-document.addEventListener('mousemove', mousemoveHandler);
-document.addEventListener('mouseup', mouseupHandler);
-background.addEventListener('load', createTiles);
-modalBtn.addEventListener('click', payTaxes);
-buyBoatBtn.addEventListener('click', boatPlace);
-cancelBtn.addEventListener('click', cancel);
-buyCompetitionBtn.addEventListener('click', buyCompetition);
-fairTradeOption.addEventListener('click', () => {
-   fairTrade = true;
-   chooseTradeOption()
-})
-exploitedTradeOption.addEventListener('click', () => {
-   fairTrade = false;
-   chooseTradeOption()
-})
-
 //Event Functions
 function drag() {
    if (money >= 50 && !dragRestaurant && !boatDrag) {
@@ -373,6 +381,7 @@ function mouseupHandler() {
 function mousemoveHandler(event) {
    mouseX = event.x - cnv.getBoundingClientRect().x;
    mouseY = event.y - cnv.getBoundingClientRect().y;
+   console.log(mouseX, mouseY);
 }
 let tileIdentifier = 0;
 
@@ -399,31 +408,26 @@ function createTiles() {
          }
          if (!containsOcean) {
             tileIdentifier++;
+
+            const europeBorder = [181, 163, 120, 98, 71, 141];
+
             if (x >= 250 && x <= 400 && y >= 350 && y <= 550) {
                sAmerica.push(new tile(x, y, tileSize, 'sAmerica', tileIdentifier));
-            } else if (
-               x >= 410 &&
-               x <= 590 &&
-               y >= 258 &&
-               y <= 508 &&
-               tileIdentifier !== 217 &&
-               tileIdentifier !== 231 &&
-               tileIdentifier !== 247
-            ) {
-               africaMiddleEast.push(new tile(x, y, tileSize, 'africaMiddleEast', tileIdentifier));
+            } else if (x >= 430 && x <= 575 && y >= 310 && y <= 510) {
+               africa.push(new tile(x, y, tileSize, 'africa', tileIdentifier));
             } else if (x >= 770 && x <= 970 && y >= 400 && y <= 550) {
                australia.push(new tile(x, y, tileSize, 'australia', tileIdentifier));
             } else if (
-               (x >= 480 && x <= 660 && y >= 80 && y <= 200) ||
-               (x >= 280 && x <= 380 && y >= 0 && y <= 100)
+               (x >= 460 && x <= 640 && y >= 280 && y <= 130) ||
+               europeBorder.includes(tileIdentifier)
             ) {
                europe.push(new tile(x, y, tileSize, 'europe', tileIdentifier));
             } else if (
-               x >= 410 &&
-               x <= 940 &&
+               x >= 460 &&
+               x <= 970 &&
                y >= 20 &&
                y <= 370
-               //africaMiddleEast.includes(new tile(x, y, tileSize, 'africaMiddleEast')) === false
+               //africa.includes(new tile(x, y, tileSize, 'africa')) === false
             ) {
                asia.push(new tile(x, y, tileSize, 'asia', tileIdentifier));
             } else {
@@ -495,7 +499,7 @@ function payTaxes() {
 }
 
 function monthlyExpenses() {
-   let totalSalaryCosts = 0;
+   totalSalaryCosts = 0;
    monthlyExpensesEl.style.display = 'block';
    mergedTiles = tiles.flat(1);
    for (let x = 0; x < mergedTiles.length; x++) {
@@ -503,9 +507,21 @@ function monthlyExpenses() {
          totalSalaryCosts += mergedTiles[x].minimumWage * 5;
       }
    }
+   if (monthlyTradeCosts !== 0) {
+      tradeInfo.innerHTML = monthlyTradeCosts;
+   }
    salaryInfo.innerHTML = totalSalaryCosts;
 }
 setTimeout(monthlyExpenses, 4500);
+
+function payMonthlyExpenses() {
+   money -= monthlyTradeCosts + totalSalaryCosts;
+   monthlyExpensesEl.style.display = 'none';
+   setTimeout(monthlyExpenses, 4500);
+   if (money < 0) {
+      console.log('bankrupt');
+   }
+}
 
 function boatPlace() {
    if (money >= 1000) {
@@ -614,6 +630,47 @@ function display() {
    reputationEl.innerHTML = reputation;
    trading();
 
+   ctx.strokeStyle = 'red';
+   ctx.beginPath();
+   ctx.moveTo(250, 350);
+   ctx.lineTo(250, 550);
+   ctx.lineTo(400, 550);
+   ctx.lineTo(400, 350);
+   ctx.lineTo(250, 350);
+   ctx.stroke();
+
+   ctx.beginPath();
+   ctx.moveTo(430, 310);
+   ctx.lineTo(430, 510);
+   ctx.lineTo(575, 510);
+   ctx.lineTo(575, 310);
+   ctx.lineTo(430, 310);
+   ctx.stroke();
+
+   ctx.beginPath();
+   ctx.moveTo(480, 80);
+   ctx.lineTo(480, 200);
+   ctx.lineTo(660, 200);
+   ctx.lineTo(660, 80);
+   ctx.lineTo(480, 80);
+   ctx.stroke();
+
+   ctx.beginPath();
+   ctx.moveTo(280, 0);
+   ctx.lineTo(280, 200);
+   ctx.lineTo(400, 200);
+   ctx.lineTo(400, 0);
+   ctx.lineTo(280, 0);
+   ctx.stroke();
+
+   ctx.beginPath();
+   ctx.moveTo(460, 20);
+   ctx.lineTo(460, 370);
+   ctx.lineTo(970, 370);
+   ctx.lineTo(970, 20);
+   ctx.lineTo(460, 20);
+   ctx.stroke();
+
    requestAnimationFrame(display);
 }
 
@@ -646,7 +703,7 @@ function trading() {
          document.body.style.cursor = 'pointer';
          if (mouseDown) {
             document.body.style.cursor = 'default';
-            tradeOptions.style.display = 'block'
+            tradeOptions.style.display = 'block';
          }
       } else {
          document.body.style.cursor = 'default';
@@ -660,12 +717,13 @@ function trading() {
    }
 }
 
-
 function chooseTradeOption() {
-   if(fairTrade) {
-
+   if (fairTrade) {
+      monthlyTradeCosts += 100;
+      reputation += 40;
    } else {
-
+      monthlyTradeCosts += 25;
+      reputation += 10;
    }
    trade = false;
    chosenTrade.trade = 'done';
