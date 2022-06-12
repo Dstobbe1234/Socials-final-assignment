@@ -90,13 +90,14 @@ let cloudBools = {
 let fairTrade;
 let monthlyTradeCosts = 0;
 let totalSalaryCosts;
+let lastTileId;
+let cloudImages = {};
 
 //Event Listeners
 buyBtn.addEventListener('click', drag);
 document.addEventListener('mousedown', mousedownHandler);
 document.addEventListener('mousemove', mousemoveHandler);
 document.addEventListener('mouseup', mouseupHandler);
-background.addEventListener('load', createTiles);
 modalBtn.addEventListener('click', payTaxes);
 buyBoatBtn.addEventListener('click', boatPlace);
 cancelBtn.addEventListener('click', cancel);
@@ -110,6 +111,41 @@ exploitedTradeOption.addEventListener('click', () => {
    chooseTradeOption();
 });
 payMEBtn.addEventListener('click', payMonthlyExpenses);
+
+cloudsImg.addEventListener('load', () => {
+   let colors = [
+      { continent: 'sAmerica', color: 'rgb(0, 255, 0)', intensity: 0.3 },
+      { continent: 'europe', color: 'rgb(0, 0, 255)', intensity: 0.3 },
+      { continent: 'asia', color: 'rgb(255, 0, 0)', intensity: 0.3 },
+      { continent: 'australia', color: 'rgb(191, 64, 191)', intensity: 0.5 },
+      { continent: 'africa', color: 'rgb(255, 255, 0)', intensity: 0.3 },
+   ];
+
+   for (let c = 0; c < colors.length; c++) {
+      ctx.drawImage(cloudsImg, 0, 0);
+
+      ctx.globalCompositeOperation = 'source-atop';
+      ctx.globalAlpha = colors[c].intensity;
+
+      ctx.fillStyle = colors[c].color;
+      ctx.fillRect(0, 0, cnv.width, cnv.height);
+
+      let image = new Image();
+      image.src = cnv.toDataURL();
+
+      ctx.clearRect(0, 0, cnv.width, cnv.height);
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.globalAlpha = 1;
+
+      cloudImages[colors[c].continent] = image;
+   }
+
+   if (!background.complete) {
+      background.onload = createTiles();
+   } else {
+      createTiles();
+   }
+});
 
 //Tile class for placing stuff
 class tile {
@@ -138,7 +174,7 @@ class tile {
       // If the continent of the tile isn't north America, create a cloud
       if (continent != 'nAmerica') {
          this.clouded = true;
-         this.cloud = new cloud(this);
+         this.cloud = new cloud(this.continent, this.x, this.y, this.size, this.id);
       }
    }
    //  Draws tile
@@ -150,30 +186,27 @@ class tile {
    drawInfo() {
       if (!this.viewInfo.bool) return;
 
-      ctx.fillStyle = 'red';
-      ctx.fillRect(this.x, this.y, this.size, this.size);
+      function centerText(text, viewInfo) {
+         return viewInfo.x + viewInfo.w / 2 - ctx.measureText(text).width / 2;
+      }
 
-      // function centerText(text, viewInfo) {
-      //    return viewInfo.x + viewInfo.w / 2 - ctx.measureText(text).width / 2;
-      // }
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = 'rgb(0, 0, 255)';
+      ctx.strokeRect(this.x, this.y, this.size, this.size);
+      ctx.lineWidth = 1;
 
-      // ctx.lineWidth = 2;
-      // ctx.strokeStyle = 'rgb(0, 0, 255)';
-      // ctx.strokeRect(this.x, this.y, this.size, this.size);
-      // ctx.lineWidth = 1;
+      ctx.fillStyle = 'rgb(0, 0, 0, 0.5)';
+      ctx.fillRect(this.viewInfo.x, this.viewInfo.y, this.viewInfo.w, this.viewInfo.h);
 
-      // ctx.fillStyle = 'rgb(0, 0, 0, 0.5)';
-      // ctx.fillRect(this.viewInfo.x, this.viewInfo.y, this.viewInfo.w, this.viewInfo.h);
+      ctx.fillStyle = 'rgb(230, 230, 230)';
+      const titleText = 'Tile Info';
+      ctx.fillText(titleText, centerText(titleText, this.viewInfo), this.viewInfo.y + 10);
 
-      // ctx.fillStyle = 'rgb(230, 230, 230)';
-      // const titleText = 'Tile Info';
-      // ctx.fillText(titleText, centerText(titleText, this.viewInfo), this.viewInfo.y + 10);
+      const taxText = `Tax rate: ${this.taxRate}%`;
+      ctx.fillText(taxText, centerText(taxText, this.viewInfo), this.viewInfo.y + 25);
 
-      // const taxText = `Tax rate: ${this.taxRate}%`;
-      // ctx.fillText(taxText, centerText(taxText, this.viewInfo), this.viewInfo.y + 25);
-
-      // const wageText = `MW: $${this.minimumWage}`;
-      // ctx.fillText(wageText, centerText(wageText, this.viewInfo), this.viewInfo.y + 35);
+      const wageText = `MW: $${this.minimumWage}`;
+      ctx.fillText(wageText, centerText(wageText, this.viewInfo), this.viewInfo.y + 35);
    }
 
    draw() {
@@ -191,6 +224,7 @@ class tile {
          mouseY < this.y + this.size
       ) {
          this.inside = true;
+         lastTileId = this.id;
       } else {
          this.inside = false;
          this.color = 'rgb(0, 0, 0)';
@@ -252,11 +286,9 @@ class tile {
          this.viewInfo.bool = true;
          this.viewInfo.x = mouseX - this.viewInfo.w < 0 ? mouseX : mouseX - this.viewInfo.w;
          this.viewInfo.y = mouseY < this.viewInfo.h ? mouseY : mouseY - this.viewInfo.h;
-         console.log(this.id);
+      } else if (mouseDown) {
+         this.viewInfo.bool = false;
       }
-      // else if (mouseDown) {
-      //    this.viewInfo.bool = false;
-      // }
 
       if (this.status === 'player' || this.status === 'competition') {
          ctx.drawImage(this.restaurantType, this.x, this.y, this.size, this.size);
@@ -305,7 +337,7 @@ function buyCompetition() {
 }
 
 class cloud {
-   constructor(tile) {
+   constructor(continent, tileX, tileY, tileSize, tileId) {
       this.w = 60;
       this.h = this.w * 0.9;
       this.timer = 0;
@@ -313,31 +345,22 @@ class cloud {
       this.imageY = 0;
       this.imageW = 165;
       this.imageH = 135;
-      this.tileId = tile.id;
-
-      this.x = tile.x - this.w / 2 + tile.size / 2;
-      this.y = tile.y - this.h / 2 + tile.size / 2;
-
-      const borderTilesB = [160, 161, 162, 163, 164];
-
-      const borderTilesR = [26, 41, 69, 97, 120, 141, 159, 164];
-
-      this.borderTile = {
-         bool: false,
-         sides: [],
-      };
-
-      if (borderTilesB.includes(this.tileId)) {
-         this.borderTile.bool = true;
-         this.borderTile.sides.push('bottom');
-      }
-      if (borderTilesR.includes(this.tileId)) {
-         this.borderTile.bool = true;
-         this.borderTile.sides.push('right');
-      }
+      this.changeX = 0;
+      this.changeY = 0;
+      this.changeW = 0;
+      this.changeH = 0;
+      this.continent = continent;
+      this.x = tileX - this.w / 2 + tileSize / 2;
+      this.y = tileY - this.h / 2 + tileSize / 2;
+      this.tileId = tileId;
    }
 
    draw() {
+      const borderTilesT = [197, 182, 141];
+      const borderTilesB = [181, 163, 120, 162, 44];
+      const borderTilesL = [198, 183, 182, 164, 141, 142, 121, 99, 72];
+      const borderTilesR = [181, 163, 140, 120, 119, 98, 71];
+
       this.timer++;
       if (this.timer === 10) {
          this.timer = 0;
@@ -347,17 +370,35 @@ class cloud {
          }
       }
 
+      if (
+         (!cloudBools.europe && this.continent === 'asia') ||
+         (!cloudBools.asia && this.continent === 'europe')
+      ) {
+         if (borderTilesT.includes(this.tileId)) {
+            this.changeY = 10;
+            this.changeH = 10;
+         } else if (borderTilesB.includes(this.tileId)) {
+            this.changeH = 15;
+         }
+
+         if (borderTilesL.includes(this.tileId)) {
+            this.changeX = 15;
+            this.changeW = 15;
+         } else if (borderTilesR.includes(this.tileId)) {
+            this.changeW = 15;
+         }
+      }
+
       ctx.drawImage(
-         cloudsImg,
+         cloudImages[this.continent],
          this.imageX * this.imageW,
          this.imageY * this.imageH,
          this.imageW,
          this.imageH,
-         this.x,
-         this.y,
-
-         this.borderTile.sides.includes('right') && !cloudBools.asia ? this.w - 15 : this.w,
-         this.borderTile.sides.includes('bottom') && !cloudBools.asia ? this.h - 15 : this.h
+         this.x + this.changeX,
+         this.y + this.changeY,
+         this.w - this.changeW,
+         this.h - this.changeH
       );
    }
 }
@@ -381,9 +422,9 @@ function mouseupHandler() {
 function mousemoveHandler(event) {
    mouseX = event.x - cnv.getBoundingClientRect().x;
    mouseY = event.y - cnv.getBoundingClientRect().y;
-   console.log(mouseX, mouseY);
+   // console.log(mouseX, mouseY);
 }
-let tileIdentifier = 0;
+let tileId = 0;
 
 // Checks if a tile would have water in it and if not then creates it
 function createTiles() {
@@ -407,21 +448,23 @@ function createTiles() {
             }
          }
          if (!containsOcean) {
-            tileIdentifier++;
-
-            const europeBorder = [181, 163, 120, 98, 71, 141];
+            tileId++;
 
             if (x >= 250 && x <= 400 && y >= 350 && y <= 550) {
-               sAmerica.push(new tile(x, y, tileSize, 'sAmerica', tileIdentifier));
+               sAmerica.push(new tile(x, y, tileSize, 'sAmerica', tileId));
             } else if (x >= 430 && x <= 575 && y >= 310 && y <= 510) {
-               africa.push(new tile(x, y, tileSize, 'africa', tileIdentifier));
+               africa.push(new tile(x, y, tileSize, 'africa', tileId));
             } else if (x >= 770 && x <= 970 && y >= 400 && y <= 550) {
-               australia.push(new tile(x, y, tileSize, 'australia', tileIdentifier));
+               australia.push(new tile(x, y, tileSize, 'australia', tileId));
             } else if (
-               (x >= 460 && x <= 640 && y >= 280 && y <= 130) ||
-               europeBorder.includes(tileIdentifier)
+               (x >= 480 && x < 620 && y >= 130 && y < 280) ||
+               (x >= 620 && x < 660 && y >= 160 && y < 220) ||
+               (x >= 280 && x < 400 && y >= 0 && y < 200) ||
+               tileId === 163 ||
+               tileId === 140
             ) {
-               europe.push(new tile(x, y, tileSize, 'europe', tileIdentifier));
+               ctx.beginPath();
+               europe.push(new tile(x, y, tileSize, 'europe', tileId));
             } else if (
                x >= 460 &&
                x <= 970 &&
@@ -429,9 +472,9 @@ function createTiles() {
                y <= 370
                //africa.includes(new tile(x, y, tileSize, 'africa')) === false
             ) {
-               asia.push(new tile(x, y, tileSize, 'asia', tileIdentifier));
+               asia.push(new tile(x, y, tileSize, 'asia', tileId));
             } else {
-               nAmerica.push(new tile(x, y, tileSize, 'nAmerica', tileIdentifier));
+               nAmerica.push(new tile(x, y, tileSize, 'nAmerica', tileId));
             }
          }
       }
@@ -630,46 +673,56 @@ function display() {
    reputationEl.innerHTML = reputation;
    trading();
 
-   ctx.strokeStyle = 'red';
-   ctx.beginPath();
-   ctx.moveTo(250, 350);
-   ctx.lineTo(250, 550);
-   ctx.lineTo(400, 550);
-   ctx.lineTo(400, 350);
-   ctx.lineTo(250, 350);
-   ctx.stroke();
+   // ctx.strokeStyle = 'black';
+   // ctx.lineWidth = 3;
+   // ctx.beginPath();
+   // ctx.moveTo(250, 350);
+   // ctx.lineTo(250, 550);
+   // ctx.lineTo(400, 550);
+   // ctx.lineTo(400, 350);
+   // ctx.lineTo(250, 350);
+   // ctx.stroke();
 
-   ctx.beginPath();
-   ctx.moveTo(430, 310);
-   ctx.lineTo(430, 510);
-   ctx.lineTo(575, 510);
-   ctx.lineTo(575, 310);
-   ctx.lineTo(430, 310);
-   ctx.stroke();
+   // ctx.beginPath();
+   // ctx.moveTo(430, 310);
+   // ctx.lineTo(430, 510);
+   // ctx.lineTo(575, 510);
+   // ctx.lineTo(575, 310);
+   // ctx.lineTo(430, 310);
+   // ctx.stroke();
 
-   ctx.beginPath();
-   ctx.moveTo(480, 80);
-   ctx.lineTo(480, 200);
-   ctx.lineTo(660, 200);
-   ctx.lineTo(660, 80);
-   ctx.lineTo(480, 80);
-   ctx.stroke();
+   // ctx.beginPath();
+   // ctx.moveTo(280, 0);
+   // ctx.lineTo(280, 200);
+   // ctx.lineTo(400, 200);
+   // ctx.lineTo(400, 0);
+   // ctx.lineTo(280, 0);
+   // ctx.stroke();
 
-   ctx.beginPath();
-   ctx.moveTo(280, 0);
-   ctx.lineTo(280, 200);
-   ctx.lineTo(400, 200);
-   ctx.lineTo(400, 0);
-   ctx.lineTo(280, 0);
-   ctx.stroke();
+   // ctx.beginPath();
+   // ctx.moveTo(460, 20);
+   // ctx.lineTo(460, 370);
+   // ctx.lineTo(970, 370);
+   // ctx.lineTo(970, 20);
+   // ctx.lineTo(460, 20);
+   // ctx.stroke();
 
-   ctx.beginPath();
-   ctx.moveTo(460, 20);
-   ctx.lineTo(460, 370);
-   ctx.lineTo(970, 370);
-   ctx.lineTo(970, 20);
-   ctx.lineTo(460, 20);
-   ctx.stroke();
+   // ctx.beginPath();
+   // ctx.moveTo(480, 280);
+   // ctx.lineTo(480, 130);
+   // ctx.lineTo(620, 130);
+   // ctx.lineTo(620, 280);
+   // ctx.lineTo(480, 280);
+   // ctx.stroke();
+
+   // ctx.beginPath();
+   // ctx.moveTo(620, 160);
+   // ctx.lineTo(620, 220);
+   // ctx.lineTo(660, 220);
+   // ctx.lineTo(660, 160);
+   // ctx.lineTo(620, 160);
+   // ctx.stroke();
+   // ctx.lineWidth = 1;
 
    requestAnimationFrame(display);
 }
