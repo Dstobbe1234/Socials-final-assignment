@@ -1,29 +1,43 @@
 <!DOCTYPE html>
-<html lang="en" id ="page">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <img src="img/restaurant.png" alt="restaurant" style="display:none" id="restaurant">
-    <img src="img/concurrence restaurant.png" alt="concurrence" style="display:none" id="competition">
-    <img src="img/world-map.png" alt="background" id="background" style="display:none">
-    <img src="img/clouds.png" id="clouds-img" alt="clouds" style="display:none">
-    <img src="img/boat.png" alt="boat" id="boat" style="display:none">
+<html lang="en" id="page">
 
-    <img src="img/Trade Avocat.png" alt="avocadoTrade" id="avocadoTrade" style="display:none">
-    <img src="img/Trade Sweet Potato.png" alt="sweetPotatoTrade" id="sweetPotatoTrade" style="display:none">
-    <img src="img/Trade Citron.png" alt="citronTrade" id="citronTrade" style="display:none">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <img src="img/restaurant.png" alt="restaurant" style="display: none" id="restaurant" />
+    <img src="img/concurrence restaurant.png" alt="concurrence" style="display: none" id="competition" />
+    <img src="img/world-map.png" alt="background" id="background" style="display: none" />
+    <img src="img/clouds.png" id="clouds-img" alt="clouds" style="display:none" />
+    <img src="img/boat.png" alt="boat" id="boat" style="display: none" />
+    <img src="img/Trade Avocat.png" alt="avocadoTrade" id="avocadoTrade" style="display: none" />
+    <img src="img/Trade Sweet Potato.png" alt="sweetPotatoTrade" id="sweetPotatoTrade" style="display: none" />
+    <img src="img/Trade Citron.png" alt="citronTrade" id="citronTrade" style="display: none" />
+    <img src="img/Trade Apple.png" alt="appleTrade" id="appleTrade" style="display: none" />
+    <img src="img/Trade Cherry.png" alt="CherryTrade" id="cherryTrade" style="display: none" />
+    <img src="img/Trade Chili Pepper.png" alt="ChiliPepperTrade" id="chiliPepperTrade" style="display: none" />
+    <img src="img/Trade Quandong.png" alt="QuandongTrade" id="quandongTrade" style="display: none" />
+    <img src="img/Trade Orange.png" alt="OrangeTrade" id="orangeTrade" style="display: none" />
+    <img src="img/Trade_Watermelon.png" alt="WatermelonTrade" id="watermelonTrade" style="display: none" />
+    <img src="img/Trade Banane.png" alt="BananeTrade" id="bananaTrade" style="display: none" />
 
     <canvas id="canvas"></canvas>
 
+    <div id="stats">
+        <p style="float:left; margin-left: 5px;">$<span id="amount">0</span></p>
+        <p style="float:left; margin-left: 50px;">Reputation: <span id="reputation">10</span></p>
+    </div>
+
     <div id="sidebar">
-        <p>$<span id="amount">0</span></p>   <p>Reputation: <span id="reputation">10</span></p>
-        <p><span id="restaurantAmount">1</span><img src="img/restaurant.png" alt="restaurant"></p>
-        <img id="restaurant" src="img/restaurant.png" alt="restaurant">
+        <p>
+            <span id="restaurantAmount">1</span><img src="img/restaurant.png" alt="restaurant" />
+        </p>
+        <img id="restaurant" src="img/restaurant.png" alt="restaurant" />
         <p><button id="buy">Buy Store (-$50; +$2/s)</button></p>
 
         <button id="buyBoat">Buy Boat</button>
@@ -31,20 +45,33 @@
         <div id="inventory">
             <h4>Ongoing trades</h4>
             <p>South America</p>
-            <p><img src="img/blankTrade.png" alt="avocado" id="avocado" class="tnProduct"></p>
+            <p><img src="img/blankTrade.png" alt="avocado" id="avocado" class="tnProduct" /></p>
+            <p>
+                <img src="img/blankTrade.png" alt="sweetPotato" id="sweetPotato" class="tnProduct" />
+            </p>
             <p>Europe</p>
-            <p><img src="img/blankTrade.png" alt="citron" id="citron" class="tnProduct"></p>
+            <p><img src="img/blankTrade.png" alt="apple" id="apple" class="tnProduct" /></p>
+            <p>Asia</p>
+            <p><img src="img/blankTrade.png" alt="banana" id="banana" class="tnProduct" /></p>
+            <p><img src="img/blankTrade.png" alt="orange" id="orange" class="tnProduct" /></p>
+            <p><img src="img/blankTrade.png" alt="lemon" id="lemon" class="tnProduct" /></p>
             <p>Africa / Middle East</p>
-            <p><img src="img/blankTrade.png" alt="watermelon" id="watermelon" class="tnProduct"></p>
+            <p>
+                <img src="img/blankTrade.png" alt="watermelon" id="watermelon" class="tnProduct" />
+            </p>
+            <p><img src="img/blankTrade.png" alt="cherry" id="cherry" class="tnProduct" /></p>
             <p>Australia</p>
+            <p>
+                <img src="img/blankTrade.png" alt="quandong" id="quandong" class="tnProduct" />
+            </p>
         </div>
     </div>
 
-    <div id="taxesModal">
+    <div id="taxesModal" class="modal">
         <div class="modal-content">
             <h1>Taxes:</h1>
-            <p>Total Income = <span id = "income"></span></p>
-            <p>Income per store = <span id = "storeIncome"></span></p>
+            <p>Total Income = <span id="income"></span></p>
+            <p>Income per store = <span id="storeIncome"></span></p>
             <p id="taxes"></p>
             <p>Total: <span id="total"></span>$</p>
             <button id="hide">Pay</button>
@@ -52,7 +79,7 @@
         </div>
     </div>
 
-    <div id="competitionModal">
+    <div id="competitionModal" class="modal">
         <div class="modal-content">
             <h1>BUY COMPETITION</h1>
             <p>-100$ +20 pop</p>
@@ -62,18 +89,26 @@
     </div>
 
     <div id="tradeOptions">
-        <p><img src="img/FairTrade.png" alt="fairTrade" id="fairTradeOption">(-100$ per month, +40 pop)</p>
-        <p><img src="img/ExploitedOption.png" alt="exploited" id="exploitedTradeOption">(-25$ per month, +10 pop)</p>
+        <p>
+            <img src="img/FairTrade.png" alt="fairTrade" id="fairTradeOption" />(-100$ per month,
+            +40 pop)
+        </p>
+        <p>
+            <img src="img/ExploitedOption.png" alt="exploited" id="exploitedTradeOption" />(-25$ per
+            month, +10 pop)
+        </p>
     </div>
 
-    <div id="monthlyExpenses">
-        <h1>Monthly Expenses</h1>
-        <p>Transnational trades: <span id="tradeInfo">None</span></p>
-        <p>Worker Salaries: <span id="salaryInfo"></span>$</p>
-        <button id="payMonthlyExpenses">Pay</button>
+    <div id="monthlyExpenses" class="modal">
+        <div class="modal-content">
+            <h1>Monthly Expenses</h1>
+            <p>Transnational trades: <span id="tradeInfo">None</span></p>
+            <p>Worker Salaries: <span id="salaryInfo"></span>$</p>
+            <button id="payMonthlyExpenses">Pay</button>
+        </div>
     </div>
 
-
-<script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
+
 </html>

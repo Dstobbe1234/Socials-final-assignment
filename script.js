@@ -40,6 +40,7 @@ const exploitedTradeOption = document.getElementById('exploitedTradeOption');
 const fairTradeOption = document.getElementById('fairTradeOption');
 const tradeInfo = document.getElementById('tradeInfo');
 const payMEBtn = document.getElementById('payMonthlyExpenses');
+const evadeBtn = document.getElementById('evade');
 
 function getRandInt(min, max) {
    // min and max are included
@@ -52,7 +53,7 @@ let mouseDown = false;
 let dragRestaurant = false;
 let numberOfRestaurants = 1;
 let money = 0;
-let randomInterval = getRandInt(500, 1000);
+let randomInterval = getRandInt(50, 50);
 let randomX, randomY;
 let randomIndex;
 let repetition = 0;
@@ -74,12 +75,14 @@ let pollution = 0;
 let pollutionPercentage = 0;
 let gameOver = false;
 let income = 0;
-let taxBool = false;
+let modalBool = false;
 let reputation = 10;
 let buyCompetitionBool = false;
 let totalTaxAmt = 0;
 let avocado = false;
 let lemon = false;
+let orange = false;
+let watermelon;
 let cloudBools = {
    sAmerica: true,
    europe: true,
@@ -111,14 +114,14 @@ exploitedTradeOption.addEventListener('click', () => {
    chooseTradeOption();
 });
 payMEBtn.addEventListener('click', payMonthlyExpenses);
-
+modalBtn.addEventListener('click', evadeTaxes);
 cloudsImg.addEventListener('load', () => {
    let colors = [
-      { continent: 'sAmerica', color: 'rgb(0, 255, 0)', intensity: 0.3 },
-      { continent: 'europe', color: 'rgb(0, 0, 255)', intensity: 0.3 },
-      { continent: 'asia', color: 'rgb(255, 0, 0)', intensity: 0.3 },
-      { continent: 'australia', color: 'rgb(191, 64, 191)', intensity: 0.5 },
-      { continent: 'africa', color: 'rgb(255, 255, 0)', intensity: 0.3 },
+      { continent: 'sAmerica', color: 'lightgreen', intensity: 0.5 },
+      { continent: 'europe', color: 'blue', intensity: 0.3 },
+      { continent: 'asia', color: 'red', intensity: 0.3 },
+      { continent: 'australia', color: 'purple', intensity: 0.5 },
+      { continent: 'africa', color: 'yellow', intensity: 0.5 },
    ];
 
    for (let c = 0; c < colors.length; c++) {
@@ -207,6 +210,9 @@ class tile {
 
       const wageText = `MW: $${this.minimumWage}`;
       ctx.fillText(wageText, centerText(wageText, this.viewInfo), this.viewInfo.y + 35);
+
+      const idText = `id: ${this.id}`;
+      ctx.fillText(idText, centerText(idText, this.viewInfo), this.viewInfo.y + 45);
    }
 
    draw() {
@@ -268,17 +274,29 @@ class tile {
          }
       }
 
-      if (this.id === 289 && !this.clouded) {
+      if (this.id === 265 && !this.clouded) {
          if (this.trade !== 'done') {
             this.trade = document.getElementById('avocadoTrade');
          } else {
             avocado = true;
          }
-      } else if (this.id === 249 && !this.clouded) {
+      } else if (this.id === 215 && !this.clouded) {
          if (this.trade !== 'done') {
             this.trade = document.getElementById('citronTrade');
          } else {
             lemon = true;
+         }
+      } else if (this.id === 191 && !this.clouded) {
+         if (this.trade !== 'done') {
+            this.trade = document.getElementById('orangeTrade');
+         } else {
+            orange = true;
+         }
+      } else if (this.id === 129 && !this.clouded) {
+         if (this.trade !== 'done') {
+            this.trade = document.getElementById('watermelonTrade');
+         } else {
+            watermelon = true;
          }
       }
 
@@ -299,7 +317,7 @@ class tile {
          mouseDown &&
          !dragRestaurant &&
          this.status === 'competition' &&
-         taxBool === false
+         modalBool === false
       ) {
          this.competitionClicked = true;
          competitionTaxRate.innerHTML = this.taxRate;
@@ -463,12 +481,11 @@ function createTiles() {
                tileId === 163 ||
                tileId === 140
             ) {
-               ctx.beginPath();
                europe.push(new tile(x, y, tileSize, 'europe', tileId));
             } else if (
-               x >= 460 &&
+               x >= 580 &&
                x <= 970 &&
-               y >= 20 &&
+               y >= 80 &&
                y <= 370
                //africa.includes(new tile(x, y, tileSize, 'africa')) === false
             ) {
@@ -492,22 +509,45 @@ function createTiles() {
          nAmerica[randomIndex].status = 'competition';
       }
    }
+   reputation;
 
    display();
 }
 
-function changeMoney() {
-   if (!taxBool) {
-      money += 2 * numberOfRestaurants;
-      income += 2 * numberOfRestaurants;
+function toStat(value) {
+   const valueAbs = Math.abs(value);
+   const sign = Math.sign(value);
+
+   if (valueAbs >= 1e18) {
+      return ((valueAbs / 1e18) * sign).toFixed(1) + '?';
+   } else if (valueAbs >= 1e15) {
+      return ((valueAbs / 1e15) * sign).toFixed(1) + 'q';
+   } else if (valueAbs >= 1e12) {
+      return ((valueAbs / 1e12) * sign).toFixed(1) + 't';
+   } else if (valueAbs >= 1e9) {
+      return ((valueAbs / 1e9) * sign).toFixed(1) + 'b';
+   } else if (valueAbs >= 1e6) {
+      return ((valueAbs / 1e6) * sign).toFixed(1) + 'm';
+   } else if (valueAbs >= 1e3) {
+      return ((valueAbs / 1e3) * sign).toFixed(1) + 'k';
+   } else {
+      return valueAbs * sign;
    }
-   amountEl.innerHTML = money;
 }
+
+function changeMoney() {
+   if (!modalBool) {
+      money += 1000000 * reputation;
+      income += 100 * reputation;
+   }
+   amountEl.innerHTML = toStat(money);
+}
+
 setInterval(changeMoney, 100);
 let storeNum = 0;
 function taxes() {
    if (income >= 0) {
-      taxBool = true;
+      modalBool = true;
       for (let i = 0; i < tiles.length; i++) {
          for (let n = 0; n < tiles[i].length; n++) {
             if (tiles[i][n].status === 'player') {
@@ -531,7 +571,7 @@ function taxes() {
 setTimeout(taxes, 18000);
 
 function payTaxes() {
-   taxBool = false;
+   modalBool = false;
    taxModalEl.style.display = 'none';
    taxInfo.innerHTML = '';
    money -= totalTaxAmt;
@@ -541,7 +581,20 @@ function payTaxes() {
    setTimeout(taxes, 18000);
 }
 
+function evadeTaxes() {
+   if (reputation === 1000) {
+      modalBool = false;
+      taxModalEl.style.display = 'none';
+      taxInfo.innerHTML = '';
+      totalTaxAmt = 0;
+      storeNum = 0;
+      income = 0;
+      setTimeout(taxes, 18000);
+   }
+}
+
 function monthlyExpenses() {
+   modalBool = true;
    totalSalaryCosts = 0;
    monthlyExpensesEl.style.display = 'block';
    mergedTiles = tiles.flat(1);
@@ -555,9 +608,10 @@ function monthlyExpenses() {
    }
    salaryInfo.innerHTML = totalSalaryCosts;
 }
-setTimeout(monthlyExpenses, 4500);
+setTimeout(monthlyExpenses, 10000);
 
 function payMonthlyExpenses() {
+   modalBool = false;
    money -= monthlyTradeCosts + totalSalaryCosts;
    monthlyExpensesEl.style.display = 'none';
    setTimeout(monthlyExpenses, 4500);
@@ -631,9 +685,16 @@ function display() {
    }
 
    if (lemon) {
-      document.getElementById('citron').src = 'img/Citron.png';
+      document.getElementById('lemon').src = 'img/Citron.png';
    }
 
+   if (orange) {
+      document.getElementById('orange').src = 'img/orange.png';
+   }
+
+   if (watermelon) {
+      document.getElementById('watermelon').src = 'img/watermelon.png';
+   }
    // Draw pollution bar
    ctx.strokeStyle = 'rgb(255, 255, 255)';
    ctx.strokeRect(35, cnv.height - 50, 175, 30);
@@ -670,59 +731,10 @@ function display() {
    if (boatDrag) {
       ctx.drawImage(boat, mouseX - 50, mouseY - 50, 100, 100);
    }
+
    reputationEl.innerHTML = reputation;
+
    trading();
-
-   // ctx.strokeStyle = 'black';
-   // ctx.lineWidth = 3;
-   // ctx.beginPath();
-   // ctx.moveTo(250, 350);
-   // ctx.lineTo(250, 550);
-   // ctx.lineTo(400, 550);
-   // ctx.lineTo(400, 350);
-   // ctx.lineTo(250, 350);
-   // ctx.stroke();
-
-   // ctx.beginPath();
-   // ctx.moveTo(430, 310);
-   // ctx.lineTo(430, 510);
-   // ctx.lineTo(575, 510);
-   // ctx.lineTo(575, 310);
-   // ctx.lineTo(430, 310);
-   // ctx.stroke();
-
-   // ctx.beginPath();
-   // ctx.moveTo(280, 0);
-   // ctx.lineTo(280, 200);
-   // ctx.lineTo(400, 200);
-   // ctx.lineTo(400, 0);
-   // ctx.lineTo(280, 0);
-   // ctx.stroke();
-
-   // ctx.beginPath();
-   // ctx.moveTo(460, 20);
-   // ctx.lineTo(460, 370);
-   // ctx.lineTo(970, 370);
-   // ctx.lineTo(970, 20);
-   // ctx.lineTo(460, 20);
-   // ctx.stroke();
-
-   // ctx.beginPath();
-   // ctx.moveTo(480, 280);
-   // ctx.lineTo(480, 130);
-   // ctx.lineTo(620, 130);
-   // ctx.lineTo(620, 280);
-   // ctx.lineTo(480, 280);
-   // ctx.stroke();
-
-   // ctx.beginPath();
-   // ctx.moveTo(620, 160);
-   // ctx.lineTo(620, 220);
-   // ctx.lineTo(660, 220);
-   // ctx.lineTo(660, 160);
-   // ctx.lineTo(620, 160);
-   // ctx.stroke();
-   // ctx.lineWidth = 1;
 
    requestAnimationFrame(display);
 }
@@ -734,17 +746,22 @@ function trading() {
    repetition++;
 
    if (repetition === randomInterval) {
+      console.log('1');
       mergedTiles = tiles.flat(1);
       possibleTrades = mergedTiles.filter((tile) => tile.trade !== 'none');
       chosenTrade = possibleTrades[getRandInt(0, possibleTrades.length - 1)];
-      if (typeof chosenTrade !== 'undefined' && chosenTrade.trade !== 'done') {
+
+      if (chosenTrade && chosenTrade.trade !== 'done') {
+         console.log('2');
          trade = true;
       } else {
-         randomInterval = getRandInt(500, 1000);
+         randomInterval = getRandInt(50, 5000);
          repetition = 0;
       }
    }
    if (trade) {
+      console.log('3');
+      console.log('EEEEEEE');
       displayDuration++;
       ctx.drawImage(chosenTrade.trade, chosenTrade.x, chosenTrade.y - 150, 150, 150);
       if (
@@ -765,7 +782,7 @@ function trading() {
          trade = false;
          displayDuration = 0;
          repetition = 0;
-         randomInterval = getRandInt(500, 1000);
+         randomInterval = getRandInt(50, 5000);
       }
    }
 }
@@ -782,6 +799,6 @@ function chooseTradeOption() {
    chosenTrade.trade = 'done';
    displayDuration = 0;
    repetition = 0;
-   randomInterval = getRandInt(500, 1000);
+   randomInterval = getRandInt(50, 5000);
    tradeOptions.style.display = 'none';
 }
