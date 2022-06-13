@@ -99,3 +99,7 @@ canvas {
    margin-top: 100px;
    margin-right: 100px;
 }
+
+#evadeBtn {
+   background: red
+}

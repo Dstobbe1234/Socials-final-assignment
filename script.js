@@ -41,6 +41,7 @@ const fairTradeOption = document.getElementById('fairTradeOption');
 const tradeInfo = document.getElementById('tradeInfo');
 const payMEBtn = document.getElementById('payMonthlyExpenses');
 const evadeBtn = document.getElementById('evade');
+const monthlyExpensesTot = document.getElementById('monthlyExpensesTot')
 
 function getRandInt(min, max) {
    // min and max are included
@@ -53,7 +54,7 @@ let mouseDown = false;
 let dragRestaurant = false;
 let numberOfRestaurants = 1;
 let money = 0;
-let randomInterval = getRandInt(50, 50);
+let randomInterval = getRandInt(50, 5000);
 let randomX, randomY;
 let randomIndex;
 let repetition = 0;
@@ -114,7 +115,7 @@ exploitedTradeOption.addEventListener('click', () => {
    chooseTradeOption();
 });
 payMEBtn.addEventListener('click', payMonthlyExpenses);
-modalBtn.addEventListener('click', evadeTaxes);
+evadeBtn.addEventListener('click', evadeTaxes)
 cloudsImg.addEventListener('load', () => {
    let colors = [
       { continent: 'sAmerica', color: 'lightgreen', intensity: 0.5 },
@@ -292,7 +293,7 @@ class tile {
          } else {
             orange = true;
          }
-      } else if (this.id === 129 && !this.clouded) {
+      } else if (this.id === 244 && !this.clouded) {
          if (this.trade !== 'done') {
             this.trade = document.getElementById('watermelonTrade');
          } else {
@@ -537,7 +538,7 @@ function toStat(value) {
 
 function changeMoney() {
    if (!modalBool) {
-      money += 1000000 * reputation;
+      money += 100 * reputation;
       income += 100 * reputation;
    }
    amountEl.innerHTML = toStat(money);
@@ -582,7 +583,8 @@ function payTaxes() {
 }
 
 function evadeTaxes() {
-   if (reputation === 1000) {
+   console.log('eee')
+   if (reputation >= 20) {
       modalBool = false;
       taxModalEl.style.display = 'none';
       taxInfo.innerHTML = '';
@@ -593,6 +595,7 @@ function evadeTaxes() {
    }
 }
 
+let stores = 0;
 function monthlyExpenses() {
    modalBool = true;
    totalSalaryCosts = 0;
@@ -600,24 +603,33 @@ function monthlyExpenses() {
    mergedTiles = tiles.flat(1);
    for (let x = 0; x < mergedTiles.length; x++) {
       if (mergedTiles[x].status === 'player') {
+         stores ++
+         salaryInfo.innerHTML += `<br>Store # ${stores} <br>Continent: ${mergedTiles[x].continent}<br>Monthly Salary per employee: ${mergedTiles[x].minimumWage}$ (*5)`
          totalSalaryCosts += mergedTiles[x].minimumWage * 5;
       }
    }
    if (monthlyTradeCosts !== 0) {
       tradeInfo.innerHTML = monthlyTradeCosts;
    }
-   salaryInfo.innerHTML = totalSalaryCosts;
+   console.log(money)
+   monthlyExpensesTot.innerHTML = monthlyTradeCosts + totalSalaryCosts;
 }
 setTimeout(monthlyExpenses, 10000);
 
 function payMonthlyExpenses() {
    modalBool = false;
-   money -= monthlyTradeCosts + totalSalaryCosts;
+   money -= (monthlyTradeCosts + totalSalaryCosts);
    monthlyExpensesEl.style.display = 'none';
+   stores = 0
+   salaryInfo.innerHTML = ''
+   monthlyExpensesTot.innerHTML = ''
+   totalSalaryCosts = 0
+
    setTimeout(monthlyExpenses, 4500);
    if (money < 0) {
       console.log('bankrupt');
    }
+   console.log(money)
 }
 
 function boatPlace() {
