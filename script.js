@@ -29,8 +29,8 @@ const competitionTaxRate = document.getElementById('rate');
 const storeIncome = document.getElementById('storeIncome');
 const totalTaxAmtEl = document.getElementById('total');
 const avocadoTrade = document.getElementById('avocadoTrade');
-const sweetPotato = document.getElementById('sweetPotato');
-const sweetPotatoTrade = document.getElementById('sweetPotatoTrade');
+// const sweetPotato = document.getElementById('sweetPotato');
+// const sweetPotatoTrade = document.getElementById('sweetPotatoTrade');
 const monthlyExpensesEl = document.getElementById('monthlyExpenses');
 const page = document.getElementById('page');
 const salaryInfo = document.getElementById('salaryInfo');
@@ -41,6 +41,7 @@ const fairTradeOption = document.getElementById('fairTradeOption');
 const tradeInfo = document.getElementById('tradeInfo');
 const payMEBtn = document.getElementById('payMonthlyExpenses');
 const evadeBtn = document.getElementById('evade');
+const monthlyExpensesTot = document.getElementById('monthlyExpensesTot');
 
 function getRandInt(min, max) {
    // min and max are included
@@ -53,7 +54,7 @@ let mouseDown = false;
 let dragRestaurant = false;
 let numberOfRestaurants = 1;
 let money = 0;
-let randomInterval = getRandInt(50, 50);
+let randomInterval = getRandInt(50, 1000);
 let randomX, randomY;
 let randomIndex;
 let repetition = 0;
@@ -82,7 +83,10 @@ let totalTaxAmt = 0;
 let avocado = false;
 let lemon = false;
 let orange = false;
-let watermelon;
+let quandong = false;
+let watermelon = false;
+let apple = false;
+let sweetPotato = false;
 let cloudBools = {
    sAmerica: true,
    europe: true,
@@ -116,7 +120,7 @@ exploitedTradeOption.addEventListener('click', () => {
    chooseTradeOption();
 });
 payMEBtn.addEventListener('click', payMonthlyExpenses);
-modalBtn.addEventListener('click', evadeTaxes);
+evadeBtn.addEventListener('click', evadeTaxes);
 cloudsImg.addEventListener('load', () => {
    let colors = [
       { continent: 'sAmerica', color: 'lightgreen', intensity: 0.5 },
@@ -294,11 +298,29 @@ class tile {
          } else {
             orange = true;
          }
-      } else if (this.id === 129 && !this.clouded) {
+      } else if (this.id === 244 && !this.clouded) {
          if (this.trade !== 'done') {
             this.trade = document.getElementById('watermelonTrade');
          } else {
             watermelon = true;
+         }
+      } else if (this.id === 281 && !this.clouded) {
+         if (this.trade !== 'done') {
+            this.trade = document.getElementById('quandongTrade');
+         } else {
+            quandong = true;
+         }
+      } else if (this.id === 117 && !this.clouded) {
+         if (this.trade !== 'done') {
+            this.trade = document.getElementById('appleTrade');
+         } else {
+            apple = true;
+         }
+      } else if (this.id === 252 && !this.clouded) {
+         if (this.trade !== 'done') {
+            this.trade = document.getElementById('sweetPotatoTrade');
+         } else {
+            sweetPotato = true;
          }
       }
 
@@ -539,7 +561,7 @@ function toStat(value) {
 
 function changeMoney() {
    if (!modalBool) {
-      money += 1000000 * reputation;
+      money += 100 * reputation;
       income += 100 * reputation;
    }
    amountEl.innerHTML = toStat(money);
@@ -584,7 +606,8 @@ function payTaxes() {
 }
 
 function evadeTaxes() {
-   if (reputation === 1000) {
+   console.log('eee');
+   if (reputation >= 20) {
       modalBool = false;
       taxModalEl.style.display = 'none';
       taxInfo.innerHTML = '';
@@ -595,6 +618,7 @@ function evadeTaxes() {
    }
 }
 
+let stores = 0;
 function monthlyExpenses() {
    modalBool = true;
    totalSalaryCosts = 0;
@@ -602,13 +626,16 @@ function monthlyExpenses() {
    mergedTiles = tiles.flat(1);
    for (let x = 0; x < mergedTiles.length; x++) {
       if (mergedTiles[x].status === 'player') {
+         stores++;
+         salaryInfo.innerHTML += `<br>Store # ${stores} <br>Continent: ${mergedTiles[x].continent}<br>Monthly Salary per employee: ${mergedTiles[x].minimumWage}$ (*5)`;
          totalSalaryCosts += mergedTiles[x].minimumWage * 5;
       }
    }
    if (monthlyTradeCosts !== 0) {
       tradeInfo.innerHTML = monthlyTradeCosts;
    }
-   salaryInfo.innerHTML = totalSalaryCosts;
+   console.log(money);
+   monthlyExpensesTot.innerHTML = monthlyTradeCosts + totalSalaryCosts;
 }
 setTimeout(monthlyExpenses, monthlyInterval);
 
@@ -620,6 +647,7 @@ function payMonthlyExpenses() {
    if (money < 0) {
       console.log('bankrupt');
    }
+   console.log(money);
 }
 
 function boatPlace() {
@@ -643,6 +671,8 @@ setInterval(competitionGrowth, competitionInterval);
 
 // Animation loop
 function display() {
+   console.log(randomInterval);
+   console.log(repetition);
    // Draw world map
    const colorPercentage = 1 - pollutionPercentage;
 
@@ -697,6 +727,18 @@ function display() {
    if (watermelon) {
       document.getElementById('watermelon').src = 'img/watermelon.png';
    }
+
+   if (quandong) {
+      document.getElementById('quandong').src = 'img/Quandong.png';
+   }
+
+   if (apple) {
+      document.getElementById('apple').src = 'img/Apple.png';
+   }
+
+   if (sweetPotato) {
+      document.getElementById('sweetPotato').src = 'img/Sweet Potato.png';
+   }
    // Draw pollution bar
    ctx.strokeStyle = 'rgb(255, 255, 255)';
    ctx.strokeRect(35, cnv.height - 50, 175, 30);
@@ -748,16 +790,15 @@ function trading() {
    repetition++;
 
    if (repetition === randomInterval) {
-      console.log('1');
       mergedTiles = tiles.flat(1);
-      possibleTrades = mergedTiles.filter((tile) => tile.trade !== 'none');
+      possibleTrades = mergedTiles.filter((tile) => tile.trade !== 'none' || tile.trade !== 'done');
       chosenTrade = possibleTrades[getRandInt(0, possibleTrades.length - 1)];
 
       if (chosenTrade && chosenTrade.trade !== 'done') {
          console.log('2');
          trade = true;
       } else {
-         randomInterval = getRandInt(50, 5000);
+         randomInterval = getRandInt(50, 1000);
          repetition = 0;
       }
    }
@@ -784,7 +825,7 @@ function trading() {
          trade = false;
          displayDuration = 0;
          repetition = 0;
-         randomInterval = getRandInt(50, 5000);
+         randomInterval = getRandInt(50, 1000);
       }
    }
 }
@@ -801,6 +842,6 @@ function chooseTradeOption() {
    chosenTrade.trade = 'done';
    displayDuration = 0;
    repetition = 0;
-   randomInterval = getRandInt(50, 5000);
+   randomInterval = getRandInt(50, 1000);
    tradeOptions.style.display = 'none';
 }
