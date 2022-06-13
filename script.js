@@ -95,6 +95,8 @@ let monthlyTradeCosts = 0;
 let totalSalaryCosts;
 let lastTileId;
 let cloudImages = {};
+const taxesInterval = 18000;
+const monthlyInterval = 20000;
 
 //Event Listeners
 buyBtn.addEventListener('click', drag);
@@ -565,10 +567,10 @@ function taxes() {
       }
       taxModalEl.style.display = 'block';
    } else {
-      setTimeout(taxes, 18000);
+      setTimeout(taxes, taxesInterval);
    }
 }
-setTimeout(taxes, 18000);
+setTimeout(taxes, taxesInterval);
 
 function payTaxes() {
    modalBool = false;
@@ -578,7 +580,7 @@ function payTaxes() {
    totalTaxAmt = 0;
    storeNum = 0;
    income = 0;
-   setTimeout(taxes, 18000);
+   setTimeout(taxes, taxesInterval);
 }
 
 function evadeTaxes() {
@@ -589,7 +591,7 @@ function evadeTaxes() {
       totalTaxAmt = 0;
       storeNum = 0;
       income = 0;
-      setTimeout(taxes, 18000);
+      setTimeout(taxes, taxesInterval);
    }
 }
 
@@ -608,13 +610,13 @@ function monthlyExpenses() {
    }
    salaryInfo.innerHTML = totalSalaryCosts;
 }
-setTimeout(monthlyExpenses, 10000);
+setTimeout(monthlyExpenses, monthlyInterval);
 
 function payMonthlyExpenses() {
    modalBool = false;
    money -= monthlyTradeCosts + totalSalaryCosts;
    monthlyExpensesEl.style.display = 'none';
-   setTimeout(monthlyExpenses, 4500);
+   setTimeout(monthlyExpenses, monthlyInterval);
    if (money < 0) {
       console.log('bankrupt');
    }
