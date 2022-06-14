@@ -17,12 +17,6 @@ body {
    padding-right: 10px;
 }
 
-.vl {
-   border-left: 2px solid rgb(49, 32, 56);
-   height: 49px;
-   position: absolute;
-}
-
 .stats-content {
    position: absolute;
    top: 15px;

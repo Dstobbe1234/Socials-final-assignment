@@ -771,7 +771,7 @@ function display() {
       ctx.drawImage(boat, mouseX - 50, mouseY - 50, 100, 100);
    }
 
-   reputationEl.innerHTML = reputation;
+   reputationEl.innerHTML = toStat(reputation);
 
    trading();
 
