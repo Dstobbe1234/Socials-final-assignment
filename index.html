@@ -26,14 +26,17 @@
     <canvas id="canvas"></canvas>
 
     <div id="stats">
-        <p style="float:left; margin-left: 5px;">$<span id="amount">0</span></p>
-        <p style="position:absolute; margin-left: 100px;">Reputation: <span id="reputation">10</span></p>
+        <p style="float:left; margin-left:5px; margin-top:15px">$<span id="amount">0</span></p>
+        <div class="vl" style="left:77px"></div>
+        <p class="stats-content" style="left:100px;">Reputation: <span id="reputation">10</span></p>
+        <div class="vl" style="left:222px"></div>
+        <div class="stats-content" style="left:250px; top:0px; padding-top:13px;">
+            <span style="vertical-align: bottom; font-size:large;" id="restaurantAmount">1</span>
+            <img style="width:30px; vertical-align:top;" src="img/restaurant.png" alt="restaurant" />
+        </div>
     </div>
 
     <div id="sidebar">
-        <p>
-            <span id="restaurantAmount">1</span><img src="img/restaurant.png" alt="restaurant" />
-        </p>
         <img id="restaurant" src="img/restaurant.png" alt="restaurant" />
         <p><button id="buy">Buy Store (-$50; +$2/s)</button></p>
 
@@ -86,12 +89,12 @@
     <div id="tradeOptions">
         <p>
             <img src="img/FairTrade.png" alt="fairTrade" id="fairTradeOption" class="tradeOption" />(-100$ per month,
-            +40 pop)
+            +40 reputation)
         </p>
         <p>
             <img src="img/ExploitedOption.png" alt="exploited" id="exploitedTradeOption" class="tradeOptions" />(-25$
             per
-            month, +10 pop)
+            month, +10 reputation)
         </p>
     </div>
 
