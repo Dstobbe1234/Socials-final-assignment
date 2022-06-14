@@ -365,8 +365,9 @@ function cancel() {
 }
 
 function buyCompetition() {
-   if (money >= 100 && buyCompetitionBool === false) {
-      money -= 100;
+   if (money >= 15000 && buyCompetitionBool === false) {
+      money -= 15000;
+      income -= 15000;
       reputation += 20;
       buyCompetitionBool = true;
       competitionModal.style.display = 'none';
@@ -442,9 +443,9 @@ class cloud {
 
 //Event Functions
 function drag() {
-   if (money >= 50 && !dragRestaurant && !boatDrag) {
-      money -= 50;
-      income -= 50;
+   if (money >= 10000 && !dragRestaurant && !boatDrag) {
+      money -= 10000;
+      income -= 10000;
       dragRestaurant = true;
    }
 }
@@ -589,6 +590,7 @@ setTimeout(monthlyExpenses, monthlyInterval);
 function payMonthlyExpenses() {
    modalBool = false;
    money -= monthlyTradeCosts + totalSalaryCosts;
+   income -= monthlyTradeCosts + totalSalaryCosts;
    monthlyExpensesEl.style.display = 'none';
    salaryInfo.innerHTML = ''
    if (money < 0) {
@@ -650,9 +652,9 @@ function evadeTaxes() {
 }
 
 function boatPlace() {
-   if (money >= 1000) {
-      money -= 1000;
-      income -= 1000;
+   if (money >= 1000000) {
+      money -= 1000000;
+      income -= 1000000;
       boatDrag = true;
    }
 }
@@ -759,13 +761,13 @@ function display() {
          }
       }
    }
-   if (money >= 50) {
+   if (money >= 10000) {
       buyBtn.classList.add('available');
    } else {
       buyBtn.classList.remove('available');
    }
 
-   if (money >= 1000) {
+   if (money >= 1000000) {
       buyBoatBtn.classList.add('available');
    } else {
       buyBoatBtn.classList.remove('available');
