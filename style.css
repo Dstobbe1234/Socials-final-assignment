@@ -7,7 +7,7 @@ body {
 
 #stats {
    background-color: rgb(63, 42, 73);
-   max-width: 220px;
+   width: 220px;
    color: rgb(192, 192, 192);
    position: absolute;
    top: 0px;
@@ -105,5 +105,5 @@ canvas {
 }
 
 .tradeOptions {
-   width:50px;
+   width: 50px;
 }

@@ -97,10 +97,9 @@ let cloudBools = {
 let fairTrade;
 let monthlyTradeCosts = 0;
 let totalSalaryCosts;
-let lastTileId;
 let cloudImages = {};
-const taxesInterval = 18000;
-const monthlyInterval = 20000;
+const monthlyInterval = 85000;
+let monthlyCount = 0;
 
 //Event Listeners
 buyBtn.addEventListener('click', drag);
@@ -216,9 +215,6 @@ class tile {
 
       const wageText = `MW: $${this.minimumWage}`;
       ctx.fillText(wageText, centerText(wageText, this.viewInfo), this.viewInfo.y + 35);
-
-      const idText = `id: ${this.id}`;
-      ctx.fillText(idText, centerText(idText, this.viewInfo), this.viewInfo.y + 45);
    }
 
    draw() {
@@ -236,7 +232,6 @@ class tile {
          mouseY < this.y + this.size
       ) {
          this.inside = true;
-         lastTileId = this.id;
       } else {
          this.inside = false;
          this.color = 'rgb(0, 0, 0)';
@@ -566,10 +561,48 @@ function changeMoney() {
    }
    amountEl.innerHTML = toStat(money);
 }
-
 setInterval(changeMoney, 100);
-let storeNum = 0;
+
+function monthlyExpenses() {
+   let stores = 0;
+
+   monthlyCount++;
+   modalBool = true;
+   totalSalaryCosts = 0;
+   monthlyExpensesEl.style.display = 'block';
+   mergedTiles = tiles.flat(1);
+   for (let x = 0; x < mergedTiles.length; x++) {
+      if (mergedTiles[x].status === 'player') {
+         stores++;
+         salaryInfo.innerHTML += `<br>Store # ${stores} <br>Continent: ${mergedTiles[x].continent}<br>Monthly Salary per employee: ${mergedTiles[x].minimumWage}$ (*5)`;
+         totalSalaryCosts += mergedTiles[x].minimumWage * 5;
+      }
+   }
+   if (monthlyTradeCosts !== 0) {
+      tradeInfo.innerHTML = monthlyTradeCosts;
+   }
+   monthlyExpensesTot.innerHTML = monthlyTradeCosts + totalSalaryCosts;
+}
+setTimeout(monthlyExpenses, monthlyInterval);
+
+function payMonthlyExpenses() {
+   modalBool = false;
+   money -= monthlyTradeCosts + totalSalaryCosts;
+   monthlyExpensesEl.style.display = 'none';
+   if (money < 0) {
+      console.log('bankrupt');
+   }
+
+   if (monthlyCount >= 4) {
+      setTimeout(taxes, 200);
+   } else {
+      setTimeout(monthlyExpenses, monthlyInterval);
+   }
+}
+
 function taxes() {
+   let storeNum = 0;
+
    if (income >= 0) {
       modalBool = true;
       for (let i = 0; i < tiles.length; i++) {
@@ -588,11 +621,8 @@ function taxes() {
          }
       }
       taxModalEl.style.display = 'block';
-   } else {
-      setTimeout(taxes, taxesInterval);
    }
 }
-setTimeout(taxes, taxesInterval);
 
 function payTaxes() {
    modalBool = false;
@@ -600,54 +630,21 @@ function payTaxes() {
    taxInfo.innerHTML = '';
    money -= totalTaxAmt;
    totalTaxAmt = 0;
-   storeNum = 0;
    income = 0;
-   setTimeout(taxes, taxesInterval);
+
+   setTimeout(monthlyExpenses, monthlyInterval);
 }
 
 function evadeTaxes() {
-   console.log('eee');
    if (reputation >= 20) {
       modalBool = false;
       taxModalEl.style.display = 'none';
       taxInfo.innerHTML = '';
       totalTaxAmt = 0;
-      storeNum = 0;
       income = 0;
-      setTimeout(taxes, taxesInterval);
    }
-}
 
-let stores = 0;
-function monthlyExpenses() {
-   modalBool = true;
-   totalSalaryCosts = 0;
-   monthlyExpensesEl.style.display = 'block';
-   mergedTiles = tiles.flat(1);
-   for (let x = 0; x < mergedTiles.length; x++) {
-      if (mergedTiles[x].status === 'player') {
-         stores++;
-         salaryInfo.innerHTML += `<br>Store # ${stores} <br>Continent: ${mergedTiles[x].continent}<br>Monthly Salary per employee: ${mergedTiles[x].minimumWage}$ (*5)`;
-         totalSalaryCosts += mergedTiles[x].minimumWage * 5;
-      }
-   }
-   if (monthlyTradeCosts !== 0) {
-      tradeInfo.innerHTML = monthlyTradeCosts;
-   }
-   console.log(money);
-   monthlyExpensesTot.innerHTML = monthlyTradeCosts + totalSalaryCosts;
-}
-setTimeout(monthlyExpenses, monthlyInterval);
-
-function payMonthlyExpenses() {
-   modalBool = false;
-   money -= monthlyTradeCosts + totalSalaryCosts;
-   monthlyExpensesEl.style.display = 'none';
    setTimeout(monthlyExpenses, monthlyInterval);
-   if (money < 0) {
-      console.log('bankrupt');
-   }
-   console.log(money);
 }
 
 function boatPlace() {
@@ -671,8 +668,6 @@ setInterval(competitionGrowth, competitionInterval);
 
 // Animation loop
 function display() {
-   console.log(randomInterval);
-   console.log(repetition);
    // Draw world map
    const colorPercentage = 1 - pollutionPercentage;
 
@@ -705,7 +700,7 @@ function display() {
 
    if (!gameOver) {
       pollution += 0.5;
-      pollutionPercentage = pollution / 1000;
+      pollutionPercentage = pollution / 20000;
 
       if (pollutionPercentage === 1) {
          gameOver = true;
@@ -791,11 +786,10 @@ function trading() {
 
    if (repetition === randomInterval) {
       mergedTiles = tiles.flat(1);
-      possibleTrades = mergedTiles.filter((tile) => tile.trade !== 'none' || tile.trade !== 'done');
+      possibleTrades = mergedTiles.filter((tile) => tile.trade !== 'none' && tile.trade !== 'done');
       chosenTrade = possibleTrades[getRandInt(0, possibleTrades.length - 1)];
 
       if (chosenTrade && chosenTrade.trade !== 'done') {
-         console.log('2');
          trade = true;
       } else {
          randomInterval = getRandInt(50, 1000);
@@ -803,8 +797,6 @@ function trading() {
       }
    }
    if (trade) {
-      console.log('3');
-      console.log('EEEEEEE');
       displayDuration++;
       ctx.drawImage(chosenTrade.trade, chosenTrade.x, chosenTrade.y - 150, 150, 150);
       if (
