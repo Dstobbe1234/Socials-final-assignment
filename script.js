@@ -574,6 +574,7 @@ function monthlyExpenses() {
    for (let x = 0; x < mergedTiles.length; x++) {
       if (mergedTiles[x].status === 'player') {
          stores++;
+         console.log(stores)
          salaryInfo.innerHTML += `<br>Store # ${stores} <br>Continent: ${mergedTiles[x].continent}<br>Monthly Salary per employee: ${mergedTiles[x].minimumWage}$ (*5)`;
          totalSalaryCosts += mergedTiles[x].minimumWage * 5;
       }
@@ -589,6 +590,7 @@ function payMonthlyExpenses() {
    modalBool = false;
    money -= monthlyTradeCosts + totalSalaryCosts;
    monthlyExpensesEl.style.display = 'none';
+   salaryInfo.innerHTML = ''
    if (money < 0) {
       console.log('bankrupt');
    }
@@ -668,6 +670,8 @@ setInterval(competitionGrowth, competitionInterval);
 
 // Animation loop
 function display() {
+   mergedTiles = tiles.flat(1)
+   console.log(mergedTiles.length)
    // Draw world map
    const colorPercentage = 1 - pollutionPercentage;
 

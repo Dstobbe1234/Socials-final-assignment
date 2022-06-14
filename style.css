@@ -24,10 +24,11 @@ body {
 }
 
 #sidebar {
+   padding:0px;
    position: relative;
-   margin-top: 50px;
+   margin-top: 5px;
    background-color: rgb(175, 175, 175);
-   margin-left: 10px;
+   /* margin-left: 15px; */
    width: 200px;
    height: 700px;
    text-align: center;
@@ -58,6 +59,7 @@ body {
 
 img {
    width: 40px;
+   margin-bottom:none;
 }
 
 #restaurant {
@@ -80,12 +82,20 @@ img {
    overflow-y: scroll;
    background: white;
 }
-
+#boat {
+   width:100px;
+   margin:0px;
+}
 #buy {
    margin: 0px;
-   width: 100px;
+   width: 115px;
+   height: 60px;
 }
 
+#buyBoat {
+   width: 115px;
+   height: 60px;
+}
 #tradeOptions {
    display: 'none';
    position: fixed;
@@ -114,4 +124,12 @@ canvas {
 
 .tradeOptions {
    width: 50px;
+}
+
+p {
+   margin:none;
+}
+
+btn {
+   margin: none;
 }
