@@ -44,17 +44,25 @@ const evadeBtn = document.getElementById('evade');
 const monthlyExpensesTot = document.getElementById('monthlyExpensesTot');
 
 function getRandInt(min, max) {
+   if (Array.isArray(min)) {
+      max = min[1];
+      min = min[0];
+   }
+
    // min and max are included
    return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 // Global variables
-let mouseX, mouseY;
-let mouseDown = false;
+let mouse = {
+   clickedOn: '',
+   down: false,
+};
 let dragRestaurant = false;
 let numberOfRestaurants = 1;
 let money = 0;
-let randomInterval = getRandInt(50, 1000);
+const tradeInterval = [1, 1];
+let randomInterval = getRandInt(tradeInterval);
 let randomX, randomY;
 let randomIndex;
 let repetition = 0;
@@ -192,7 +200,7 @@ class tile {
    }
 
    drawInfo() {
-      if (!this.viewInfo.bool) return;
+      if (!this.viewInfo.bool || mouse.clickedOn) return;
 
       function centerText(text, viewInfo) {
          return viewInfo.x + viewInfo.w / 2 - ctx.measureText(text).width / 2;
@@ -226,10 +234,10 @@ class tile {
       }
 
       if (
-         mouseX > this.x &&
-         mouseX < this.x + this.size &&
-         mouseY > this.y &&
-         mouseY < this.y + this.size
+         mouse.x > this.x &&
+         mouse.x < this.x + this.size &&
+         mouse.y > this.y &&
+         mouse.y < this.y + this.size
       ) {
          this.inside = true;
       } else {
@@ -256,7 +264,7 @@ class tile {
       if (this.inside && dragRestaurant && !this.clouded) {
          ctx.drawImage(restaurantImg, this.x, this.y, this.size, this.size);
          if (this.status !== 'player' && this.status !== 'competition') {
-            if (mouseDown) {
+            if (mouse.down) {
                numberOfRestaurants++;
                this.status = 'player';
                dragRestaurant = false;
@@ -268,7 +276,8 @@ class tile {
             this.color = 'rgb(255, 0, 0)';
          }
       } else if (this.inside && boatDrag && this.continent !== 'nAmerica') {
-         if (mouseDown) {
+         if (mouse.down) {
+            mouse.clickedOn = 'boat';
             boatDrag = false;
             this.clouded = false;
             cloudBools[this.continent] = false;
@@ -318,12 +327,33 @@ class tile {
             sweetPotato = true;
          }
       }
-
-      if (this.inside && this.status === 'open' && !this.clouded && mouseDown) {
+      if (
+         this.inside &&
+         this.status === 'open' &&
+         !this.clouded &&
+         mouse.down &&
+         !mouse.clickedOn
+      ) {
          this.viewInfo.bool = true;
-         this.viewInfo.x = mouseX - this.viewInfo.w < 0 ? mouseX : mouseX - this.viewInfo.w;
-         this.viewInfo.y = mouseY < this.viewInfo.h ? mouseY : mouseY - this.viewInfo.h;
-      } else if (mouseDown) {
+         this.viewInfo.x = mouse.x - this.viewInfo.w < 0 ? mouse.x : mouse.x - this.viewInfo.w;
+         this.viewInfo.y = mouse.y < this.viewInfo.h ? mouse.y : mouse.y - this.viewInfo.h;
+
+         if (trade) {
+            if (
+               this.viewInfo.x + this.viewInfo.w >= chosenTrade.x &&
+               this.viewInfo.x < chosenTrade.x + 132 &&
+               this.viewInfo.y < chosenTrade.y &&
+               this.viewInfo.y > chosenTrade.y - 120 - this.viewInfo.h
+            ) {
+               if (mouse.x < chosenTrade.x + 132) {
+                  this.viewInfo.x = mouse.x;
+                  this.viewInfo.y = mouse.y;
+               } else {
+                  this.viewInfo.x = mouse.x;
+               }
+            }
+         }
+      } else if (mouse.down) {
          this.viewInfo.bool = false;
       }
 
@@ -333,7 +363,7 @@ class tile {
 
       if (
          this.inside &&
-         mouseDown &&
+         mouse.down &&
          !dragRestaurant &&
          this.status === 'competition' &&
          modalBool === false
@@ -451,16 +481,17 @@ function drag() {
 }
 
 function mousedownHandler() {
-   mouseDown = true;
+   mouse.down = true;
 }
 function mouseupHandler() {
-   mouseDown = false;
+   mouse.down = false;
+   mouse.clickedOn = '';
 }
 
 function mousemoveHandler(event) {
-   mouseX = event.x - cnv.getBoundingClientRect().x;
-   mouseY = event.y - cnv.getBoundingClientRect().y;
-   // console.log(mouseX, mouseY);
+   mouse.x = event.x - cnv.getBoundingClientRect().x;
+   mouse.y = event.y - cnv.getBoundingClientRect().y;
+   // console.log(mouse.x, mouse.y);
 }
 let tileId = 0;
 
@@ -575,7 +606,6 @@ function monthlyExpenses() {
    for (let x = 0; x < mergedTiles.length; x++) {
       if (mergedTiles[x].status === 'player') {
          stores++;
-         console.log(stores)
          salaryInfo.innerHTML += `<br>Store # ${stores} <br>Continent: ${mergedTiles[x].continent}<br>Monthly Salary per employee: ${mergedTiles[x].minimumWage}$ (*5)`;
          totalSalaryCosts += mergedTiles[x].minimumWage * 5;
       }
@@ -592,7 +622,7 @@ function payMonthlyExpenses() {
    money -= monthlyTradeCosts + totalSalaryCosts;
    income -= monthlyTradeCosts + totalSalaryCosts;
    monthlyExpensesEl.style.display = 'none';
-   salaryInfo.innerHTML = ''
+   salaryInfo.innerHTML = '';
    if (money < 0) {
       console.log('bankrupt');
    }
@@ -672,8 +702,7 @@ setInterval(competitionGrowth, competitionInterval);
 
 // Animation loop
 function display() {
-   mergedTiles = tiles.flat(1)
-   console.log(mergedTiles.length)
+   mergedTiles = tiles.flat(1);
    // Draw world map
    const colorPercentage = 1 - pollutionPercentage;
 
@@ -695,12 +724,6 @@ function display() {
       }
       for (let t = 0; t < tiles[c].length; t++) {
          tiles[c][t].draw();
-      }
-   }
-
-   for (let c = 0; c < tiles.length; c++) {
-      for (let t = 0; t < tiles[c].length; t++) {
-         tiles[c][t].drawInfo();
       }
    }
 
@@ -774,12 +797,22 @@ function display() {
    }
 
    if (boatDrag) {
-      ctx.drawImage(boat, mouseX - 50, mouseY - 50, 100, 100);
+      ctx.drawImage(boat, mouse.x - 50, mouse.y - 50, 100, 100);
    }
 
    reputationEl.innerHTML = toStat(reputation);
 
    trading();
+
+   for (let c = 0; c < tiles.length; c++) {
+      for (let t = 0; t < tiles[c].length; t++) {
+         tiles[c][t].drawInfo();
+      }
+   }
+
+   if (trade) {
+      ctx.drawImage(chosenTrade.trade, chosenTrade.x, chosenTrade.y - 150, 150, 150);
+   }
 
    requestAnimationFrame(display);
 }
@@ -798,21 +831,20 @@ function trading() {
       if (chosenTrade && chosenTrade.trade !== 'done') {
          trade = true;
       } else {
-         randomInterval = getRandInt(50, 1000);
+         randomInterval = getRandInt(tradeInterval);
          repetition = 0;
       }
    }
    if (trade) {
       displayDuration++;
-      ctx.drawImage(chosenTrade.trade, chosenTrade.x, chosenTrade.y - 150, 150, 150);
       if (
-         mouseX > chosenTrade.x + 47 &&
-         mouseX < chosenTrade.x + 86 &&
-         mouseY > chosenTrade.y - 69 &&
-         mouseY < chosenTrade.y - 55
+         mouse.x > chosenTrade.x + 47 &&
+         mouse.x < chosenTrade.x + 86 &&
+         mouse.y > chosenTrade.y - 69 &&
+         mouse.y < chosenTrade.y - 55
       ) {
          document.body.style.cursor = 'pointer';
-         if (mouseDown) {
+         if (mouse.down) {
             document.body.style.cursor = 'default';
             tradeOptions.style.display = 'block';
          }
@@ -823,7 +855,17 @@ function trading() {
          trade = false;
          displayDuration = 0;
          repetition = 0;
-         randomInterval = getRandInt(50, 1000);
+         randomInterval = getRandInt(tradeInterval);
+      }
+      if (
+         mouse.x > chosenTrade.x &&
+         mouse.x < chosenTrade.x + 132 &&
+         mouse.y > chosenTrade.y - 121 &&
+         mouse.y < chosenTrade.y - 20 &&
+         mouse.down
+      ) {
+         mouse.clickedOn = 'trade';
+         console.log('clicked');
       }
    }
 }
@@ -840,6 +882,6 @@ function chooseTradeOption() {
    chosenTrade.trade = 'done';
    displayDuration = 0;
    repetition = 0;
-   randomInterval = getRandInt(50, 1000);
+   randomInterval = getRandInt(tradeInterval);
    tradeOptions.style.display = 'none';
 }

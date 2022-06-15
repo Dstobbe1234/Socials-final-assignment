@@ -24,9 +24,9 @@ body {
 }
 
 #sidebar {
-   padding:0px;
+   padding: 0px;
    position: relative;
-   margin-top: 5px;
+   margin-top: 60px;
    background-color: rgb(175, 175, 175);
    /* margin-left: 15px; */
    width: 200px;
@@ -59,7 +59,7 @@ body {
 
 img {
    width: 40px;
-   margin-bottom:none;
+   margin-bottom: none;
 }
 
 #restaurant {
@@ -78,13 +78,13 @@ img {
 
 #inventory {
    margin-top: 20px;
-   height: 73%;
+   height: 51%;
    overflow-y: scroll;
    background: white;
 }
 #boat {
-   width:100px;
-   margin:0px;
+   width: 100px;
+   margin: 0px;
 }
 #buy {
    margin: 0px;
@@ -127,7 +127,7 @@ canvas {
 }
 
 p {
-   margin:none;
+   margin: none;
 }
 
 btn {
