@@ -42,6 +42,7 @@ const tradeInfo = document.getElementById('tradeInfo');
 const payMEBtn = document.getElementById('payMonthlyExpenses');
 const evadeBtn = document.getElementById('evade');
 const monthlyExpensesTot = document.getElementById('monthlyExpensesTot');
+const attack = document.getElementById('attack');
 
 function getRandInt(min, max) {
    if (Array.isArray(min)) {
@@ -61,7 +62,7 @@ let mouse = {
 let dragRestaurant = false;
 let numberOfRestaurants = 1;
 let money = 0;
-const tradeInterval = [1, 1];
+const tradeInterval = [50, 500];
 let randomInterval = getRandInt(tradeInterval);
 let randomX, randomY;
 let randomIndex;
@@ -260,6 +261,7 @@ class tile {
             this.minimumWage = getRandInt(7, 550);
          }
       }
+
 
       if (this.inside && dragRestaurant && !this.clouded) {
          ctx.drawImage(restaurantImg, this.x, this.y, this.size, this.size);
@@ -588,8 +590,8 @@ function toStat(value) {
 
 function changeMoney() {
    if (!modalBool) {
-      money += 100 * reputation;
-      income += 100 * reputation;
+      money += 25 * reputation;
+      income += 25 * reputation;
    }
    amountEl.innerHTML = toStat(money);
 }
@@ -694,14 +696,32 @@ function competitionGrowth() {
       let randomIndex = getRandInt(0, availableTiles.length - 1);
       availableTiles[randomIndex].status = 'competition';
    }
-   competitionInterval = getRandInt(5000, 15000);
+   //competitionInterval = getRandInt(5000, 15000);
 }
 
-let competitionInterval = getRandInt(5000, 15000);
-setInterval(competitionGrowth, competitionInterval);
+// function competitionAttack() {
+//   if (reputation >= 5) {
+//      mergedTiles = tiles.flat(1);
+//      let competitionArray = []
+//      for(let x = 0; x < mergedTiles.length; x++) {
+//         if(mergedTiles[x].status === 'competition') {
+//            competitionArray.push(mergedTiles[x])
+//         }
+//      }
+//      let randomCompetition = getRandInt(0, mergedTiles.length - 1)
+//      ctx.drawImage(attack, 100, 100, 1000, 1000)
+//      reputation -= 5
+//   }
+// }
+// setInterval(competitionAttack, getRandInt(500, 600))
+
+
+// let competitionInterval = getRandInt(5000, 15000);
+// setInterval(competitionGrowth, competitionInterval);
 
 // Animation loop
 function display() {
+   
    mergedTiles = tiles.flat(1);
    // Draw world map
    const colorPercentage = 1 - pollutionPercentage;
@@ -716,7 +736,6 @@ function display() {
 
    ctx.fillRect(0, 0, cnv.width, cnv.height);
    ctx.drawImage(background, 0, 0, cnv.width, cnv.height);
-
    // Draw all the tiles
    for (let c = 0; c < tiles.length; c++) {
       for (let t = 0; t < tiles[c].length; t++) {
