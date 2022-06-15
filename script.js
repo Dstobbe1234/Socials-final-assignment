@@ -696,7 +696,7 @@ function competitionGrowth() {
       let randomIndex = getRandInt(0, availableTiles.length - 1);
       availableTiles[randomIndex].status = 'competition';
    }
-   //competitionInterval = getRandInt(5000, 15000);
+   competitionInterval = getRandInt(5000, 15000);
 }
 
 // function competitionAttack() {
@@ -716,8 +716,8 @@ function competitionGrowth() {
 // setInterval(competitionAttack, getRandInt(500, 600))
 
 
-// let competitionInterval = getRandInt(5000, 15000);
-// setInterval(competitionGrowth, competitionInterval);
+let competitionInterval = getRandInt(5000, 15000);
+setInterval(competitionGrowth, competitionInterval);
 
 // Animation loop
 function display() {
